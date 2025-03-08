@@ -1,5 +1,6 @@
 import { db } from "./db";
 import bcrypt from "bcrypt";
+// import bcrypt from "bcryptjs";
 
 // Get current year for password generation
 const currentYear = new Date().getFullYear();
