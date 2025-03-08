@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SERVICE_PROVIDER
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  displayName String // Human-readable name (e.g., "Store Manager")
+  roleName    String   @unique // System name (e.g., "store_manager")
+  description String?
+  permissions String[] // Array of permission strings
+  users       User[]   @relation("UserRoles")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([roleName])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  firstName     String
+  lastName      String
+  phone         String    @unique
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  jobTitle      String?
+  roles         Role[]    @relation("UserRoles") // Updated to support multiple roles
+  // role          UserRole  @default(USER)
+  password      String?
+  status        Boolean   @default(true)
+  accounts      Account[]
+  sessions      Session[]
+  savings       Saving[]
+  blogs         Blog[]
+  isVerfied     Boolean   @default(false)
+  token         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  roleId        String?
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  imageUrl    String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+}
+
+model Saving {
+  id          String    @id @default(cuid())
+  amount      Int
+  month       String
+  name        String
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentDate DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+}
+
+model Blog {
+  id            String       @id @default(cuid())
+  title         String
+  slug          String       @unique
+  description   String?      @db.Text // Meta description for SEO
+  thumbnail     String?
+  content       String?      @db.Text
+  published     Boolean?     @default(false)
+  featured      Boolean?     @default(false)
+  author        User         @relation(fields: [authorId], references: [id])
+  authorId      String
+  authorName    String
+  authorImage   String?
+  authorTitle   String?
+  category      BlogCategory @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  categoryTitle String
+  readingTime   Int? // Estimated reading time in minutes
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model BlogCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  blogs     Blog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
