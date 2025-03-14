@@ -4,7 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Providers from "@/components/Providers";
 import Head from "next/head";
-import { useEffect } from "react";
+import PWAServiceWorker from "@/components/PWAServiceWorker"; // Import the client component
 
 const inter = Rethink_Sans({ subsets: ["latin"], display: "swap" });
 
@@ -18,19 +18,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((registration) => {
-          console.log("Service Worker registered with scope:", registration.scope);
-        })
-        .catch((error) => {
-          console.error("Service Worker registration failed:", error);
-        });
-    }
-  }, []);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <Head>
@@ -48,6 +35,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>{children}</Providers>
         <Toaster />
+        <PWAServiceWorker /> {/* ✅ Register SW from a client component */}
       </body>
     </html>
   );
