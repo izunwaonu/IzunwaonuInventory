@@ -7,8 +7,8 @@ import Providers from "@/components/Providers";
 const inter = Rethink_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Ronix Fit Savers",
-  description: "Join Ronix Savings Group",
+  title: "IzuInventory",
+  description: "Simplify Stock, Amplify Business",
 };
 export default function RootLayout({
   children,
