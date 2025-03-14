@@ -75,7 +75,7 @@ export default async function page() {
         <div className="relative rounded-lg overflow-hidden">
           <BorderBeam />
           <Image
-            src="/images/dash-2.webp"
+            src="/images/dash-3.png"
             alt="This is the dashbaord Image"
             width={1775}
             height={1109}
