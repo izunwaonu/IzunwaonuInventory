@@ -2,162 +2,161 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  Users,
-  Layout,
-  FileText,
+  Package,
+  Truck,
+  ShoppingCart,
   BarChart2,
-  CloudUpload,
-  Edit3,
-  Lock,
-  Database,
-  BarChart,
+  CreditCard,
+  FileText,
+  Settings,
+  Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const FeatureTabs = () => {
   const features = [
     {
-      id: "authentication",
-      icon: Users,
-      tab: "Authentication",
-      title: "Advanced Authentication",
+      id: "inventory",
+      icon: Package,
+      tab: "Inventory",
+      title: "Smart Inventory Management",
       description:
-        "Secure and flexible authentication system with role-based access control and multi-provider support.",
+        "Track, manage, and optimize your inventory with real-time updates and powerful automation tools.",
       subFeatures: [
-        "NextAuth integration with GitHub, Google, and credentials",
-        "Role-based access control for managing user permissions",
-        "Session management with JWT and secure cookies",
-        "Customizable login and registration flows",
-        "Support for multiple roles and hierarchical permissions",
-        "Secure password handling with encryption",
-        "Social login for quick and easy access",
-        "Token expiration and refresh mechanisms",
+        "Real-time stock tracking across multiple warehouses",
+        "Automated reorder points and low stock alerts",
+        "Batch tracking and serial number management",
+        "Barcode scanning for quick inventory updates",
+        "Item categorization and custom attributes",
+        "Inventory valuation reports (FIFO, LIFO, Average)",
+        "Stock adjustment and inventory counts",
+        "Expiration date tracking and management",
       ],
     },
     {
-      id: "dashboard",
-      icon: Layout,
-      tab: "Dashboard",
-      title: "Dynamic Dashboard",
+      id: "purchasing",
+      icon: Truck,
+      tab: "Purchasing",
+      title: "Streamlined Purchasing",
       description:
-        "Beautifully designed, responsive dashboard with data visualization and management tools.",
+        "Automate your purchasing workflow from purchase orders to receiving inventory.",
       subFeatures: [
-        "Fully responsive and mobile-friendly interface",
-        "Customizable widgets for key metrics",
-        "Real-time data updates with server-side rendering",
-        "User-friendly navigation and layout",
-        "Integrated charts and data visualization tools",
-        "Dark and light mode support",
-        "Role-specific dashboard views",
-        "Seamless integration with backend APIs",
+        "Create and manage purchase orders effortlessly",
+        "Track vendor performance and order history",
+        "Automated purchase order approval workflows",
+        "Multi-currency support for international purchases",
+        "Partial receiving and backorder management",
+        "Vendor catalog integration and price tracking",
+        "Purchase planning based on sales forecasts",
+        "Custom email templates for vendor communication",
       ],
     },
     {
-      id: "forms",
-      icon: FileText,
-      tab: "Forms",
-      title: "Reusable Form Components",
+      id: "sales",
+      icon: ShoppingCart,
+      tab: "Sales Orders",
+      title: "Efficient Sales Management",
       description:
-        "Streamline your workflows with reusable and customizable form components.",
+        "Manage your entire sales process from quotation to fulfillment and invoicing.",
       subFeatures: [
-        "Prebuilt form inputs with validation",
-        "Support for text, numbers, dates, and dropdowns",
-        "Integration with React Hook Form for effortless validation",
-        "Customizable error handling and feedback",
-        "Tooltips and inline helper text support",
-        "Reusable form sections for consistent design",
-        "Dynamic forms with conditional fields",
-        "Optimized performance for large forms",
+        "Streamlined quote-to-cash workflow",
+        "Customizable sales order templates",
+        "Inventory reservation for pending orders",
+        "Real-time availability checking during order entry",
+        "Partial shipments and backorder handling",
+        "Customer price lists and discount management",
+        "Order status tracking and notifications",
+        "Integration with shipping carriers for label printing",
       ],
     },
     {
-      id: "tables",
+      id: "reports",
       icon: BarChart2,
-      tab: "Data Tables",
-      title: "Advanced Data Tables",
+      tab: "Analytics",
+      title: "Advanced Analytics & Reports",
       description:
-        "Manage and display data effortlessly with customizable and powerful data tables.",
+        "Gain insights into your inventory performance with customizable reports and dashboards.",
       subFeatures: [
-        "Pagination, sorting, and filtering out-of-the-box",
-        "Custom column rendering with advanced formatting",
-        "Export data to CSV, Excel, or PDF formats",
-        "Integrated search functionality",
-        "Server-side data fetching and caching",
-        "Dynamic row actions for CRUD operations",
-        "Role-based data access and visibility",
-        "Seamless integration with Prisma and backend APIs",
+        "Inventory turnover and aging reports",
+        "Sales performance by product and category",
+        "Demand forecasting and trend analysis",
+        "Customizable dashboards for KPI tracking",
+        "Dead stock identification and management",
+        "COGS and profit margin calculations",
+        "Export reports to Excel, PDF, or CSV formats",
+        "Scheduled report delivery via email",
       ],
     },
     {
-      id: "upload",
-      icon: CloudUpload,
-      tab: "Image Upload",
-      title: "Image Upload",
+      id: "billing",
+      icon: CreditCard,
+      tab: "Billing",
+      title: "Seamless Billing & Invoicing",
       description:
-        "Effortless image uploads powered by UploadThing, supporting both single and multiple file uploads.",
+        "Generate professional invoices, track payments, and manage your accounts receivable.",
       subFeatures: [
-        "Single image upload for profile or cover images",
-        "Multiple image uploads for galleries or portfolios",
-        "Drag-and-drop upload interface",
-        "Validation for file types and sizes",
-        "Previews of uploaded images",
-        "Seamless integration with backend storage solutions",
-        "Error handling for upload failures",
-        "Optimized for fast performance and secure uploads",
+        "Automated invoice generation from sales orders",
+        "Multiple payment gateway integrations",
+        "Recurring billing for subscription products",
+        "Credit memo and refund processing",
+        "Payment reminder workflows and aging reports",
+        "Tax calculation and management",
+        "Customer statements and payment history",
+        "Multi-currency support for international sales",
       ],
     },
     {
-      id: "editor",
-      icon: Edit3,
-      tab: "Rich Text",
-      title: "Rich Text Editor",
+      id: "documents",
+      icon: FileText,
+      tab: "Documents",
+      title: "Document Management",
       description:
-        "Seamlessly create and edit rich content using an integrated Quill editor.",
+        "Create, customize, and manage all your inventory-related documents in one place.",
       subFeatures: [
-        "Support for text formatting (bold, italic, underline)",
-        "Image and media embedding",
-        "Customizable toolbar options",
-        "Support for markdown and HTML content",
-        "Error handling for invalid input",
-        "Dynamic content rendering with previews",
-        "Integration with backend for content storage",
-        "Support for multiple languages",
+        "Customizable templates for all business documents",
+        "Batch printing for picking lists and packing slips",
+        "Electronic signature capture for deliveries",
+        "Document versioning and history tracking",
+        "Automatic PDF generation and storage",
+        "Email integration for document sharing",
+        "Barcode and QR code generation for documents",
+        "Custom branding options for all documents",
       ],
     },
     {
-      id: "security",
-      icon: Lock,
-      tab: "Security",
-      title: "Secure Authentication",
+      id: "integrations",
+      icon: Settings,
+      tab: "Integrations",
+      title: "Powerful Integrations",
       description:
-        "Role-based authentication system with customizable access control.",
+        "Connect IzuInventory with your favorite tools and platforms for a seamless workflow.",
       subFeatures: [
-        "Password encryption using secure algorithms",
-        "Token-based authentication with expiry settings",
-        "Multi-factor authentication support",
-        "Granular role-based access permissions",
-        "Session management for active users",
-        "Audit trails and logging for sensitive actions",
-        "IP-based access restrictions",
-        "Secure API token generation for developers",
+        "E-commerce integration (Shopify, WooCommerce, Amazon)",
+        "Accounting software connection (QuickBooks, Xero)",
+        "CRM integration for customer data synchronization",
+        "Shipping carrier APIs (UPS, FedEx, DHL)",
+        "Payment processor connections",
+        "POS system integration for retail operations",
+        "EDI support for B2B transactions",
+        "API access for custom integrations",
       ],
     },
     {
-      id: "database",
-      icon: Database,
-      tab: "Database",
-      title: "Prisma ORM",
+      id: "access",
+      icon: Users,
+      tab: "User Access",
+      title: "Role-Based Access Control",
       description:
-        "Leverage Prisma ORM for robust and scalable database management in TypeScript.",
+        "Manage user permissions and ensure data security with granular access controls.",
       subFeatures: [
-        "Schema-driven database design",
-        "Support for relational and non-relational databases",
-        "Migrations and seeding out-of-the-box",
-        "Type-safe database queries",
-        "GraphQL and REST API integration",
-        "Support for nested queries and relations",
-        "Performance optimization tools",
-        "Developer-friendly syntax and tooling",
+        "Role-based permission management",
+        "User activity logs and audit trails",
+        "Warehouse-specific access restrictions",
+        "Custom approval workflows by user role",
+        "Two-factor authentication support",
+        "Single sign-on (SSO) integration",
+        "Mobile app access with same permissions",
+        "Time-based access restrictions for temporary users",
       ],
     },
   ];
@@ -167,21 +166,21 @@ const FeatureTabs = () => {
       {/* Header Section */}
       <div className="max-w-6xl mx-auto px-6 mb-16 text-center">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
-          All the Essential Features
-          <br /> for a{" "}
-          <span className="inline-block bg-gradient-to-r from-orange-200 via-purple-200 to-purple-300 px-4 rounded-lg">
-            Successful SaaS
+          Powerful Features for
+          <br /> Modern{" "}
+          <span className="inline-block bg-gradient-to-r from-blue-200 via-teal-200 to-teal-300 px-4 rounded-lg">
+            Inventory Management
           </span>
         </h2>
         <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto">
-          From payments to an admin dashboard,
-          <br /> this starter kit covers everything you need.
+          From stock tracking to analytics,
+          <br /> IzuInventory helps you manage your inventory with ease.
         </p>
       </div>
 
       {/* Tabs Component */}
       <div className="w-full max-w-6xl mx-auto px-6">
-        <Tabs defaultValue="authentication" className="w-full">
+        <Tabs defaultValue="inventory" className="w-full">
           {/* Tab Buttons */}
           <TabsList className="flex items-center w-full gap-2 bg-white/50 backdrop-blur-sm p-2 rounded-full shadow-sm mb-8 flex-wrap justify-center">
             {features.map((feature) => {
@@ -190,7 +189,7 @@ const FeatureTabs = () => {
                 <TabsTrigger
                   key={feature.id}
                   value={feature.id}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full data-[state=active]:bg-purple-100 data-[state=active]:text-purple-900 transition-all duration-300 text-slate-600"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full data-[state=active]:bg-teal-100 data-[state=active]:text-teal-900 transition-all duration-300 text-slate-600"
                 >
                   <Icon className="w-5 h-5" />
                   <span className="hidden md:inline font-medium">
@@ -217,8 +216,8 @@ const FeatureTabs = () => {
               >
                 <div className="flex items-start gap-6">
                   {/* Feature Icon */}
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center shadow-sm">
-                    <feature.icon className="w-8 h-8 text-purple-600" />
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 flex items-center justify-center shadow-sm">
+                    <feature.icon className="w-8 h-8 text-teal-600" />
                   </div>
 
                   {/* Content */}
@@ -234,9 +233,9 @@ const FeatureTabs = () => {
                     <ul className="space-y-4">
                       {feature.subFeatures.map((item, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-1">
+                          <div className="w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0 mt-1">
                             <svg
-                              className="w-3 h-3 text-purple-600"
+                              className="w-3 h-3 text-teal-600"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"

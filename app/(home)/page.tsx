@@ -16,6 +16,9 @@ import {
   Folder,
   Layout,
   Rocket,
+  Layers,
+  Package,
+  BarChart2,
 } from "lucide-react";
 import React from "react";
 import Showcase from "@/components/frontend/showcase";
@@ -27,42 +30,42 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 import FeatureTabs from "@/components/frontend/SmoothTabs";
 
 export default async function page() {
-  const currentUsers = 300;
+  const currentUsers = 1570;
   return (
     <section>
-      <ReUsableHero
-        theme="light"
-        announcement={{
-          text: "Introducing Hubstack Advanced - Launch Your app in days",
-        }}
-        title={
-          <>
-            The Ultimate Next.js Agency
-            <br />& Fullstack SaaS Starter Kit
-          </>
-        }
-        mobileTitle="Ultimate Next.js Agency & SaaS Kit"
-        subtitle="You will get a premium Next.js 15 starter kit with a complete agency website, user & admin dashboards, full authentication system, blog platform, documentation system, and project showcase features - everything you need to launch your digital agency or SaaS product in days instead of months."
-        buttons={[
-          {
-            label: "Get the Kit Now",
-            href: "https://gmukejohnbaptist.gumroad.com/l/hubstack-simple-auth",
-            primary: true,
-          },
-          {
-            label: "View Demo",
-            href: "/#demo",
-          },
-        ]}
-        icons={[
-          { icon: Code2, position: "left" },
-          { icon: Layout, position: "right" }, // Changed to Layout for dashboard representation
-          { icon: Rocket, position: "center" }, // Changed to Rocket for launch/speed representation
-        ]}
-        backgroundStyle="neutral"
-        className="min-h-[70vh]"
-        userCount={currentUsers > 10 ? currentUsers : null}
-      />
+      <ReUsableHero 
+  theme="light"
+  announcement={{
+    text: "Introducing IzuInventory - Streamline Your Inventory Management",
+  }}
+  title={
+    <>
+      Modern Inventory Management
+      <br />Simplified for Your Business
+    </>
+  }
+  mobileTitle="Modern Inventory Management Simplified"
+  subtitle="IzuInventory provides a comprehensive solution for businesses to track products, manage stock across multiple locations, process sales orders, and generate essential reports. Designed for both small businesses and growing enterprises, our system helps you minimize stockouts, reduce excess inventory, and make data-driven decisions."
+  buttons={[
+    {
+      label: "Get Started Free",
+      href: "/register",
+      primary: true,
+    },
+    {
+      label: "Book a Demo",
+      href: "/#demo",
+    },
+  ]}
+  icons={[
+    { icon: Package, position: "left" },    // Package icon for inventory
+    { icon: BarChart2, position: "right" }, // Charts for analytics/reporting
+    { icon: Layers, position: "center" },   // Layers for multi-location support
+  ]}
+  backgroundStyle="neutral"
+  className="min-h-[70vh]"
+  userCount={currentUsers > 10 ? currentUsers : null}
+/>
       <GridBackground>
         <div className="px-8 py-16 ">
           <TechStackGrid />
@@ -87,15 +90,15 @@ export default async function page() {
 
       <div id="demo" className="py-16 max-w-6xl mx-auto relative">
         <Iframe
-          url="https://www.youtube.com/embed/TcyKfjikcIA?si=naix1jg9I2r0CnSu"
+          url="https://www.youtube.com/embed/HSXXGl4QCbA?si=-Dz_mOPmAjM4aqJt"
           width="100%"
           className="h-[32rem] rounded-lg"
           display="block"
           position="relative"
         />
-        <div className="pb-16">
+        {/* <div className="pb-16">
           <Showcase />
-        </div>
+        </div> */}
         <div className="py-8">
           <PricingCard />
         </div>
@@ -107,3 +110,4 @@ export default async function page() {
     </section>
   );
 }
+

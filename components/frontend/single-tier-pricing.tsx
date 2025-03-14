@@ -3,26 +3,27 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  RocketIcon,
-  StarIcon,
-  HeartIcon,
-  TimerIcon,
-  MessageCircleIcon,
+  BarChart2,
+  CheckCircle,
+  RefreshCw,
+  Clock,
+  MessageCircle,
+  Package,
 } from "lucide-react";
 
 const PricingCard = ({ theme = "light" }) => {
   const isDark = theme === "dark";
-  const price = 100.0;
-  const originalPrice = 300.0;
+  const price = 79.99;
+  const originalPrice = 149.99;
   return (
     <div
       id="pricing"
       className={`w-full grid grid-cols-12 max-w-5xl ${isDark ? "bg-slate-900" : "bg-white"} mx-auto rounded-xl overflow-hidden shadow-sm`}
     >
-      <div className="col-span-full md:col-span-7  p-8 md:p-12 relative overflow-hidden">
+      <div className="col-span-full md:col-span-7 p-8 md:p-12 relative overflow-hidden">
         {/* Gradient overlay */}
         <div
-          className={`absolute inset-0 ${isDark ? "bg-gradient-to-br from-blue-900/20 to-purple-900/20" : "bg-gradient-to-br from-blue-50 to-purple-50"}`}
+          className={`absolute inset-0 ${isDark ? "bg-gradient-to-br from-teal-900/20 to-blue-900/20" : "bg-gradient-to-br from-teal-50 to-blue-50"}`}
         />
 
         <div className="space-y-8 relative z-10">
@@ -31,28 +32,27 @@ const PricingCard = ({ theme = "light" }) => {
             <h2
               className={`text-5xl font-extrabold tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}
             >
-              One-time purchase.
+              Streamline your
             </h2>
-            <h2 className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-300 to-amber-500">
-              Unlimited projects.
+            <h2 className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-600">
+              inventory management.
             </h2>
           </div>
           {/* Description */}
           <p
             className={`text-xl leading-relaxed ${isDark ? "text-slate-300" : "text-slate-600"}`}
           >
-            HubStack is a one-time purchase with no recurring fees. You get
-            access to the repository and can use it for as many projects as you
-            want.
+            IzuInventory offers a complete inventory solution with no hidden costs. 
+            Pay once and manage your stock, orders, and business operations with ease.
           </p>
           {/* Upselling */}
-          <div className="p-4 bg-gradient-to-r from-amber-100 to-amber-50 rounded-xl border border-amber-200/50">
-            <span className="text-amber-700 font-medium ">
-              <span className="text-xl">🎉</span> Looking for the advanced
-              version checkout{" "}
+          <div className="p-4 bg-gradient-to-r from-teal-100 to-teal-50 rounded-xl border border-teal-200/50">
+            <span className="text-teal-700 font-medium ">
+              <span className="text-xl">🚀</span> Need enterprise features? Check out{" "}
               <a className="font-bold underline" href="#">
-                Hubstack Advanced here
+                IzuInventory Enterprise
               </a>
+              {" "}with multi-location support
             </span>
           </div>
         </div>
@@ -67,12 +67,12 @@ const PricingCard = ({ theme = "light" }) => {
             <h3
               className={`text-2xl font-bold ${isDark ? "text-slate-200" : "text-slate-800"}`}
             >
-              Lifetime access
+              Professional Plan
             </h3>
             <p
               className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}
             >
-              for one developer
+              for small to medium businesses
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -84,75 +84,81 @@ const PricingCard = ({ theme = "light" }) => {
               </div>
               <div className="flex items-baseline gap-2">
                 <span
-                  className={`text-6xl font-black tracking-tight ${isDark ? "text-amber-300" : "text-amber-600"}`}
+                  className={`text-6xl font-black tracking-tight ${isDark ? "text-teal-300" : "text-teal-600"}`}
                 >
                   ${price}
+                </span>
+                <span className={`${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  / month
                 </span>
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-8">
-          {/* Discount Badge
-          <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-amber-100 to-amber-50 rounded-xl border border-amber-200/50">
-            <span className="text-amber-700 font-medium flex items-center gap-2">
-              <span className="text-xl">🎉</span> Get $50 off with code
-              NEWYEAR50
-            </span>
-          </div> */}
-
           {/* Features List */}
           <div className="space-y-6">
             <div className="flex gap-4">
-              <StarIcon className="w-6 h-6 text-blue-500" />
+              <Package className="w-6 h-6 text-teal-500" />
               <div className="space-y-1">
                 <p
                   className={`font-bold text-lg ${isDark ? "text-slate-200" : "text-slate-800"}`}
                 >
-                  All features included
+                  Complete inventory solution
                 </p>
                 <p
                   className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}
                 >
-                  Authentication, billing, user management, and more.
+                  Track stock, manage orders, and handle purchasing
                 </p>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <HeartIcon className="w-6 h-6 text-pink-500" />
+              <RefreshCw className="w-6 h-6 text-blue-500" />
               <div className="space-y-1">
                 <p
                   className={`font-bold text-lg ${isDark ? "text-slate-200" : "text-slate-800"}`}
                 >
-                  Lifetime updates
+                  Regular updates
                 </p>
                 <p
                   className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}
                 >
-                  Last update to codebase: 14 days ago
+                  Latest update: New barcode scanning feature
                 </p>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <RocketIcon className="w-6 h-6 text-purple-500" />
+              <BarChart2 className="w-6 h-6 text-indigo-500" />
               <div>
                 <p
                   className={`font-bold text-lg ${isDark ? "text-slate-200" : "text-slate-800"}`}
                 >
-                  Saves you 99+ hours
+                  Advanced reporting & analytics
                 </p>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <MessageCircleIcon className="w-6 h-6 text-green-500" />
+              <CheckCircle className="w-6 h-6 text-green-500" />
               <div>
                 <p
                   className={`font-bold text-lg ${isDark ? "text-slate-200" : "text-slate-800"}`}
                 >
-                  Exclusive discord server for support
+                  Up to 5 user accounts included
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <MessageCircle className="w-6 h-6 text-orange-500" />
+              <div>
+                <p
+                  className={`font-bold text-lg ${isDark ? "text-slate-200" : "text-slate-800"}`}
+                >
+                  Priority email & chat support
                 </p>
               </div>
             </div>
@@ -163,14 +169,18 @@ const PricingCard = ({ theme = "light" }) => {
             className={`w-full h-14 text-lg font-bold tracking-wide
               ${
                 isDark
-                  ? "bg-gradient-to-r from-amber-300 to-amber-400 text-slate-900 hover:from-amber-400 hover:to-amber-500"
-                  : "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700"
+                  ? "bg-gradient-to-r from-teal-400 to-teal-500 text-slate-900 hover:from-teal-500 hover:to-teal-600"
+                  : "bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:from-teal-600 hover:to-teal-700"
               } shadow-lg hover:shadow-xl transition-all duration-200`}
           >
-            <a href="https://gmukejohnbaptist.gumroad.com/l/hubstack-simple-auth">
-              Buy HubStack for Next.js →
+            <a href="#">
+              Start your 14-day free trial →
             </a>
           </Button>
+          
+          <p className={`text-center text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            No credit card required. Cancel anytime.
+          </p>
         </CardContent>
       </Card>
     </div>

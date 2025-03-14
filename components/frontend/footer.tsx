@@ -9,31 +9,25 @@ import Logo from "../global/Logo";
 export default function Footer() {
   const navItems = [
     { label: "Home", href: "/" },
+    { label: "Features", href: "/#features" },
     { label: "Pricing", href: "/#pricing" },
     { label: "Documentation", href: "/docs" },
-    { label: "Showcase", href: "/showcase" },
-    { label: "Agency Site", href: "/agency" },
-    // { label: "Blog", href: "/blog" },
-    { label: "Support", href: "https://wa.me/message/5USU26346OWRF1" },
+    { label: "Integrations", href: "/integrations" },
+    { label: "Support", href: "/support" },
   ];
 
   const serviceItems = [
-    { label: "Next.js Starter Kit", href: "/" },
-    {
-      label: "Need Custom Development",
-      href: "https://wa.me/message/5USU26346OWRF1",
-    },
-    {
-      label: "Need Deployment Support",
-      href: "https://wa.me/message/5USU26346OWRF1",
-    },
-    {
-      label: "Need UI Customization",
-      href: "https://wa.me/message/5USU26346OWRF1",
-    },
+    { label: "Inventory Management", href: "/features/inventory" },
+    { label: "Order Processing", href: "/features/orders" },
+    { label: "Barcode Scanning", href: "/features/barcode" },
+    { label: "Reports & Analytics", href: "/features/reports" },
+    { label: "Multi-location Support", href: "/features/multi-location" },
+    { label: "Mobile App Access", href: "/features/mobile" },
   ];
+  
   const router = useRouter();
   const { email, fullAddress, mainPhone } = getContactInfo();
+  
   return (
     <footer className="bg-gray-900 text-white py-16 px-4 md:px-8 lg:px-16 rounded-t-[2.5rem] relative overflow-hidden">
       {/* Background gradient effects */}
@@ -50,23 +44,23 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto mb-16 flex flex-col md:flex-row justify-between items-start md:items-center">
           <div className="mb-8 md:mb-0">
             <h2 className="text-2xl md:text-3xl font-semibold mb-4 bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
-              Build faster with HubStack
+              Streamline your inventory with IzuInventory
             </h2>
             <p className="text-gray-400 max-w-xl text-base">
-              Start your next project with our premium starter kit. Get all the
-              features you need to build modern web applications.
+              Manage your stock effortlessly with our comprehensive inventory solution. 
+              Track items, process orders, and generate reports with ease.
             </p>
           </div>
           <div className="flex gap-4 md:flex-row flex-col">
             <button
-              onClick={() => router.push("/contact")}
+              onClick={() => router.push("/demo")}
               className="px-6 md:!py-1 py-3 border border-gray-700 hover:border-emerald-500 rounded-full text-gray-300 hover:text-emerald-400 transition-all duration-300 block"
             >
-              Get Support
+              Request Demo
             </button>
             <ThemeButton
-              href="https://gmukejohnbaptist.gumroad.com/l/hubstack-simple-auth"
-              title="Purchase Now"
+              href="/signup"
+              title="Start Free Trial"
             />
           </div>
         </div>
@@ -79,7 +73,7 @@ export default function Footer() {
               <Logo variant="dark" />
               <div className="flex flex-col mt-6">
                 <h3 className="text-base font-semibold mb-4 text-gray-200">
-                  Social Media Links
+                  Connect With Us
                 </h3>
                 <div className="flex gap-4">
                   {[
@@ -126,10 +120,10 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Services */}
+            {/* Features */}
             <div className="lg:col-span-3">
               <h3 className="text-base font-semibold mb-4 text-gray-200">
-                Services
+                Features
               </h3>
               <ul className="space-y-3">
                 {serviceItems.slice(0, 6).map((service, i) => (
@@ -171,8 +165,6 @@ export default function Footer() {
                   Address:
                   <br />
                   {fullAddress}
-                  {/* <br />
-                  Wellness City, 56789 */}
                 </li>
               </ul>
             </div>
@@ -186,25 +178,25 @@ export default function Footer() {
                 href="/"
                 className="hover:text-emerald-400 transition-colors"
               >
-                Hubstack
+                IzuInventory
               </Link>{" "}
               |
               <Link
-                href="#"
+                href="/privacy"
                 className="hover:text-emerald-400 transition-colors ml-2"
               >
                 Privacy Policy
               </Link>{" "}
               |
               <Link
-                href="#"
+                href="/terms"
                 className="hover:text-emerald-400 transition-colors ml-2"
               >
-                Terms & Conditions
+                Terms of Service
               </Link>{" "}
               |
               <Link
-                href="#"
+                href="/accessibility"
                 className="hover:text-emerald-400 transition-colors ml-2"
               >
                 Accessibility

@@ -399,7 +399,7 @@ const ReUsableHero: React.FC<HeroProps> = ({
               <div className="">
                 <StarRating count={5} />
                 <p className="dark:text-slate-900">
-                  {userCount} developers use it.
+                  {userCount} Business owners use it.
                 </p>
               </div>
             </div>

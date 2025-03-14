@@ -1,6 +1,6 @@
 export const siteConfig = {
-  name: "Hubstack Starter kit",
-  shortName: "HSK",
+  name: "IzunwaonuInventory",
+  shortName: "IZU",
   description:
     "Providing exceptional healthcare services with compassion and expertise since 2008. Our commitment to excellence has made us a trusted healthcare provider in the region.",
 
@@ -29,11 +29,11 @@ export const siteConfig = {
 
   // Social Media Links
   social: {
-    facebook: "https://facebook.com/kasesehospital",
-    twitter: "https://twitter.com/kasesehospital",
-    instagram: "https://instagram.com/kasesehospital",
-    linkedin: "https://linkedin.com/company/kasesehospital",
-    youtube: "https://youtube.com/kasesehospital",
+    facebook: "https://facebook.com/",
+    twitter: "https://twitter.com/",
+    instagram: "https://instagram.com/",
+    linkedin: "https://linkedin.com/company",
+    youtube: "https://youtube.com/",
   },
 
   // Working Hours

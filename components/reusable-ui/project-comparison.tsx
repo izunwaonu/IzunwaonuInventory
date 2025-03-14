@@ -1,19 +1,22 @@
 import React from "react";
 import {
-  LayoutTemplate,
-  KeyRound,
-  Mail,
-  Database,
-  Palette,
+  Package,
+  AlertTriangle,
+  ShoppingCart,
+  Truck,
+  Users,
+  BarChart2,
+  Map,
   FileText,
-  Search,
-  TableProperties,
-  Upload,
-  CheckCircle,
+  Database,
   Clock,
   Rocket,
   X,
   ArrowRight,
+  CheckCircle,
+  Layers,
+  Bell,
+  DollarSign,
 } from "lucide-react";
 
 interface TimelineStep {
@@ -25,135 +28,135 @@ interface TimelineStep {
   benefit: string;
 }
 
-const ProjectComparison = ({ theme = "light" }) => {
+const InventoryComparison = ({ theme = "light" }) => {
   const steps: TimelineStep[] = [
     {
-      title: "Creating",
-      highlight: "Agency page",
-      duration: 10,
-      icon: <LayoutTemplate className="w-4 h-4" />,
-      painPoint:
-        "Struggling with responsive design, animations, and optimizing for different devices",
-      benefit:
-        "Pre-built, responsive landing pages with modern animations and optimized performance",
-    },
-    {
-      title: "Setting up",
-      highlight: "DB and Authentication w Roles",
-      duration: 15,
-      icon: <KeyRound className="w-4 h-4" />,
-      painPoint:
-        "Implementing secure auth flows, social logins, and session management",
-      benefit:
-        "Production-ready authentication with multiple providers,user roles and secure session handling",
-    },
-    {
-      title: "Setting up",
-      highlight: "Forms & Uploads",
-      duration: 10,
-      icon: <Database className="w-4 h-4" />,
-      painPoint:
-        "Creating forms,Handling file uploads can be really a daunting task where you can spend countless hours ",
-      benefit:
-        "Pre-configured Reusable Form Inputs with react hook form, Re-usable file upload components with uploadthing",
-    },
-    {
-      title: "Setting up",
-      highlight: "Emails",
-      duration: 6,
-      icon: <Mail className="w-4 h-4" />,
-      painPoint: "Wrestling with email templates, testing, and deliverability",
-      benefit:
-        "Ready-to-use email templates with testing and reliable delivery setup",
-    },
-
-    {
-      title: "Designing",
-      highlight: "Modern UI",
-      duration: 18,
-      icon: <Palette className="w-4 h-4" />,
-      painPoint:
-        "Building consistent UI components and maintaining design system",
-      benefit:
-        "Beautiful, ready-to-use UI components following modern design principles",
-    },
-    {
-      title: "Setting up",
-      highlight: "Blog",
+      title: "Managing",
+      highlight: "Product Catalog",
       duration: 8,
-      icon: <FileText className="w-4 h-4" />,
+      icon: <Package className="w-4 h-4" />,
       painPoint:
-        "Creating blog layout, managing content, and implementing features",
+        "Struggling with spreadsheets, duplicate entries, and manual SKU tracking",
       benefit:
-        "Full-featured blog system with content management and rich features",
+        "Centralized product catalog with automated SKU generation and complete product history",
     },
     {
-      title: "Setting up",
-      highlight: "Mdx Docs",
-      duration: 10,
-      icon: <FileText className="w-4 h-4" />,
-      painPoint: "Creating a documentation is very Scary",
-      benefit: "Full-featured Mdx docs ",
-    },
-    {
-      title: "Optimizing",
-      highlight: "SEO",
-      duration: 4,
-      icon: <Search className="w-4 h-4" />,
-      painPoint: "Implementing meta tags, sitemaps, and SEO best practices",
-      benefit:
-        "SEO-optimized structure with automatic meta tags and sitemap generation",
-    },
-    {
-      title: "Building",
-      highlight: "Dashboard & Data tables",
+      title: "Tracking",
+      highlight: "Inventory Levels",
       duration: 12,
-      icon: <TableProperties className="w-4 h-4" />,
+      icon: <Layers className="w-4 h-4" />,
       painPoint:
-        "Creating responsive dashboards and implementing data tables with search , pagination and filters",
+        "Constant stockouts or overstocking due to inaccurate inventory counts",
       benefit:
-        "Ready-to-use dashboard with Working Data tables with extra functionalities like export to excel",
+        "Real-time inventory tracking with automated low-stock alerts and precise quantity management",
     },
-
     {
-      title: "Configuring",
-      highlight: "Forms & Uploads",
-      duration: 6,
-      icon: <Upload className="w-4 h-4" />,
+      title: "Managing",
+      highlight: "Multiple Locations",
+      duration: 10,
+      icon: <Map className="w-4 h-4" />,
       painPoint:
-        "Setting up form validation, file uploads, and progress tracking",
+        "Confusion about stock availability across different warehouses or stores",
       benefit:
-        "Pre-built form components with validation and optimized file uploads",
+        "Unified view of inventory across all locations with easy stock transfer functionality",
+    },
+    {
+      title: "Processing",
+      highlight: "Stock Adjustments",
+      duration: 6,
+      icon: <AlertTriangle className="w-4 h-4" />,
+      painPoint: "No clear record of inventory losses, damages, or adjustments",
+      benefit:
+        "Detailed adjustment tracking with reason codes and complete audit history",
+    },
+    {
+      title: "Handling",
+      highlight: "Sales Orders",
+      duration: 15,
+      icon: <ShoppingCart className="w-4 h-4" />,
+      painPoint:
+        "Order fulfillment delays and missed shipments due to poor visibility",
+      benefit:
+        "Streamlined order processing with real-time inventory checks and automated invoicing",
+    },
+    {
+      title: "Managing",
+      highlight: "Customer Information",
+      duration: 7,
+      icon: <Users className="w-4 h-4" />,
+      painPoint:
+        "Scattered customer data making personalized service difficult",
+      benefit:
+        "Comprehensive customer profiles with purchase history and preference tracking",
+    },
+    {
+      title: "Creating",
+      highlight: "Purchase Orders",
+      duration: 8,
+      icon: <Truck className="w-4 h-4" />,
+      painPoint:
+        "Late reordering leading to stockouts and missed sales opportunities",
+      benefit:
+        "Automated purchase order suggestions based on historical data and current stock levels",
+    },
+    {
+      title: "Analyzing",
+      highlight: "Inventory Reports",
+      duration: 14,
+      icon: <BarChart2 className="w-4 h-4" />,
+      painPoint: "Time-consuming manual report creation with outdated information",
+      benefit:
+        "Real-time analytics and customizable reports for inventory valuation and performance metrics",
+    },
+    {
+      title: "Receiving",
+      highlight: "Stock Notifications",
+      duration: 5,
+      icon: <Bell className="w-4 h-4" />,
+      painPoint:
+        "Missing critical inventory events leading to business disruptions",
+      benefit:
+        "Automated alerts for low stock, incoming shipments, and inventory discrepancies",
+    },
+    {
+      title: "Calculating",
+      highlight: "Inventory Costs",
+      duration: 10,
+      icon: <DollarSign className="w-4 h-4" />,
+      painPoint:
+        "Inaccurate cost calculations leading to pricing mistakes and profit loss",
+      benefit:
+        "Precise cost tracking with FIFO/LIFO methods and automatic margin calculations",
     },
   ];
 
   const totalHours = steps.reduce((acc, step) => acc + step.duration, 0);
 
   return (
-    <section className="w-full bg-teal-50/20">
+    <section className="w-full bg-blue-50/20">
       {/* Updated Header Section */}
       <div className="w-full max-w-6xl mx-auto py-20 px-6 text-center">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-8">
-          Why Waste Time Starting
+          Why Struggle with Manual
           <br />
-          from
-          <span className="inline-block bg-gradient-to-r from-orange-100 via-purple-100 to-purple-200 px-4 rounded-lg">
-            Scratch?
+          Inventory
+          <span className="inline-block bg-gradient-to-r from-blue-100 via-teal-100 to-teal-200 px-4 rounded-lg">
+            Management?
           </span>
         </h2>
 
         <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-          See how HubStack dramatically reduces development time with
-          production-ready features that typically take days to implement.
+          See how IzuInventory transforms your business operations by eliminating time-consuming manual processes 
+          and replacing them with streamlined, automated solutions.
           <br />
-          Save up to {totalHours} hours of development time
+          Save up to {totalHours} hours per month on inventory management
         </p>
       </div>
 
       {/* Comparison Grid */}
       <div className="max-w-7xl mx-auto px-6 pb-20">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Without HubStack */}
+          {/* Without IzuInventory */}
           <div className="relative">
             <div className="sticky top-8 bg-white rounded-3xl border border-rose-100 overflow-hidden">
               <div className="p-6 border-b border-rose-100 bg-gradient-to-b from-rose-50/50">
@@ -162,14 +165,14 @@ const ProjectComparison = ({ theme = "light" }) => {
                     <X className="w-5 h-5 text-rose-500" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900">
-                    Without HubStack
+                    Without IzuInventory
                   </h3>
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-rose-500">
                     {totalHours} Hours
                   </span>
-                  <span className="text-slate-600">of development time</span>
+                  <span className="text-slate-600">wasted each month</span>
                 </div>
               </div>
               <div className="p-6">
@@ -200,31 +203,31 @@ const ProjectComparison = ({ theme = "light" }) => {
             </div>
           </div>
 
-          {/* With HubStack */}
+          {/* With IzuInventory */}
           <div className="relative">
-            <div className="sticky top-8 bg-white rounded-3xl border border-emerald-100 overflow-hidden">
-              <div className="p-6 border-b border-emerald-100 bg-gradient-to-b from-emerald-50/50">
+            <div className="sticky top-8 bg-white rounded-3xl border border-teal-100 overflow-hidden">
+              <div className="p-6 border-b border-teal-100 bg-gradient-to-b from-teal-50/50">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    <Rocket className="w-5 h-5 text-emerald-500" />
+                  <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+                    <Rocket className="w-5 h-5 text-teal-500" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900">
-                    With HubStack
+                    With IzuInventory
                   </h3>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-emerald-500">
-                    Instant Setup
+                  <span className="text-3xl font-bold text-teal-500">
+                    Automated System
                   </span>
-                  <span className="text-slate-600">with ready features</span>
+                  <span className="text-slate-600">saves time & reduces errors</span>
                 </div>
               </div>
               <div className="p-6">
                 <ul className="space-y-6">
                   {steps.map((step, index) => (
                     <li key={index} className="flex gap-4">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="w-5 h-5 text-emerald-500" />
+                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-5 h-5 text-teal-500" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
@@ -232,9 +235,9 @@ const ProjectComparison = ({ theme = "light" }) => {
                             {step.title}{" "}
                             <span className="font-bold">{step.highlight}</span>
                           </h4>
-                          <ArrowRight className="w-4 h-4 text-emerald-500" />
-                          <span className="text-emerald-500 text-sm">
-                            Ready to use
+                          <ArrowRight className="w-4 h-4 text-teal-500" />
+                          <span className="text-teal-500 text-sm">
+                            Automated
                           </span>
                         </div>
                         <p className="text-slate-600 text-sm">{step.benefit}</p>
@@ -251,4 +254,4 @@ const ProjectComparison = ({ theme = "light" }) => {
   );
 };
 
-export default ProjectComparison;
+export default InventoryComparison;

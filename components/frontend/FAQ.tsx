@@ -3,54 +3,55 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, HelpCircle, Minus, Plus } from "lucide-react";
 import Link from "next/link";
+
 const faqs = [
   {
-    question: "What is the difference between a starter kit and a boilerplate?",
+    question: "What features does your IzuInventory  offer?",
     answer:
-      "A starter kit is typically more opinionated and comes with pre-built features, components, and design decisions, making it ready for immediate use in production. A boilerplate, on the other hand, is usually a bare-bones template with basic setup and structure, requiring more customization and development work. Our starter kit includes fully implemented features like authentication, payment systems, and user management, saving you significant development time.",
+      "Our IzuInventory  provides comprehensive inventory management features including item tracking, stock level monitoring, purchase order management, sales order processing, and barcode scanning. It also includes reporting tools for inventory valuation, stock movement analysis, and sales performance tracking. The app is designed to streamline your inventory workflows and improve operational efficiency.",
   },
   {
-    question:
-      "How is supastarter different from other starter kits or boilerplates?",
+    question: "How is your IzuInventory  different from other inventory management solutions?",
     answer:
-      "Our starter kit stands out by providing a complete, production-ready solution with fully implemented features rather than just templates. We include advanced functionality like user authentication, payment processing, email systems, and responsive UI components. Additionally, we maintain clean, well-documented code, regular updates, and provide dedicated support through our Discord community.",
+      "Our IzuInventory  stands out with its intuitive user interface, real-time synchronization across devices, and seamless integration capabilities with popular e-commerce platforms and accounting software. We focus on delivering a complete solution that's both powerful and easy to use, with features like automated reordering, batch tracking, and customizable workflows that adapt to your specific business needs.",
   },
   {
-    question: "How do I get access to the boilerplate code?",
+    question: "How do I get started with the IzuInventory ?",
     answer:
-      "After purchasing, you'll receive immediate access to the complete source code via GitHub. You'll be invited to our private repository where you can clone or download the code. We'll also send you detailed documentation and setup instructions to your registered email address.",
+      "After signing up, you'll receive immediate access to your account. Our onboarding process will guide you through setting up your inventory items, configuring your warehouses, and importing existing data. We also provide comprehensive documentation and video tutorials to help you get started quickly.",
   },
   {
-    question: "Is the boilerplate being maintained regularly?",
+    question: "Is the IzuInventory  regularly updated?",
     answer:
-      "Yes, we actively maintain and update the codebase with regular commits, bug fixes, and feature improvements. Our team consistently reviews dependencies, implements security patches, and adds new features based on user feedback and modern development practices. You can check our changelog for detailed update history.",
+      "Yes, we actively maintain and update our app with regular feature enhancements, bug fixes, and performance improvements. Our development team closely monitors industry trends and user feedback to continuously improve the application. We typically release updates every two weeks, and you can track our update history in the app's changelog.",
   },
   {
-    question: "What if I find a bug?",
+    question: "What should I do if I encounter technical issues?",
     answer:
-      "If you encounter any bugs, you can report them through our GitHub issues or Discord community. Our development team actively monitors these channels and typically responds within 24-48 hours. We prioritize bug fixes and regularly release updates to ensure the stability of the codebase.",
+      "If you experience any technical issues, you can reach out through our in-app support chat or email our dedicated support team. Our technical specialists respond within 24 hours and will work with you to resolve any problems. For common issues, check our knowledge base, which contains troubleshooting guides and FAQs.",
   },
   {
-    question: "What do I get for my money?",
+    question: "What pricing plans are available?",
     answer:
-      "Your purchase includes: Full source code access, Regular updates and improvements, Premium UI components, Authentication system, Payment integration, Email templates, Documentation, APIs, Database schema, Admin dashboard, and Customer support through our Discord community. You also get lifetime access to all future updates within the current major version.",
+      "We offer flexible pricing plans to suit businesses of all sizes. Our plans include: Basic (for small businesses), Professional (for growing businesses), and Enterprise (for large operations). Each plan includes different features and user limits. All plans come with core inventory management features, while advanced features like multi-location management and API access are available in higher-tier plans.",
   },
   {
-    question: "What am I allowed to do with the starter template?",
+    question: "Can I use the IzuInventory  on multiple devices?",
     answer:
-      "You can use the starter kit to create unlimited personal or commercial projects. Each license is valid for one developer and can be used to create multiple end products. You cannot resell the source code as-is or redistribute it as another starter kit/boilerplate. The code must be part of a larger application.",
+      "Yes, our IzuInventory  is fully responsive and works across desktop, tablet, and mobile devices. You can access your inventory data from anywhere with an internet connection. Changes made on one device are instantly synchronized across all your devices, ensuring you always have the most up-to-date information.",
   },
   {
-    question: "Can I see what I am getting before purchasing?",
+    question: "Can I try the IzuInventory  before purchasing?",
     answer:
-      "Yes, you can explore our detailed feature list, view our live demo, and check our documentation to understand the full scope of what's included. We also provide code samples and component previews on our website. Additionally, we offer a 14-day money-back guarantee if you're not satisfied with the product.",
+      "Absolutely! We offer a 14-day free trial with full access to all features. No credit card is required to start your trial. During this period, you can explore all the app's capabilities, import your data, and see how it fits your business needs. Additionally, we offer demo sessions where our team can walk you through specific features.",
   },
   {
-    question: "Can I get a refund?",
+    question: "What's your refund policy?",
     answer:
-      "Yes, we offer a 14-day money-back guarantee. If you're not satisfied with the starter kit, simply contact our support team within 14 days of purchase, and we'll process your refund. No questions asked. However, refunds cannot be issued if you've already used the code in a production project.",
+      "We offer a 30-day money-back guarantee on all our plans. If you're not satisfied with our IzuInventory , simply contact our customer support team within 30 days of your purchase, and we'll process your refund. We also offer prorated refunds if you need to cancel an annual subscription after the 30-day period.",
   },
 ];
+
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -62,7 +63,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            You ask? We <span className="italic">answer</span>
+            Got questions about our <span className="italic">IzuInventory </span>?
           </h2>
         </div>
         <div className="space-y-4">
@@ -104,13 +105,13 @@ export default function FAQ() {
         <div className="mt-12 flex items-center justify-between">
           <div className="flex items-center">
             <HelpCircle className="w-5 h-5 text-gray-500 mr-2" />
-            <span className="text-gray-600">Need further support?</span>
+            <span className="text-gray-600">Need additional help?</span>
           </div>
           <Link
-            href="/#contact"
+            href="/#support"
             className="bg-lime-400 text-green-900 px-6 py-2 rounded-full hover:bg-lime-500 transition duration-300 flex items-center"
           >
-            Contact us
+            Contact support
             <ArrowRight className="w-4 h-4 ml-2" />
           </Link>
         </div>
