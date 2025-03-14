@@ -1,5 +1,9 @@
 {
   "extends": [
     "development"
-  ]
+  ],
+  "hints": {
+    "manifest-file-extension": "off",
+    "apple-touch-icons": "off"
+  }
 }
