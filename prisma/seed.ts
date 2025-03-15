@@ -99,6 +99,8 @@ async function cleanDatabase() {
 
       // Delete all sessions first (if you have them)
       await tx.session.deleteMany({});
+      // Delete all sessions first (if you have them)
+      await tx.organization.deleteMany({});
 
       // Delete all accounts (if you have them)
       await tx.account.deleteMany({});
@@ -130,6 +132,16 @@ async function cleanDatabase() {
 async function seedDatabase() {
   try {
     console.log("Starting to seed new data...");
+
+    //Creating organization
+    console.log("Creating Organization...");
+    const org = await db.organization.create({
+      data:{
+        name: "Default Organization",
+        slug: "default-organization",
+      }
+    })
+    
 
     // Create admin role with all permissions
     console.log("Creating admin role...");
@@ -164,8 +176,10 @@ async function seedDatabase() {
         name: "System Admin",
         firstName: "System",
         lastName: "Admin",
-        phone: "1234567890",
+        phone: "+2348120337154",
+        orgName: org.name,
         password: hashedAdminPassword,
+        orgId: org.id,
         roles: {
           connect: { id: adminRole.id },
         },
@@ -183,8 +197,10 @@ async function seedDatabase() {
         name: "Regular User",
         firstName: "Regular",
         lastName: "User",
-        phone: "0987654321",
+        phone: "+2348138390681",
+        orgName: org.name,
         password: hashedUserPassword,
+        orgId: org.id,
         roles: {
           connect: { id: userRole.id },
         },

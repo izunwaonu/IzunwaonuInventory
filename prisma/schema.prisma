@@ -74,11 +74,32 @@ model User {
   sessions      Session[]
   savings       Saving[]
   blogs         Blog[]
+  orgName       String?
+  organization  Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId         String
   isVerfied     Boolean   @default(false)
   token         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   roleId        String?
+}
+
+model Organization {
+  id         String      @id @default(cuid())
+  name       String
+  slug       String   @unique
+  industry   String?
+  country    String?
+  state      String?
+  address    String?
+  currency   String?
+  timeZone   String?
+  inventory  Boolean? // Assuming this is a boolean flag, adjust if needed
+  startDate  DateTime?
+  fiscalYear String?
+  users      User[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Category {

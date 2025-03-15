@@ -15,6 +15,8 @@ export interface AuthenticatedUser {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  orgId: string;
+  orgName: string | null;
 }
 
 // Function to check authorization and return NotAuthorized component if needed

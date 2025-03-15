@@ -46,6 +46,12 @@ export const authOptions: NextAuthOptions = {
         const defaultRole = await db.role.findFirst({
           where: { roleName: "user" },
         });
+        const org = await db.organization.create({
+          data:{
+            name: "Default Organization",
+            slug: "default-organization",
+          }
+        })
 
         return {
           id: profile.id.toString(),
@@ -55,6 +61,8 @@ export const authOptions: NextAuthOptions = {
           phone: "",
           image: profile.avatar_url,
           email: profile.email,
+          orgId: org.id,
+          orgName: org.name,
           roles: defaultRole ? [defaultRole] : [],
           permissions: defaultRole ? defaultRole.permissions : [], // Include permissions from default role
         };
@@ -68,6 +76,12 @@ export const authOptions: NextAuthOptions = {
         const defaultRole = await db.role.findFirst({
           where: { roleName: "user" },
         });
+        const org = await db.organization.create({
+          data:{
+            name: "Default Organization",
+            slug: "default-organization",
+          }
+        })
 
         return {
           id: profile.sub,
@@ -75,6 +89,8 @@ export const authOptions: NextAuthOptions = {
           firstName: profile.given_name,
           lastName: profile.family_name,
           phone: "",
+          orgId: org.id,
+          orgName: org.name,
           image: profile.picture,
           email: profile.email,
           roles: defaultRole ? [defaultRole] : [],
@@ -137,6 +153,8 @@ export const authOptions: NextAuthOptions = {
             email: existingUser.email,
             roles: existingUser.roles,
             permissions: uniquePermissions,
+            orgId: existingUser.orgId,
+            orgName: existingUser.orgName,
           };
         } catch (error) {
           throw { error: "Something went wrong", status: 401 };
@@ -187,13 +205,18 @@ export const authOptions: NextAuthOptions = {
         token.lastName = user.lastName;
         token.phone = user.phone;
         token.roles = user.roles;
+        token.orgId = user.orgId;
+        token.orgName = user.orgName;
         token.permissions = user.permissions;
+
       } else {
         // For subsequent requests, refresh roles and permissions
         const userData = await getUserWithRoles(token.id);
         if (userData) {
           token.roles = userData.roles;
           token.permissions = userData.permissions;
+          token.orgName = userData.orgName;
+          token.orgId = userData.orgId;
         }
       }
       return token;
@@ -208,6 +231,8 @@ export const authOptions: NextAuthOptions = {
         session.user.lastName = token.lastName;
         session.user.phone = token.phone;
         session.user.roles = token.roles;
+        session.user.orgName = token.orgName;
+        session.user.orgId = token.orgId;
         session.user.permissions = token.permissions;
       }
       return session;
