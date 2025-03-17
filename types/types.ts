@@ -15,6 +15,7 @@ export type SavingProps = {
 };
 export type UserProps = {
   name: string;
+  orgName: string;
   firstName: string;
   lastName: string;
   phone: string;

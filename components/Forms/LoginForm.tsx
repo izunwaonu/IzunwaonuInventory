@@ -61,13 +61,13 @@ export default function LoginForm() {
     <div className="w-full lg:grid h-screen lg:min-h-[600px] lg:grid-cols-2 relative ">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[400px] gap-6 mt-10 md:mt-0">
-          <div className="absolute left-1/3 top-14 md:top-5 md:left-5">
+          {/* <div className="absolute left-1/3 top-14 md:top-5 md:left-5">
             <Logo />
-          </div>
+          </div> */}
           <div className="grid gap-2  mt-10 md:mt-0">
             <h1 className="text-3xl font-bold">Login to your Account</h1>
             <p className="text-muted-foreground text-sm">
-              Welcome Back to <span className="text-blue-600">Next Admin</span>
+              Welcome Back to <span className="text-blue-600">IzuInventory</span>
             </p>
           </div>
           <div className="">
@@ -107,7 +107,7 @@ export default function LoginForm() {
               <div className="h-[1px] w-full bg-slate-200"></div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Button
                 onClick={() => signIn("google")}
                 variant={"outline"}
@@ -124,7 +124,7 @@ export default function LoginForm() {
                 <FaGithub className="mr-2 w-6 h-6 text-slate-900 dark:text-white" />
                 Login with Github
               </Button>
-            </div>
+            </div> */}
             <p className="mt-6  text-sm text-gray-500">
               Not a Registered ?{" "}
               <Link

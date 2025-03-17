@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { PasswordProps } from "@/components/Forms/ChangePasswordForm";
 import { Resend } from "resend";
 import { generateToken } from "@/lib/token";
+import { OrgData } from "@/components/Forms/RegisterForm";
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -23,7 +24,7 @@ const DEFAULT_USER_ROLE = {
   ],
 };
 
-export async function createUser(data: UserProps) {
+export async function createUser(data: UserProps, orgData:OrgData) {
   const { email, password, firstName, lastName, name, phone, image } = data;
 
   try {
@@ -54,6 +55,25 @@ export async function createUser(data: UserProps) {
         };
       }
 
+      //Check for already existing Organization
+      const existingOrganization = await tx.organization.findUnique({
+        where: { 
+          slug: orgData.slug
+        },
+      });
+
+      if (existingOrganization){
+        return {
+          error: `The Organization name ${orgData.name} is already taken. Kindly create a new Organization`,
+          status: 409,
+          data: null,
+        };
+      }
+      //Create the Organization
+      const org = await db.organization.create({
+        data:orgData,
+      })
+
       // Find or create default role
       let defaultRole = await tx.role.findFirst({
         where: { roleName: DEFAULT_USER_ROLE.roleName },
@@ -69,12 +89,7 @@ export async function createUser(data: UserProps) {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-       const org = await db.organization.create({
-            data:{
-              name: "Default Organization",
-              slug: "default-organization",
-            }
-          })
+      
 
       // Create user with role
       const newUser = await tx.user.create({
