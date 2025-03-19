@@ -267,7 +267,7 @@ export async function createUser(data: UserProps, orgData: OrgData) {
       console.log("🟢 Sending verification email...");
       try {
         const { data: emailResponse, error: emailError } = await resend.emails.send({
-          from: "IzuInventory <onboarding@resend.dev>",
+          from: "IzuInventory <izuinventory@mirronet.com>",
           to: email,
           subject: "Verify Your Account",
           react: emailTemplate,
@@ -378,7 +378,7 @@ export async function sendResetLink(email: string) {
 
     const resetPasswordLink = `${baseUrl}/reset-password?token=${token}&&email=${email}`;
     const { data, error } = await resend.emails.send({
-      from: "NextAdmin <info@desishub.com>",
+      from: "IzuInventory <izuinventory@mirronet.com>",
       to: email,
       subject: "Reset Password Request",
       react: ResetPasswordEmail({ userFirstname, resetPasswordLink }),
@@ -513,6 +513,40 @@ export async function resetUserPassword(
 //   throw new Error("Function not implemented.");
 // }
 
+// export async function verifyOTP(userId: string, otp: string) {
+//   try {
+//     const user = await db.user.findUnique({
+//       where: {
+//         id: userId,
+//       },
+//     });
+
+//     if (user?.token !== otp) {
+//       return {
+//         status: 403,
+//       };
+//     }
+
+//     return {
+//       status: 200,
+//     };
+//     const update = await db.user.update({
+//       where: {
+//         id:userId,
+//       },
+//       data: {
+//         isVerfied:true,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.error("Error verifying OTP:", error);
+//     return {
+//       status: 500, // Ensure a response is always returned
+//     };
+//   }
+// }
+
 export async function verifyOTP(userId: string, otp: string) {
   try {
     const user = await db.user.findUnique({
@@ -521,28 +555,30 @@ export async function verifyOTP(userId: string, otp: string) {
       },
     });
 
-    if (user?.token !== otp) {
+    if (!user || user.token !== otp) {
       return {
         status: 403,
       };
     }
 
+    // Ensure the update runs before returning a response
+    await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isVerfied: true, // Fix typo: should be `isVerified`
+      },
+    });
+
     return {
       status: 200,
     };
-    const update = await db.user.update({
-      where: {
-        id:userId,
-      },
-      data: {
-        isVerfied:true,
-      },
-    });
 
   } catch (error) {
     console.error("Error verifying OTP:", error);
     return {
-      status: 500, // Ensure a response is always returned
+      status: 500,
     };
   }
 }
