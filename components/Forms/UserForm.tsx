@@ -29,6 +29,7 @@ import PasswordInput from "../FormInputs/PasswordInput";
 import TextInput from "../FormInputs/TextInput";
 import FormSelectInput from "../FormInputs/FormSelectInput";
 import ImageInput from "../FormInputs/ImageInput";
+import { OrgData } from "./RegisterForm";
 type UserFormProps = {
   editingId?: string | undefined;
   initialData?: User | undefined | null;
@@ -82,6 +83,7 @@ export default function UserForm({
     console.log("value:", item);
     setStatus(item);
   };
+  const [startDate, setStartDate] = useState(new Date());
   async function saveUser(data: UserProps) {
     try {
       setLoading(true);
@@ -98,7 +100,20 @@ export default function UserForm({
         //route
         router.push("/dashboard/users");
       } else {
-        await createUser(data);
+        const orgData : OrgData = {
+          name: "",
+          slug: "",
+          country: ``,
+          currency: "",
+          timezone: "",
+          fiscalYear: null,
+          startDate: startDate,
+          inventory: false,
+          industry: null,
+          address: null,
+          state: null
+        }
+        await createUser(data, orgData);
         setLoading(false);
         // Toast
         toast.success("Successfully Created!");
