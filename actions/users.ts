@@ -267,7 +267,7 @@ export async function createUser(data: UserProps, orgData: OrgData) {
       console.log("🟢 Sending verification email...");
       try {
         const { data: emailResponse, error: emailError } = await resend.emails.send({
-          from: "IzuInventory <izuinventory@mirronet.com>",
+          from: "IzuInventory <izu@inventory.mirronet.com>",
           to: email,
           subject: "Verify Your Account",
           react: emailTemplate,
@@ -378,7 +378,7 @@ export async function sendResetLink(email: string) {
 
     const resetPasswordLink = `${baseUrl}/reset-password?token=${token}&&email=${email}`;
     const { data, error } = await resend.emails.send({
-      from: "IzuInventory <izuinventory@mirronet.com>",
+      from: "IzuInventory <izu@inventory.mirronet.com>",
       to: email,
       subject: "Reset Password Request",
       react: ResetPasswordEmail({ userFirstname, resetPasswordLink }),
