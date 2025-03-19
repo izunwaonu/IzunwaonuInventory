@@ -13,6 +13,7 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+const baseUrl = "https://izunwaonu-inventory.vercel.app/";
 
 interface ResetPasswordEmailProps {
   userFirstname?: string;
@@ -29,9 +30,15 @@ export const ResetPasswordEmail = ({
       <Preview>IzuInventory reset your password</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={textBlue} className="text-center ">
-            IzuInventory
-          </Heading>
+           <Section style={coverSection}>
+                        <Section style={imageSection}>
+                          <Img
+                            src={`${baseUrl}/logo-light.png`}
+                            width="75"
+                            height="45"
+                            alt="IzuInventory"
+                          />
+                        </Section>
           <Section>
             <Text style={text}>Hi {userFirstname},</Text>
             <Text style={text}>
@@ -59,7 +66,7 @@ export const ResetPasswordEmail = ({
 
             <Hr className="my-[16px] border-t-2 border-gray-300" />
             <Text className="text-muted-foreground">
-              © {new Date().getFullYear()} NextAdmin. All rights reserved.
+              © {new Date().getFullYear()} IzuInventory. All rights reserved.
             </Text>
           </Section>
         </Container>
@@ -93,6 +100,15 @@ const text = {
 const textBlue = {
   color: "#007ee6",
 };
+const imageSection = {
+    backgroundColor: '#252f3d',
+    display: 'flex',
+    padding: '20px 0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+  
+  const coverSection = { backgroundColor: '#fff' };
 
 const button = {
   backgroundColor: "#007ee6",

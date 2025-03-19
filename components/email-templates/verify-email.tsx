@@ -31,7 +31,7 @@ import {
             <Section style={coverSection}>
               <Section style={imageSection}>
                 <Img
-                  src={`${baseUrl}/bell.png`}
+                  src={`${baseUrl}/logo-light.png`}
                   width="75"
                   height="45"
                   alt="IzuInventory"
