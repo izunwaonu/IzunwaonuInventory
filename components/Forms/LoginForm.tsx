@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 
 import { LoginProps } from "@/types/types";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "../ui/button";
@@ -39,8 +39,8 @@ export default function LoginForm() {
       console.log("SignIn response:", loginData);
       if (loginData?.error) {
         setLoading(false);
-        toast.error("Sign-in error: Check your credentials");
-        setPassErr("Wrong Credentials, Check again");
+        toast.error("Sign-in error",{description: "Check your credentials or make sure your email is verified"});
+        setPassErr("Wrong Credentials | Not verified, Check again");
         // setShowNotification(true);
       } else {
         // Sign-in was successful

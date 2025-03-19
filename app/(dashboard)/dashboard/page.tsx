@@ -12,9 +12,9 @@ export default async function Dashboard() {
   return (
     <main>
       <div className="space-y-6">
-        <div className="space-y-1">
+        <div className="space-y-1 mb-4">
           <h2 className="text-2xl font-semibold tracking-tight">
-           {user?.orgName??""}
+           Org Name: {user?.orgName??""}
           </h2>
           <p className="text-sm text-muted-foreground">
             Org ID: {user?.orgId??""}

@@ -8,6 +8,8 @@ import { PasswordProps } from "@/components/Forms/ChangePasswordForm";
 import { Resend } from "resend";
 import { generateToken } from "@/lib/token";
 import { OrgData } from "@/components/Forms/RegisterForm";
+import { generateOTP}  from "@/lib/generateOTP";
+import VerifyEmail from "@/components/email-templates/verify-email";
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -24,74 +26,207 @@ const DEFAULT_USER_ROLE = {
   ],
 };
 
-export async function createUser(data: UserProps, orgData:OrgData) {
+// export async function createUser(data: UserProps, orgData:OrgData) {
+//   const { email, password, firstName, lastName, name, phone, image } = data;
+
+//   try {
+//     // Use a transaction for atomic operations
+//     return await db.$transaction(async (tx) => {
+//       // Check for existing users
+//       const existingUserByEmail = await tx.user.findUnique({
+//         where: { email },
+//       });
+
+//       const existingUserByPhone = await tx.user.findUnique({
+//         where: { phone },
+//       });
+
+//       if (existingUserByEmail) {
+//         return {
+//           error: `This email ${email} is already in use`,
+//           status: 409,
+//           data: null,
+//         };
+//       }
+
+//       if (existingUserByPhone) {
+//         return {
+//           error: `This Phone number ${phone} is already in use`,
+//           status: 409,
+//           data: null,
+//         };
+//       }
+
+//       //Check for already existing Organization
+//       const existingOrganization = await tx.organization.findUnique({
+//         where: { 
+//           slug: orgData.slug
+//         },
+//       });
+
+//       if (existingOrganization){
+//         return {
+//           error: `The Organization name ${orgData.name} is already taken. Kindly create a new Organization`,
+//           status: 409,
+//           data: null,
+//         };
+//       }
+//       //Create the Organization
+//       const org = await db.organization.create({
+//         data:orgData,
+//       })
+
+//       // Find or create default role
+//       let defaultRole = await tx.role.findFirst({
+//         where: { roleName: DEFAULT_USER_ROLE.roleName },
+//       });
+
+//       // Create default role if it doesn't exist
+//       if (!defaultRole) {
+//         defaultRole = await tx.role.create({
+//           data: DEFAULT_USER_ROLE,
+//         });
+//       }
+
+//       // Hash password
+//       const hashedPassword = await bcrypt.hash(password, 10);
+
+//       //Generating a 6 figure token
+//  const token = generateOTP() 
+
+//       // Create user with role
+//       const newUser = await tx.user.create({
+//         data: {
+//           email,
+//           password: hashedPassword,
+//           firstName,
+//           lastName,
+//           name,
+//           orgId: org.id,
+//           orgName: org.name,
+//           phone,
+//           image,
+//           token,
+//           roles: {
+//             connect: {
+//               id: defaultRole.id,
+//             },
+//           },
+//         },
+//         include: {
+//           roles: true, // Include roles in the response
+//         },
+//       });
+// //Send the Verification email
+// const verificationCode = newUser.token??""
+//       const { data, error } = await resend.emails.send({
+//         from: "IzuInventory <info@desishub.com>",
+//         to: email,
+//         subject: "Verify Your Account",
+//         react: VerifyEmail({verificationCode }),
+//       });
+//       if (error) {
+//         console.log(error)
+//       };
+//       return {
+//         error: `Something went wrong, Please try again`,
+//         status: 500,
+//         data: null,
+//       };
+
+//       console.log(data)
+//       return {
+//         error: null,
+//         status: 200,
+//         data: {id:newUser.id, email: newUser.email},
+//       };
+//     });
+//   } catch (error) {
+//     console.error("Error creating user:", error);
+//     return {
+//       error: `Something went wrong, Please try again`,
+//       status: 500,
+//       data: null,
+//     };
+//   }
+// }
+
+
+
+
+export async function createUser(data: UserProps, orgData: OrgData) {
   const { email, password, firstName, lastName, name, phone, image } = data;
 
-  try {
-    // Use a transaction for atomic operations
-    return await db.$transaction(async (tx) => {
-      // Check for existing users
-      const existingUserByEmail = await tx.user.findUnique({
-        where: { email },
-      });
+  console.log("🟢 Starting user creation process...");
+  console.log("Received data:", JSON.stringify(data, null, 2));
+  console.log("Received organization data:", JSON.stringify(orgData, null, 2));
 
-      const existingUserByPhone = await tx.user.findUnique({
-        where: { phone },
-      });
+  try {
+    return await db.$transaction(async (tx) => {
+      console.log("🔵 Checking for existing users...");
+
+      // Check for existing users
+      const existingUserByEmail = await tx.user.findUnique({ where: { email } });
+      const existingUserByPhone = await tx.user.findUnique({ where: { phone } });
 
       if (existingUserByEmail) {
-        return {
-          error: `This email ${email} is already in use`,
-          status: 409,
-          data: null,
-        };
+        console.log("❌ Email already in use:", email);
+        return { error: `This email ${email} is already in use`, status: 409, data: null };
       }
 
       if (existingUserByPhone) {
-        return {
-          error: `This Phone number ${phone} is already in use`,
-          status: 409,
-          data: null,
-        };
+        console.log("❌ Phone number already in use:", phone);
+        return { error: `This phone number ${phone} is already in use`, status: 409, data: null };
       }
 
-      //Check for already existing Organization
-      const existingOrganization = await tx.organization.findUnique({
-        where: { 
-          slug: orgData.slug
+      console.log("🔵 Checking for existing organization...");
+      const existingOrganization = await tx.organization.findUnique({ where: { slug: orgData.slug } });
+
+      if (existingOrganization) {
+        console.log("❌ Organization already exists:", orgData.name);
+        return { error: `The organization name ${orgData.name} is already taken. Kindly create a new organization`, status: 409, data: null };
+      }
+
+      console.log("🔵 Validating organization data...");
+      if (!orgData.name || !orgData.slug || !orgData.country || !orgData.currency || !orgData.timezone) {
+        console.error("❌ Missing required organization fields:", orgData);
+        return { error: "Invalid organization data. Please provide all required fields.", status: 400, data: null };
+      }
+
+      console.log("🟢 Creating organization...");
+      const org = await tx.organization.create({
+        data: {
+          name: orgData.name,
+          slug: orgData.slug,
+          country: orgData.country,
+          currency: orgData.currency,
+          timeZone: orgData.timezone,
+          state: orgData.state ?? null,
+          address: orgData.address ?? null,
+          industry: orgData.industry ?? null,
+          inventory: orgData.inventory ?? false,
+          startDate: orgData.startDate ?? new Date(),
+          fiscalYear: orgData.fiscalYear ?? null,
         },
       });
+      console.log("✅ Organization created successfully:", org.id);
 
-      if (existingOrganization){
-        return {
-          error: `The Organization name ${orgData.name} is already taken. Kindly create a new Organization`,
-          status: 409,
-          data: null,
-        };
-      }
-      //Create the Organization
-      const org = await db.organization.create({
-        data:orgData,
-      })
+      console.log("🟢 Looking for default user role...");
+      let defaultRole = await tx.role.findFirst({ where: { roleName: DEFAULT_USER_ROLE.roleName } });
 
-      // Find or create default role
-      let defaultRole = await tx.role.findFirst({
-        where: { roleName: DEFAULT_USER_ROLE.roleName },
-      });
-
-      // Create default role if it doesn't exist
       if (!defaultRole) {
-        defaultRole = await tx.role.create({
-          data: DEFAULT_USER_ROLE,
-        });
+        console.log("🟢 Creating default user role...");
+        defaultRole = await tx.role.create({ data: DEFAULT_USER_ROLE });
       }
 
-      // Hash password
+      console.log("🟢 Hashing password...");
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      
+      console.log("🟢 Generating verification token...");
+      const token = generateOTP();
+      console.log("Generated token:", token);
 
-      // Create user with role
+      console.log("🟢 Creating new user...");
       const newUser = await tx.user.create({
         data: {
           email,
@@ -103,32 +238,59 @@ export async function createUser(data: UserProps, orgData:OrgData) {
           orgName: org.name,
           phone,
           image,
-          roles: {
-            connect: {
-              id: defaultRole.id,
-            },
-          },
+          token,
+          roles: { connect: { id: defaultRole.id } },
         },
-        include: {
-          roles: true, // Include roles in the response
-        },
+        include: { roles: true },
       });
 
-      return {
-        error: null,
-        status: 200,
-        data: newUser,
-      };
+      console.log("✅ User created successfully:", newUser.id);
+
+      console.log("🟢 Preparing email verification...");
+      if (!newUser.token) {
+        console.error("❌ User token is missing. Email verification cannot proceed.");
+        return { error: "Failed to generate verification token.", status: 500, data: null };
+      }
+
+      console.log("Verification code:", newUser.token);
+
+      console.log("🟢 Generating email template...");
+      const emailTemplate = VerifyEmail({ verificationCode: newUser.token });
+
+      if (!emailTemplate) {
+        console.error("❌ Email template generation failed! It returned null or undefined.");
+        return { error: "Failed to generate email verification template.", status: 500, data: null };
+      }
+
+      console.log("Generated email template:", emailTemplate);
+
+      console.log("🟢 Sending verification email...");
+      try {
+        const { data: emailResponse, error: emailError } = await resend.emails.send({
+          from: "IzuInventory <onboarding@resend.dev>",
+          to: email,
+          subject: "Verify Your Account",
+          react: emailTemplate,
+        });
+
+        if (emailError) {
+          console.error("❌ Email sending failed:", emailError);
+        } else {
+          console.log("✅ Verification email sent successfully:", emailResponse);
+        }
+      } catch (emailErr) {
+        console.error("❌ Exception occurred while sending email:", emailErr);
+      }
+
+      return { error: null, status: 200, data: { id: newUser.id, email: newUser.email } };
     });
   } catch (error) {
-    console.error("Error creating user:", error);
-    return {
-      error: `Something went wrong, Please try again`,
-      status: 500,
-      data: null,
-    };
+    console.error("❌ Error creating user:", error);
+    return { error: "Something went wrong, Please try again", status: 500, data: null };
   }
 }
+
+
 export async function getAllMembers() {
   try {
     const members = await db.user.findMany({
@@ -312,5 +474,75 @@ export async function resetUserPassword(
     };
   } catch (error) {
     console.log(error);
+  }
+}
+// export async function verifyOTP(userId:string, otp:string){
+//  try {
+//   const user = await db.user.findUnique({
+//     where:{
+//       id:userId
+//     }
+//   })
+//   if(user?.token !==otp){
+//     return{
+//       status:403
+//     }
+//   };
+//   {
+//     return{
+//       status:200
+//     }
+//   };
+  
+//  } catch (error) {
+  
+//  }
+// }
+
+
+
+// function generateOTP() {
+//   throw new Error("Function not implemented.");
+// }
+
+// function generateOTP() {
+//   throw new Error("Function not implemented.");
+// }
+
+// function generateOTP() {
+//   throw new Error("Function not implemented.");
+// }
+
+export async function verifyOTP(userId: string, otp: string) {
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (user?.token !== otp) {
+      return {
+        status: 403,
+      };
+    }
+
+    return {
+      status: 200,
+    };
+    const update = await db.user.update({
+      where: {
+        id:userId,
+      },
+      data: {
+        isVerfied:true,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return {
+      status: 500, // Ensure a response is always returned
+    };
   }
 }

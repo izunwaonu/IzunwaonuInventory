@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Rethink_Sans } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/components/Providers";
 import Head from "next/head";
 import PWAServiceWorker from "@/components/PWAServiceWorker"; // Import the client component
@@ -33,8 +33,11 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
       </Head>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
-        <Toaster />
+        <Providers>
+        <Toaster richColors />
+          {children}
+        </Providers>
+        
         <PWAServiceWorker /> {/* ✅ Register SW from a client component */}
       </body>
     </html>

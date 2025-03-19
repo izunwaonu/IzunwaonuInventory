@@ -134,6 +134,9 @@ export const authOptions: NextAuthOptions = {
           if (!passwordMatch) {
             throw { error: "Password Incorrect", status: 401 };
           }
+          if (!existingUser.isVerfied) {
+            throw { error: "Account not verified yet", status: 401 };
+          }
 
           // Get all permissions from user's roles
           const permissions = existingUser.roles.flatMap(
