@@ -30,8 +30,7 @@ export const ResetPasswordEmail = ({
       <Preview>IzuInventory reset your password</Preview>
       <Body style={main}>
         <Container style={container}>
-           <Section style={coverSection}>
-                        <Section style={imageSection}>
+          <Section style={imageSection}>
                           <Img
                             src={`${baseUrl}/logo-light.png`}
                             width="75"
@@ -81,6 +80,13 @@ const main = {
   backgroundColor: "#f6f9fc",
   padding: "10px 0",
 };
+const imageSection = {
+  backgroundColor: '#252f3d',
+  display: 'flex',
+  padding: '20px 0',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 
 const container = {
   backgroundColor: "#ffffff",
@@ -100,15 +106,6 @@ const text = {
 const textBlue = {
   color: "#007ee6",
 };
-const imageSection = {
-    backgroundColor: '#252f3d',
-    display: 'flex',
-    padding: '20px 0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-  
-  const coverSection = { backgroundColor: '#fff' };
 
 const button = {
   backgroundColor: "#007ee6",
