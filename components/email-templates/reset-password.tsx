@@ -32,9 +32,9 @@ export const ResetPasswordEmail = ({
         <Container style={container}>
           <Section style={imageSection}>
                           <Img
-                            src={`${baseUrl}/logo-light.png`}
-                            width="75"
-                            height="45"
+                            src={`${baseUrl}/logo-dark.png`}
+                            width="143"
+                            height="70"
                             alt="IzuInventory"
                           />
                         </Section>
