@@ -26,16 +26,16 @@ export const ResetPasswordEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>NextAdmin reset your password</Preview>
+      <Preview>IzuInventory reset your password</Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={textBlue} className="text-center ">
-            Next Admin
+            IzuInventory
           </Heading>
           <Section>
             <Text style={text}>Hi {userFirstname},</Text>
             <Text style={text}>
-              Someone recently requested a password change for your NextAdmin
+              Someone recently requested a password change for your IzuInventory
               account. If this was you, you can set a new password by clicking
               the button below:
             </Text>
@@ -51,7 +51,7 @@ export const ResetPasswordEmail = ({
               to anyone. See our Help Center for{" "}
               <Link
                 style={anchor}
-                href="https://next-admin-starter-kit.vercel.app/"
+                href="https://portfolio.izunwaonu.com.ng/"
               >
                 Help Center
               </Link>
