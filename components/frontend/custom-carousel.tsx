@@ -2,21 +2,54 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+// const carouselItems = [
+//   {
+//     image: "/images/slide-1.jpg",
+//     title: "Simple Monthly Savings,",
+//     subtitle: "Join Ronix Savings Group",
+//   },
+//   {
+//     image: "/images/slide-2.jpg",
+//     title: "Healthy Habits,",
+//     subtitle: "Financial & Physical Wellness",
+//   },
+//   {
+//     image: "/images/slide-3.jpg",
+//     title: "End Year Celebration,",
+//     subtitle: "Reap Your Rewards in December",
+//   },
+// ];
+
 const carouselItems = [
   {
-    image: "/images/slide-1.jpg",
-    title: "Simple Monthly Savings,",
-    subtitle: "Join Ronix Savings Group",
+    image: "/images/slide-1.png",
+    title: "Streamlined Inventory Management",
+    subtitle: "Track Stock Levels in Real-Time",
   },
   {
-    image: "/images/slide-2.jpg",
-    title: "Healthy Habits,",
-    subtitle: "Financial & Physical Wellness",
+    image: "/images/slide-2.png",
+    title: "Efficient Order Processing",
+    subtitle: "Handle Sales and Purchase Orders Seamlessly",
   },
   {
-    image: "/images/slide-3.jpg",
-    title: "End Year Celebration,",
-    subtitle: "Reap Your Rewards in December",
+    image: "/images/slide-3.png",
+    title: "Barcode Scanning Integration",
+    subtitle: "Speed Up Inventory Operations",
+  },
+  {
+    image: "/images/slide-4.png",
+    title: "Detailed Analytics & Reporting",
+    subtitle: "Make Data-Driven Inventory Decisions",
+  },
+  {
+    image: "/images/slide-5.png",
+    title: "Multi-Location Support",
+    subtitle: "Manage Inventory Across Multiple Warehouses",
+  },
+  {
+    image: "/images/slide-6.png",
+    title: "Mobile Access Anywhere",
+    subtitle: "Control Your Inventory On-the-Go",
   },
 ];
 
