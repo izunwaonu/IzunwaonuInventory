@@ -219,7 +219,7 @@ export default function RegisterForm() {
               Already Registered ?{" "}
               <Link
                 href="/login"
-                className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+                className="font-semibold leading-6 text-rose-600 hover:text-rose-500"
               >
                 Login
               </Link>

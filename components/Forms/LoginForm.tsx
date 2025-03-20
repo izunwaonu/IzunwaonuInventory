@@ -129,7 +129,7 @@ export default function LoginForm() {
               Not a Registered ?{" "}
               <Link
                 href="/register"
-                className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+                className="font-semibold leading-6 text-rose-600 hover:text-rose-500"
               >
                 Create Account
               </Link>

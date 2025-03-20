@@ -281,7 +281,7 @@ export default function VerifyOTPForm({
                 {/* <p className="mt-6 text-sm text-center text-gray-500">
                   <Link
                     href="/login"
-                    className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+                    className="font-semibold leading-6 text-rose-600 hover:text-rose-500"
                   >
                     Back to Login
                   </Link>
