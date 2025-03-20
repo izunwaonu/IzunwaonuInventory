@@ -34,7 +34,7 @@ export default async function page() {
   return (
     <section>
       <ReUsableHero 
-  theme="light"
+  theme="dark"
   announcement={{
     text: "Introducing IzuInventory - Streamline Your Inventory Management",
   }}
@@ -62,7 +62,7 @@ export default async function page() {
     { icon: BarChart2, position: "right" }, // Charts for analytics/reporting
     { icon: Layers, position: "center" },   // Layers for multi-location support
   ]}
-  backgroundStyle="neutral"
+  backgroundStyle="red"
   className="min-h-[70vh]"
   userCount={currentUsers > 10 ? currentUsers : null}
 />
