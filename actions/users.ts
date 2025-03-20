@@ -582,3 +582,15 @@ export async function verifyOTP(userId: string, otp: string) {
     };
   }
 }
+
+export async function getCurrentUsersCount(){
+  try {
+    const count = await db.user.count();
+    return count;
+    
+  } catch (error) {
+    console.error("Error getting current users count:", error);
+    return 0;
+    
+  }
+}

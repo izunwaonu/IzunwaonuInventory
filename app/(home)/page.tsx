@@ -28,9 +28,11 @@ import CustomizationCard from "@/components/frontend/customisation-card";
 import Image from "next/image";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import FeatureTabs from "@/components/frontend/SmoothTabs";
+import { getCurrentUsersCount } from "@/actions/users";
 
 export default async function page() {
-  const currentUsers = 1570;
+  const currentUsers = await getCurrentUsersCount();
+  console.log("Current Users are:",currentUsers);
   return (
     <section>
       <ReUsableHero 
@@ -64,7 +66,7 @@ export default async function page() {
   ]}
   backgroundStyle="red"
   className="min-h-[70vh]"
-  userCount={currentUsers > 10 ? currentUsers : null}
+  userCount={currentUsers > 1 ? 1998 + currentUsers : null}
 />
       <GridBackground>
         <div className="px-8 py-16 ">
