@@ -32,7 +32,7 @@ import { getCurrentUsersCount } from "@/actions/users";
 
 export default async function page() {
   const currentUsers = await getCurrentUsersCount();
-  console.log("Current Users are:",currentUsers);
+  
   return (
     <section>
       <ReUsableHero 
