@@ -10,6 +10,7 @@ import { generateToken } from "@/lib/token";
 import { OrgData } from "@/components/Forms/RegisterForm";
 import { generateOTP}  from "@/lib/generateOTP";
 import VerifyEmail from "@/components/email-templates/verify-email";
+import { adminPermissions } from "@/config/permissions";
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -25,6 +26,14 @@ const DEFAULT_USER_ROLE = {
     "orders.read",
   ],
 };
+
+const ADMIN_USER_ROLE = {
+  displayName: "Administrator",
+  roleName: "admin",
+  description: "Full system access",
+  permissions: adminPermissions,
+};
+
 
 // export async function createUser(data: UserProps, orgData:OrgData) {
 //   const { email, password, firstName, lastName, name, phone, image } = data;
@@ -212,11 +221,12 @@ export async function createUser(data: UserProps, orgData: OrgData) {
       console.log("✅ Organization created successfully:", org.id);
 
       console.log("🟢 Looking for default user role...");
-      let defaultRole = await tx.role.findFirst({ where: { roleName: DEFAULT_USER_ROLE.roleName } });
+      //Find or Create a default Admin role
+      let defaultRole = await tx.role.findFirst({ where: { roleName: ADMIN_USER_ROLE.roleName } });
 
       if (!defaultRole) {
         console.log("🟢 Creating default user role...");
-        defaultRole = await tx.role.create({ data: DEFAULT_USER_ROLE });
+        defaultRole = await tx.role.create({ data: ADMIN_USER_ROLE });
       }
 
       console.log("🟢 Hashing password...");
