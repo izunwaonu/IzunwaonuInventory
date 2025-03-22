@@ -30,12 +30,12 @@ import {
           <Container style={container}>
             <Section style={coverSection}>
               <Section style={imageSection}>
-                <Img
-                  src={`${baseUrl}/logo-dark.png`}
-                  width="143"
-                  height="70"
-                  alt="IzuInventory"
-                />
+              <Img
+                src={`${baseUrl}/logo-dark.png`}
+                width="489"
+                height="113"
+                alt="AWS's Logo"
+              />
               </Section>
               <Section style={upperSection}>
                 <Heading style={h1}>Verify your email address</Heading>
