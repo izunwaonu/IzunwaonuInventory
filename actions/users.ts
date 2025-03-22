@@ -11,6 +11,8 @@ import { OrgData } from "@/components/Forms/RegisterForm";
 import { generateOTP}  from "@/lib/generateOTP";
 import VerifyEmail from "@/components/email-templates/verify-email";
 import { adminPermissions } from "@/config/permissions";
+import { inviteData } from "@/components/Forms/users/UserInvitationForm.";
+import UserInvitation from "@/components/email-templates/user-invite";
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -604,3 +606,97 @@ export async function getCurrentUsersCount(){
     
   }
 }
+
+// export async function sendInvite(data: inviteData) {
+//   const { email, orgId, orgName, roleId, roleName} = data;
+//   try {
+//       // Check for existing users
+//       const existingUserByEmail = await db.user.findUnique({ where: { email} });
+//       if (existingUserByEmail) {
+//         console.log("❌ Email already in use:", email);
+//         return { error: `This email ${email} is already in use`, status: 409, data: null };
+//       }
+
+//       //check if this user is already invited
+//       const existingInvite = await db.invite.findFirst({ where: { email} });
+//       if (existingInvite) {
+//         console.log("❌ Email already in use:", email);
+//         return { error: `This user ${email} is already invited`, status: 409, data: null };
+//       }
+//       //Sending email verification link
+//     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+//      const linkUrl = `${baseUrl}/user-invite/${orgId}?roleId=${roleId}&&email=${email}&&orgName=${orgName}`;
+//         const { data, error } = await resend.emails.send({
+//           from: "IzuInventory <izu@inventory.mirronet.com>",
+//           to: email,
+//           subject: `Welcome to ${orgName} Inventory Management Team`,
+//           react: UserInvitation({orgName, roleName, linkUrl})
+//         });
+
+//         if (error) {
+//           console.log(error); // Removed incorrect `{`
+//           return {
+//             error: "Something went wrong, try again",
+//             status: 500,
+//             data: null,
+//           };
+//         }
+        
+//         console.log(data);
+//         return {
+//           error: null,
+//           status: 200,
+//           data,
+//         };
+//   }
+export async function sendInvite(data: inviteData) {
+  const { email, orgId, orgName, roleId, roleName } = data;
+  try {
+    // Check for existing users
+    const existingUserByEmail = await db.user.findUnique({ where: { email } });
+    if (existingUserByEmail) {
+      console.log("❌ Email already in use:", email);
+      return { error: `This email ${email} is already in use`, status: 409, data: null };
+    }
+
+    // Check if this user is already invited
+    const existingInvite = await db.invite.findFirst({ where: { email } });
+    if (existingInvite) {
+      console.log("❌ Email already in use:", email);
+      return { error: `This user ${email} is already invited`, status: 409, data: null };
+    }
+
+    // Sending email verification link
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const linkUrl = `${baseUrl}/user-invite/${orgId}?roleId=${roleId}&&email=${email}&&orgName=${orgName}`;
+    const { data, error } = await resend.emails.send({
+      from: "IzuInventory <izu@inventory.mirronet.com>",
+      to: email,
+      subject: `Welcome to ${orgName} Inventory Management Team`,
+      react: UserInvitation({ orgName, roleName, linkUrl }),
+    });
+
+    if (error) {
+      console.log(error);
+      return {
+        error: "Something went wrong, try again",
+        status: 500,
+        data: null,
+      };
+    }
+
+    console.log(data);
+    return {
+      error: null,
+      status: 200,
+      data,
+    };
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return {
+      error: "Internal server error",
+      status: 500,
+      data: null,
+    };
+  }
+} 

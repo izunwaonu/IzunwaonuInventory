@@ -57,19 +57,19 @@ model Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String
   firstName     String
   lastName      String
-  phone         String    @unique
-  email         String    @unique
+  phone         String        @unique
+  email         String        @unique
   emailVerified DateTime?
   image         String?
   jobTitle      String?
-  roles         Role[]    @relation("UserRoles") // Updated to support multiple roles
+  roles         Role[]        @relation("UserRoles") // Updated to support multiple roles
   // role          UserRole  @default(USER)
   password      String?
-  status        Boolean   @default(true)
+  status        Boolean       @default(true)
   accounts      Account[]
   sessions      Session[]
   savings       Saving[]
@@ -77,17 +77,17 @@ model User {
   orgName       String?
   organization  Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId         String
-  isVerfied     Boolean   @default(false)
+  isVerfied     Boolean       @default(false)
   token         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   roleId        String?
 }
 
 model Organization {
-  id         String      @id @default(cuid())
+  id         String    @id @default(cuid())
   name       String
-  slug       String   @unique
+  slug       String    @unique
   industry   String?
   country    String?
   state      String?
@@ -98,8 +98,23 @@ model Organization {
   startDate  DateTime?
   fiscalYear String?
   users      User[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  invites    Invite[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("organizations")
+}
+
+model Invite {
+  id           String        @id @default(cuid())
+  email        String
+  organization Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  status       Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("invites")
 }
 
 model Category {

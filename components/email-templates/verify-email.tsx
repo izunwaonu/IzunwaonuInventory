@@ -34,7 +34,7 @@ import {
                 src={`${baseUrl}/logo-dark.png`}
                 width="489"
                 height="113"
-                alt="AWS's Logo"
+                alt="IzuInventory Logo"
               />
               </Section>
               <Section style={upperSection}>

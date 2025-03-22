@@ -86,9 +86,12 @@
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
       "bcrypt"
     ],
     "onlyBuiltDependencies": [
+      "@prisma/client",
       "bcrypt"
     ]
   }
