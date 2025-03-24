@@ -62,7 +62,7 @@ export function UserInvitationForm({
       console.log(res);
       if (res.status!==200) {
         setLoading(false);
-        toast.success(res.error);
+        toast.error(res.error);
         setErr(res.error??"")
         return
       }

@@ -1,7 +1,7 @@
 "use server";
 import { ResetPasswordEmail } from "@/components/email-templates/reset-password";
 import { db } from "@/prisma/db";
-import { UserProps } from "@/types/types";
+import { InvitedUserProps, UserProps } from "@/types/types";
 import bcrypt, { compare } from "bcrypt";
 import { revalidatePath } from "next/cache";
 import { PasswordProps } from "@/components/Forms/ChangePasswordForm";
@@ -301,6 +301,62 @@ export async function createUser(data: UserProps, orgData: OrgData) {
     return { error: "Something went wrong, Please try again", status: 500, data: null };
   }
 }
+export async function createInvitedUser(data: InvitedUserProps) {
+  const { email, password, firstName, lastName, name, phone, image,orgId,roleId, orgName } = data;
+
+  console.log("🟢 Starting user creation process...");
+ 
+
+  try {
+    return await db.$transaction(async (tx) => {
+      console.log("🔵 Checking for existing users...");
+
+      // Check for existing users
+      const existingUserByEmail = await tx.user.findUnique({ where: { email } });
+      const existingUserByPhone = await tx.user.findUnique({ where: { phone } });
+
+      if (existingUserByEmail) {
+        console.log("❌ Email already in use:", email);
+        return { error: `This email ${email} is already in use`, status: 409, data: null };
+      }
+
+      if (existingUserByPhone) {
+        console.log("❌ Phone number already in use:", phone);
+        return { error: `This phone number ${phone} is already in use`, status: 409, data: null };
+      }
+      
+
+      console.log("🟢 Hashing password...");
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+  
+
+      console.log("🟢 Creating new user...");
+      const newUser = await tx.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          firstName,
+          lastName,
+          name,
+          orgId: orgId,
+          orgName: orgName,
+          phone,
+          image,
+         
+          roles: { connect: { id: roleId} },
+        },
+  
+      });
+
+
+      return { error: null, status: 200, data: { id: newUser.id, email: newUser.email } };
+    });
+  } catch (error) {
+    console.error("❌ Error creating user:", error);
+    return { error: "Something went wrong, Please try again", status: 500, data: null };
+  }
+}
 
 
 export async function getAllMembers() {
@@ -326,6 +382,48 @@ export async function getAllUsers() {
       include: {
         roles: true,
       },
+    });
+    return users;
+  } catch (error) {
+    console.error("Error fetching the count:", error);
+    return 0;
+  }
+}
+export async function getOrgUsers(orgId:string) {
+  try {
+    const users = await db.user.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      where:{
+        orgId
+      },
+      include: {
+        roles: true,
+      },
+    });
+    return users;
+  } catch (error) {
+    console.error("Error fetching the count:", error);
+    return 0;
+  }
+}
+export async function getOrgInvites(orgId:string) {
+  try {
+    const users = await db.invite.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      where:{
+        orgId
+      },
+      select:{
+        email: true,
+        id: true,
+        createdAt:true,
+        updatedAt:true,
+        status:true,
+      }
     });
     return users;
   } catch (error) {
@@ -665,6 +763,14 @@ export async function sendInvite(data: inviteData) {
       console.log("❌ Email already in use:", email);
       return { error: `This user ${email} is already invited`, status: 409, data: null };
     }
+
+    //Create Invite
+    await db.invite.create({
+      data:{
+        email,
+        orgId,
+      },
+    })
 
     // Sending email verification link
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

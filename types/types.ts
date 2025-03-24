@@ -23,6 +23,18 @@ export type UserProps = {
   email: string;
   password: string;
 };
+export type InvitedUserProps = {
+  name: string;
+  orgId: string;
+  orgName: string;
+  roleId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  image: string;
+  email: string;
+  password: string;
+};
 export type LoginProps = {
   email: string;
   password: string;

@@ -32,7 +32,7 @@ import {
         <Preview>Invitation to Join {orgName} on IzuInventory - {roleName}</Preview>
         <Container style={container}>
            <Img
-           src={`${baseUrl}/logo-dark.png`}
+           src={`${baseUrl}/logo-light.png`}
            width="489"
            height="113"
            alt="IzuInventory logo"
@@ -102,8 +102,8 @@ import {
   };
   
   const button = {
-    backgroundColor: '#5e6ad2',
-    borderRadius: '3px',
+    backgroundColor: '#7b1414',
+    borderRadius: '5px',
     fontWeight: '600',
     color: '#fff',
     fontSize: '15px',
@@ -124,8 +124,8 @@ import {
   };
   const h1 = {
     color: '#1d1c1d',
-    fontSize: '36px',
-    fontWeight: '700',
+    fontSize: '30px',
+    fontWeight: '600',
     margin: '30px 0',
     padding: '0',
     lineHeight: '42px',
