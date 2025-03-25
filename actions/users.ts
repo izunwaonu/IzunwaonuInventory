@@ -329,7 +329,6 @@ export async function createInvitedUser(data: InvitedUserProps) {
       console.log("🟢 Hashing password...");
       const hashedPassword = await bcrypt.hash(password, 10);
 
-  
 
       console.log("🟢 Creating new user...");
       const newUser = await tx.user.create({
@@ -343,13 +342,12 @@ export async function createInvitedUser(data: InvitedUserProps) {
           orgName: orgName,
           phone,
           image,
+          isVerfied: true,
          
           roles: { connect: { id: roleId} },
         },
   
       });
-
-
       return { error: null, status: 200, data: { id: newUser.id, email: newUser.email } };
     });
   } catch (error) {

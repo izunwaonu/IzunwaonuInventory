@@ -34,6 +34,7 @@ export type InvitedUserProps = {
   image: string;
   email: string;
   password: string;
+  disabled?: boolean;
 };
 export type LoginProps = {
   email: string;

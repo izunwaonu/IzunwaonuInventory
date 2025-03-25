@@ -30,9 +30,7 @@ import { Button } from "../ui/button";
 import { signIn } from "next-auth/react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import Logo from "../global/Logo";
-import FormSelectInput from "../FormInputs/FormSelectInput";
-import countries from "@/countries";
-import { generateSlug } from "@/lib/generateSlug";
+
 
 export default function RegisterInvitedUserForm({orgId, userEmail, orgName, roleId}:{orgId:string, userEmail:string, orgName:string, roleId:string}) {
   const [startDate, setStartDate] = useState(new Date());
@@ -68,8 +66,8 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
         setEmailErr(res.error);
       } else if (res.status === 200) {
         setLoading(false);
-        toast.success("Account Created successfully", {description: "Your account has been created, pending verification"});
-        router.push(`/verify/${res.data?.id}?email=${res.data?.email}`);
+        toast.success("Account Created successfully", {description: "Your account has been created successfully, kindly login"});
+        router.push("/login");
       } else {
         setLoading(false);
         toast.error("Something went wrong");
@@ -88,7 +86,7 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
             <Logo/>
           </div>  */}
           <div className="grid gap-2  mt-10 md:mt-0">
-            <h1 className="text-3xl font-bold">Welcome to {orgName} </h1>
+            <h1 className="text-3xl font-bold">Welcome to {orgName} team </h1>
             <p className="text-muted-foreground text-sm">
               Please customize your account to get started.
             </p>
@@ -132,6 +130,7 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
                     icon={Mail}
                     placeholder="email"
                     isRequired={false}
+                    disabled
                   />
                 </div>
               </div>

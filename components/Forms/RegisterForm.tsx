@@ -37,8 +37,6 @@ import { generateSlug } from "@/lib/generateSlug";
 export default function RegisterForm() {
   const [startDate, setStartDate] = useState(new Date());
 
-
-
   const initialCountryCode = "NG";
  const initialCountry = countries.find(
    (item) => item.code === initialCountryCode
