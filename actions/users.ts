@@ -338,17 +338,27 @@ export async function createInvitedUser(data: InvitedUserProps) {
           firstName,
           lastName,
           name,
-          orgId: orgId,
-          orgName: orgName,
+          orgId,
+          orgName,
           phone,
           image,
           isVerfied: true,
-         
-          roles: { connect: { id: roleId} },
+          roles: { connect: { id: roleId } },
         },
-  
       });
+      
+      // Update the status of the invite separately
+      await db.invite.update({
+        where: {
+          email,
+        },
+        data: {
+          status: true,
+        },
+      });
+      
       return { error: null, status: 200, data: { id: newUser.id, email: newUser.email } };
+      
     });
   } catch (error) {
     console.error("❌ Error creating user:", error);
