@@ -12,28 +12,28 @@ import { UserWithRoles } from "@/types/types";
 import UserRoleBtn from "@/components/DataTableColumns/UserRoleBtn";
 
 export const columns: ColumnDef<UserWithRoles>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "select",
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
 
   {
     accessorKey: "image",
@@ -79,6 +79,7 @@ export const columns: ColumnDef<UserWithRoles>[] = [
   // },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const user = row.original;
       return (

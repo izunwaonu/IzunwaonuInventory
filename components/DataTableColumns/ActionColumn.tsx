@@ -61,28 +61,20 @@ export default function ActionColumn({
     }
   }
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <AlertDialog>
+  
+    <div className="flex items-center">
+    <AlertDialog>
           <AlertDialogTrigger asChild>
             {/* <DropdownMenuItem className="text-red-600 hover:text-red-700 transition-all duration-500 cursor-pointer">
               
             </DropdownMenuItem> */}
             <Button
               variant={"ghost"}
-              size={"sm"}
+              size={"icon"}
               className="text-red-600 hover:text-red-700 transition-all duration-500 cursor-pointer "
             >
               <Trash className="w-4 h-4  mr-2 flex-shrink-0" />
-              <span>Delete</span>
+              
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -100,21 +92,19 @@ export default function ActionColumn({
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
-        </AlertDialog>
-        {/* <DropdownMenuItem
-          className="text-red-600 hover:text-red-700 transition-all duration-500 cursor-pointer"
-          onClick={() => handleDelete()}
-        >
-          <Trash className="w-4 h-4  mr-2 flex-shrink-0" />
-          <span>Delete</span>
-        </DropdownMenuItem> */}
-        <DropdownMenuItem>
-          <Link href={editEndpoint} className="flex item gap-2">
+    </AlertDialog>
+    <Button 
+    variant={"ghost"} 
+    size={"icon"} 
+    className="text-green-600 hover:text-green-700 transition-all duration-500 cursor-pointer "  asChild
+    >
+            <Link href={editEndpoint} >
             <Pencil className="w-4 h-4 " />
-            <span>Edit</span>
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          
+           </Link>
+            </Button>
+    
+    </div>
+   
   );
 }

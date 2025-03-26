@@ -13,6 +13,7 @@ import VerifyEmail from "@/components/email-templates/verify-email";
 import { adminPermissions } from "@/config/permissions";
 import { inviteData } from "@/components/Forms/users/UserInvitationForm.";
 import UserInvitation from "@/components/email-templates/user-invite";
+import email from "next-auth/providers/email";
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -440,12 +441,56 @@ export async function getOrgInvites(orgId:string) {
   }
 }
 
+// export async function deleteUser(id: string) {
+//   try {
+//     const user = await db.user.findUnique({
+//       where: {
+//         id
+//       },
+//       select:{
+//         email:true
+//       }
+//     })
+//     await db.invite.delete({
+//       where: {
+//         email: user?.email,
+//       }
+//     })
+//     const deleted = await db.user.delete({
+//       where: {
+//         id,
+//       },
+//     });
+
+//     return {
+//       ok: true,
+//       data: deleted,
+//     };
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 export async function deleteUser(id: string) {
   try {
+    const user = await db.user.findUnique({
+      where: { id },
+      select: { email: true }
+    });
+
+    if (!user) {
+      return {
+        ok: false,
+        error: "User not found",
+      };
+    }
+
+    // Proceed only if the user exists
+    await db.invite.deleteMany({
+      where: { email: user.email },
+    });
+
     const deleted = await db.user.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     return {
@@ -454,8 +499,13 @@ export async function deleteUser(id: string) {
     };
   } catch (error) {
     console.log(error);
+    return {
+      ok: false,
+      error: "An error occurred while deleting the user.",
+    };
   }
 }
+
 
 export async function getUserById(id: string) {
   try {
