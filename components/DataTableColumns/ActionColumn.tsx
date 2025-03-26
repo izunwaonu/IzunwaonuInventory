@@ -77,6 +77,7 @@ export default function ActionColumn({
               
             </Button>
           </AlertDialogTrigger>
+
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -93,7 +94,7 @@ export default function ActionColumn({
             </AlertDialogFooter>
           </AlertDialogContent>
     </AlertDialog>
-    <Button 
+    {editEndpoint && <Button 
     variant={"ghost"} 
     size={"icon"} 
     className="text-green-600 hover:text-green-700 transition-all duration-500 cursor-pointer "  asChild
@@ -102,7 +103,8 @@ export default function ActionColumn({
             <Pencil className="w-4 h-4 " />
           
            </Link>
-            </Button>
+    </Button>}
+    
     
     </div>
    

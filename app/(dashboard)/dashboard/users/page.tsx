@@ -5,23 +5,24 @@ import { getAllUsers, getOrgInvites, getOrgUsers } from "@/actions/users";
 import ModalTableHeader from "@/components/dashboard/Tables/ModalTableHeader";
 import { UserInvitationForm } from "@/components/Forms/users/UserInvitationForm.";
 import { getAuthenticatedUser } from "@/config/useAuth";
-import { getRoles } from "@/actions/roles";
+// import { getRoles } from "@/actions/roles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InviteTable from "@/components/dashboard/Tables/InvitesTables";
+import { getOrgRoles } from "@/actions/roles";
 
 export default async function page() {
   
   const user = await getAuthenticatedUser();
-  const res = await getRoles();
+  const orgId = user.orgId;
+  const orgName = user?.orgName??"";
+  const users = (await getOrgUsers(orgId)) || [];
+  const invites = (await getOrgInvites(orgId)) || [];
+  const res = await getOrgRoles(orgId);
   const rolesData = res.data || [];
   const roles = rolesData.map((role) => ({ 
     label: role.displayName, 
     value: role.id
   }))
-  const orgId = user.orgId;
-  const orgName = user?.orgName??"";
-  const users = (await getOrgUsers(orgId)) || [];
-  const invites = (await getOrgInvites(orgId)) || [];
   return (
    
     <div className="p-8">

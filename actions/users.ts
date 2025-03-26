@@ -229,7 +229,12 @@ export async function createUser(data: UserProps, orgData: OrgData) {
 
       if (!defaultRole) {
         console.log("🟢 Creating default user role...");
-        defaultRole = await tx.role.create({ data: ADMIN_USER_ROLE });
+        defaultRole = await tx.role.create({ 
+          data:{
+            ...ADMIN_USER_ROLE,
+            orgId:org.id
+          }
+        });
       }
 
       console.log("🟢 Hashing password...");

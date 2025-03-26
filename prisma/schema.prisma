@@ -48,6 +48,8 @@ model Role {
   displayName String // Human-readable name (e.g., "Store Manager")
   roleName    String   @unique // System name (e.g., "store_manager")
   description String?
+  organization  Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId         String
   permissions String[] // Array of permission strings
   users       User[]   @relation("UserRoles")
   createdAt   DateTime @default(now())
@@ -99,6 +101,7 @@ model Organization {
   fiscalYear String?
   users      User[]
   invites    Invite[]
+  roles      Role[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
