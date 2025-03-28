@@ -105,7 +105,7 @@ export function UserInvitationForm({
               />
               {err && <p className="text-red-500 -mt-1">{err}</p>}
               <FormSelectInput
-                label="Blog Categories"
+                label="User Role"
                 options={roles}
                 option={selectedRole}
                 setOption={setSelectedRole}
