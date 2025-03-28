@@ -43,7 +43,7 @@ import {
         </Text>
         <Text style={heroText}>
         You've been invited to join {orgName} inventory management team 
-        as a {roleName} on IzuInventory. As a Secretary, you'll 
+        as a {roleName} on IzuInventory. As a {roleName}, you'll 
         have access to specific inventory management features tailored to your role.
         </Text>
         <Text style={heroText}>
