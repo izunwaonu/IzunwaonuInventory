@@ -103,6 +103,7 @@ export async function createRole(data: RoleFormData) {
         roleName: createRoleName(data.displayName),
         description: data.description,
         permissions: data.permissions,
+        orgId:data.orgId,
       },
     });
 

@@ -17,9 +17,10 @@ import { createRole, updateRole } from "@/actions/roles";
 type RoleFormProps = {
   editingId?: string;
   initialData?: Role | null;
+  orgId: string;
 };
 
-export default function RoleForm({ editingId, initialData }: RoleFormProps) {
+export default function RoleForm({ orgId, editingId, initialData }: RoleFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
@@ -38,6 +39,7 @@ export default function RoleForm({ editingId, initialData }: RoleFormProps) {
 
   async function saveRole(data: RoleFormData) {
     try {
+      data.orgId = orgId;
       setLoading(true);
       const result = editingId
         ? await updateRole(editingId, data)

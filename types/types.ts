@@ -50,6 +50,7 @@ export interface RoleFormData {
   displayName: string;
   description?: string;
   permissions: string[];
+  orgId: string;
 }
 
 export interface UserWithRoles extends User {
