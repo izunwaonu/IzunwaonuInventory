@@ -13,7 +13,7 @@ import VerifyEmail from "@/components/email-templates/verify-email";
 import { adminPermissions } from "@/config/permissions";
 import { inviteData } from "@/components/Forms/users/UserInvitationForm.";
 import UserInvitation from "@/components/email-templates/user-invite";
-import email from "next-auth/providers/email";
+
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

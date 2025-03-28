@@ -208,22 +208,22 @@ export async function deleteRole(id: string) {
   }
 }
 
-// export async function getRoles() {
-//   try {
-//     const roles = await db.role.findMany({
-//       orderBy: {
-//         createdAt: "desc",
-//       },
-//     });
-//     return { success: true, data: roles };
-//   } catch (error) {
-//     console.error("Error fetching roles:", error);
-//     return {
-//       success: false,
-//       error: "Failed to fetch roles",
-//     };
-//   }
-// }
+export async function getRoles() {
+  try {
+    const roles = await db.role.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return { success: true, data: roles };
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    return {
+      success: false,
+      error: "Failed to fetch roles",
+    };
+  }
+}
 
 export async function getOrgRoles(orgId:string) {
   try {
