@@ -16,7 +16,7 @@ import { Options } from "react-tailwindcss-select/dist/components/type";
 import FormSelectInput from "../FormInputs/FormSelectInput";
 import SubmitButton from "../FormInputs/SubmitButton";
 import { UserWithRoles, RoleOption } from "@/types/types";
-import { getRoles, updateUserRole } from "@/actions/roles";
+import {getOrgRoles, updateUserRole } from "@/actions/roles";
 
 interface UserRoleBtnProps {
   user: UserWithRoles;
@@ -37,7 +37,7 @@ export default function UserRoleBtn({ user }: UserRoleBtnProps) {
   useEffect(() => {
     async function fetchRoles() {
       try {
-        const { data: rolesData } = await getRoles();
+        const { data: rolesData } = await getOrgRoles(user.orgId);
         if (rolesData) {
           const dataOptions = rolesData.map((role) => ({
             label: role.displayName,
