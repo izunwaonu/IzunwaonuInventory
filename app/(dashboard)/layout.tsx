@@ -19,7 +19,7 @@ export default async function DashboardLayout({
       <Sidebar session={session} />
       <div className="md:ml-[220px] lg:ml-[280px]">
         <Navbar session={session} />
-        <div className="p-8">{children}</div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );

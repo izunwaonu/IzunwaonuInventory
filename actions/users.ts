@@ -855,6 +855,7 @@ export async function sendInvite(data: inviteData) {
     }
 
     console.log(data);
+    revalidatePath("/dashboard/users")
     return {
       error: null,
       status: 200,
