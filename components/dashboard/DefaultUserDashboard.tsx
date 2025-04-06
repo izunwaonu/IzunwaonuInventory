@@ -46,11 +46,20 @@ type MenuItem = {
   href: string;
   permission: string; // Required permission to view this menu item
 };
-
+export type NavigationLink ={
+  title: string;
+  icon: React.ReactNode;
+  href: string;
+  count: string;
+  description: string;
+}
 export default function DefaultUserDashboard({
   user,
+  
 }: {
   user: AuthenticatedUser;
+
+  
 }) {
   const hasPermission = (permission: string): boolean => {
     return user.permissions?.includes(permission) ?? false;
@@ -71,8 +80,10 @@ export default function DefaultUserDashboard({
           !link.dropdown || (link.dropdownMenu && link.dropdownMenu.length > 0)
       );
   };
+    
+const filteredLinks = filterSidebarLinks(sidebarLinks);
 
-  const filteredLinks = filterSidebarLinks(sidebarLinks);
+ 
   console.log(filteredLinks);
   const [greeting, setGreeting] = useState("");
   const [currentTime, setCurrentTime] = useState("");
@@ -150,6 +161,7 @@ export default function DefaultUserDashboard({
       </div>
 
       {/* Main Navigation Cards */}
+      
       {/* */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {filteredLinks.map((link, index) => {
@@ -202,7 +214,7 @@ export default function DefaultUserDashboard({
                 </CardFooter>
               )}
             </Card>
-          );
+          )
         })}
       </div>
     </main>

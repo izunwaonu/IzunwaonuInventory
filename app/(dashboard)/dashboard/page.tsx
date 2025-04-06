@@ -1,20 +1,27 @@
 import { getDashboardOverview } from "@/actions/analytics";
 import { getAllSavings } from "@/actions/savings";
 import DashboardMain from "@/components/dashboard/DashboardMain";
-import DefaultUserDashboard from "@/components/dashboard/DefaultUserDashboard";
+import DefaultUserDashboard, { ISidebarLink } from "@/components/dashboard/DefaultUserDashboard";
 import OverViewCard from "@/components/OverViewCard";
 import { DashboardWelcome } from "@/components/WelcomeBanner";
+import { sidebarLinks } from "@/config/sidebar";
 import { getAuthenticatedUser } from "@/config/useAuth";
+import { Layers } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const analytics = (await getDashboardOverview()) || [];
   const user = await getAuthenticatedUser();
   const userPermissions = user.permissions;
-  const hasPermission = userPermissions.includes('dashboard.read');
+  // const hasPermission = userPermissions.includes('dashboard.read');
 
-  if(!hasPermission){
-    return <p><DefaultUserDashboard user={user}/></p>;
+   // Helper function to check if user has permission
+   
+
+  if(!userPermissions.includes('dashboard.read')){
+    return <DefaultUserDashboard
+    // navigationLinks={filteredLinks}
+         user={user}/>;
   }
 
   return (

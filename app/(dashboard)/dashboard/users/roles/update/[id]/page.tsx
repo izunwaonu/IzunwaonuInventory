@@ -14,5 +14,5 @@ export default async function page({
   if (!id || !data) {
     return NotFound();
   }
-  return <RoleForm editingId={id} initialData={data} />;
+  return <RoleForm editingId={id} initialData={data} orgId={data.orgId} />;
 }
