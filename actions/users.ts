@@ -10,7 +10,7 @@ import { generateToken } from "@/lib/token";
 import { OrgData } from "@/components/Forms/RegisterForm";
 import { generateOTP}  from "@/lib/generateOTP";
 import VerifyEmail from "@/components/email-templates/verify-email";
-import { adminPermissions } from "@/config/permissions";
+import { adminPermissions, userPermissions } from "@/config/permissions";
 import { inviteData } from "@/components/Forms/users/UserInvitationForm.";
 import UserInvitation from "@/components/email-templates/user-invite";
 
@@ -22,12 +22,7 @@ const DEFAULT_USER_ROLE = {
   displayName: "User",
   roleName: "user",
   description: "Default user role with basic permissions",
-  permissions: [
-    "dashboard.read",
-    "profile.read",
-    "profile.update",
-    "orders.read",
-  ],
+  permissions: userPermissions,
 };
 
 const ADMIN_USER_ROLE = {

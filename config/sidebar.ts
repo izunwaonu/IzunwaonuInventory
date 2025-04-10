@@ -361,12 +361,12 @@ export const sidebarLinks: ISidebarLink[] = [
       },
       {
         title: "Users & Invites",
-        href: "/dashboard/users",
+        href: "/dashboard/settings/users",
         permission: "users.read",
       },
       {
         title: "Roles & Permissions",
-        href: "/dashboard/users/roles",
+        href: "/dashboard/settings/roles",
         permission: "roles.read",
       },
       {
@@ -381,7 +381,7 @@ export const sidebarLinks: ISidebarLink[] = [
       },
       {
         title: "Change Password",
-        href: "/dashboard/change-password",
+        href: "/dashboard/settings/change-password",
         permission: "settings.read",
       },
     ],

@@ -363,7 +363,7 @@ export const adminPermissions = [
   "reports.create", "reports.read", "reports.update", "reports.delete",
   
   // Settings and related
-  "settings.create", "settings.read", "settings.update", "settings.delete",
+  "settings.create", "settings.read", "settings.update", "settings.delete", "settings.access",
   "locations.create", "locations.read", "locations.update", "locations.delete",
   "users.create", "users.read", "users.update", "users.delete",
   "roles.create", "roles.read", "roles.update", "roles.delete",
