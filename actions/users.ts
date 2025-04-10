@@ -274,6 +274,9 @@ export async function createUser(data: UserProps, orgData: OrgData) {
 
       console.log("🟢 Generating email template...");
       const emailTemplate = VerifyEmail({ verificationCode: newUser.token });
+      console.log("Generated email template:", emailTemplate);
+      console.log("Template type:", typeof emailTemplate);
+
 
       if (!emailTemplate) {
         console.error("❌ Email template generation failed! It returned null or undefined.");

@@ -1,4 +1,4 @@
-import { adminPermissions } from "@/config/permissions";
+import { adminPermissions, userPermissions } from "@/config/permissions";
 import { db } from "./db";
 import bcrypt from "bcrypt";
 // import bcrypt from "bcryptjs";
@@ -65,14 +65,7 @@ const currentYear = new Date().getFullYear();
 // ];
 
 // Define user role permissions (basic access)
-const userPermissions = [
-  "dashboard.read",
-  "profile.read",
-  "profile.update",
-  "products.read",
-  "orders.read",
-  "orders.create",
-];
+
 async function cleanDatabase() {
   console.log("Cleaning up existing data...");
   try {
