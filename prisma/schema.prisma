@@ -175,7 +175,7 @@ model Item {
   taxRateId         String?
   organization      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId             String
-  tax               Float //tax rate
+  tax               Float?  @default(0) //tax rate
   taxRate           TaxRate?       @relation(fields: [taxRateId], references: [id])
   brandId           String?
   brand             Brand?         @relation(fields: [brandId], references: [id])

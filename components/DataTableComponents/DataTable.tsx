@@ -81,78 +81,81 @@ export default function DataTable<TData, TValue>({
   // console.log(searchResults);
   return (
     <div className="space-y-4">
-      {model === "savings" && (
-        <SavingsSummary data={isSearch ? searchResults : filteredData} />
-      )}
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-full md:col-span-8">
-          <SearchBar
-            data={data}
-            onSearch={setSearchResults}
-            setIsSearch={setIsSearch}
-            placeholder={searchPlaceholder}
-          />
-        </div>
-        <div className="col-span-full md:col-span-4 flex items-center gap-2">
-          <DateFilters
-            data={data}
-            onFilter={setFilteredData}
-            setIsSearch={setIsSearch}
-          />
-        </div>
+    <div className="flex justify-between items-center gap-8">
+      <div className="flex-1 w-full">
+        <SearchBar
+          data={data}
+          onSearch={setSearchResults}
+          setIsSearch={setIsSearch}
+        />
       </div>
+      <div className="flex items-center gap-2 ">
+        <DateRangeFilter
+          data={data}
+          onFilter={setFilteredData}
+          setIsSearch={setIsSearch}
+        />
+        <DateFilters
+          data={data}
+          onFilter={setFilteredData}
+          setIsSearch={setIsSearch}
+        />
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <DataTableViewOptions table={table} />
       </div>
-      <DataTablePagination table={table} />
     </div>
+
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id} colSpan={header.colSpan}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="h-24 text-center"
+              >
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+    <DataTablePagination table={table} />
+  </div>
   );
 }
