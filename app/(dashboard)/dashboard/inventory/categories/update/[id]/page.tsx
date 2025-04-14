@@ -11,7 +11,8 @@ export default async function page({
   const category = await getCategoryById(id);
   return (
     <div className="p-8">
-      <CategoryForm initialData={category} editingId={id} />
+      {/* <CategoryForm initialData={category} editingId={id} /> */}
+      <h1 className="text-3xl font-bold mb-4">Category </h1>
     </div>
   );
 }
