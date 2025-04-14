@@ -83,6 +83,13 @@ export interface UnitDTO {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface TaxDTO {
+  id: string;
+  name: string;
+  rate: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 export interface BrandDTO {
   id: string;
   name: string;

@@ -170,6 +170,8 @@ model Item {
   ean               String? //Thirteen digit unique number (International Article Number)
   mpn               String? //Manufacturing Part Number unambiguously identifies a part design
   isbn              String //Thirteen digit unique commercial book identifier (International Standard Book Number)
+  thumbnail        String?
+  imageUrls         String[]
   categoryId        String?
   category          Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   taxRateId         String?

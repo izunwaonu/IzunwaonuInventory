@@ -367,6 +367,7 @@ export const adminPermissions = [
   "locations.create", "locations.read", "locations.update", "locations.delete",
   "users.create", "users.read", "users.update", "users.delete",
   "roles.create", "roles.read", "roles.update", "roles.delete",
+  "taxes.create", "taxes.read", "taxes.update", "taxes.delete",
   "company.create", "company.read", "company.update", "company.delete",
   "profile.create", "profile.read", "profile.update", "profile.delete",
   
