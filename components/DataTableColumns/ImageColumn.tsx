@@ -22,7 +22,7 @@ export default function ImageColumn({
     <div className="shrink-0">
       <Image
         alt={`${accessorKey}`}
-        className="aspect-square rounded-md object-cover"
+        className="aspect-square rounded-full object-cover"
         height="50"
         src={imageUrl ?? "/placeholder.png"}
         width="50"
