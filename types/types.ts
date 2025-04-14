@@ -76,3 +76,17 @@ export interface RoleResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface UnitDTO {
+  id: string;
+  name: string;
+  symbol: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface BrandDTO {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

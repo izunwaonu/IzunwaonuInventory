@@ -496,6 +496,8 @@ export async function deleteUser(id: string) {
       where: { id },
     });
 
+    revalidatePath("/dashboard/settings/users");
+
     return {
       ok: true,
       data: deleted,

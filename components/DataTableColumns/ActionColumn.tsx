@@ -21,17 +21,18 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 import Link from "next/link";
-import { deleteSaving } from "@/actions/savings";
 import { deleteUser } from "@/actions/users";
+import { deleteUnit } from "@/actions/units";
+import { deleteBrand } from "@/actions/brands";
 
 type ActionColumnProps = {
   row: any;
   model: any;
   editEndpoint: string;
   id: string | undefined;
-  // revPath: string;
+  
 };
 export default function ActionColumn({
   row,
@@ -42,12 +43,13 @@ export default function ActionColumn({
   const isActive = row.isActive;
   async function handleDelete() {
     try {
-      if (model === "saving") {
-        const res = await deleteSaving(id);
+      if (model === "unit") {
+        const res = await deleteUnit(id);
         if (res?.ok) {
-          window.location.reload();
+         
+          toast.success(`${model} Deleted Successfully`);
         }
-        toast.success(`${model} Deleted Successfully`);
+      
       } else if (model === "user") {
         const res = await deleteUser(id);
         if (res?.ok) {
@@ -55,9 +57,16 @@ export default function ActionColumn({
         }
         toast.success(`${model} Deleted Successfully`);
       }
+      else if (model === "brand") {
+        const res = await deleteBrand(id);
+        if (res?.ok) {
+          window.location.reload();
+        }
+        toast.success(`${model} Deleted Successfully`);
+      }
     } catch (error) {
       console.log(error);
-      toast.error("Category Couldn't be deleted");
+      toast.error("Unit Couldn't be deleted");
     }
   }
   return (

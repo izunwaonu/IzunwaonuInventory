@@ -90,16 +90,18 @@ enum UserRole {
 }
 
 model Location {
-  id        String       @id @default(cuid())
-  name      String
-  type      LocationType
-  address   String?
-  phone     String?
-  email     String?
-  isActive  Boolean      @default(true)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  users     User[]
+  id           String       @id @default(cuid())
+  name         String
+  type         LocationType
+  address      String?
+  phone        String?
+  email        String?
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  users        User[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
   // inventories   Inventory[]
   // incomingTransfers Transfer[] @relation("ToLocation")
   // outgoingTransfers Transfer[] @relation("FromLocation")
@@ -108,44 +110,52 @@ model Location {
 }
 
 model Category {
-  id            String     @id @default(cuid())
+  id            String       @id @default(cuid())
   title         String
-  slug          String     @unique
+  slug          String       @unique
   imageUrl      String?
   description   String?
   parentId      String?
-  parent        Category?  @relation("SubCategories", fields: [parentId], references: [id])
-  subCategories Category[] @relation("SubCategories")
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId         String
+  parent        Category?    @relation("SubCategories", fields: [parentId], references: [id])
+  subCategories Category[]   @relation("SubCategories")
   items         Item[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 model Unit {
-  id        String   @id @default(cuid())
-  name      String
-  symbol    String
-  items     Item[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String       @id @default(cuid())
+  name         String
+  symbol       String
+  items        Item[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model Brand {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  items     Item[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  items        Item[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model TaxRate {
-  id        String   @id @default(cuid())
-  name      String
-  rate      Float
-  items     Item[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String       @id @default(cuid())
+  name         String
+  rate         Float
+  items        Item[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model Item {
@@ -163,6 +173,8 @@ model Item {
   categoryId        String?
   category          Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   taxRateId         String?
+  organization      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId             String
   tax               Float //tax rate
   taxRate           TaxRate?       @relation(fields: [taxRateId], references: [id])
   brandId           String?
@@ -242,6 +254,8 @@ model Supplier {
   phone             String?
   address           String?
   taxId             String?
+  organization      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId             String
   paymentTerms      Int? // Days
   notes             String?
   isActive          Boolean        @default(true)
@@ -253,9 +267,9 @@ model Supplier {
 }
 
 model Organization {
-  id                 String    @id @default(cuid())
+  id                 String     @id @default(cuid())
   name               String
-  slug               String    @unique
+  slug               String     @unique
   industry           String?
   country            String?
   state              String?
@@ -267,9 +281,16 @@ model Organization {
   inventoryStartDate DateTime?
   fiscalYear         String?
   users              User[]
+  units              Unit[]
+  categories         Category[]
   invites            Invite[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  items              Item[]
+  locations          Location[]
+  brands             Brand[]
+  taxes              TaxRate[]
+  suppliers          Supplier[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
   role               Role[]
   ApiKey             ApiKey[]
 
