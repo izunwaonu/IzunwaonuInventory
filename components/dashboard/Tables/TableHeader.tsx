@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatBytes } from "@/lib/formatBytes";
 import { generateSlug } from "@/lib/generateSlug";
-import { createBulkCategories } from "@/actions/categories";
+// import { createBulkCategories } from "@/actions/categories";
 import toast from "react-hot-toast";
 import exportDataToExcel from "@/lib/exportDataToExcel";
 import { FaFileExcel } from "react-icons/fa";
@@ -132,7 +132,7 @@ export default function TableHeader({
                   status: true,
                 };
               });
-              await createBulkCategories(categories);
+              // await createBulkCategories(categories);
             }
             setLoading(false);
             setUploadSuccess(true);

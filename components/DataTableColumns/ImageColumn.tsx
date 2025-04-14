@@ -8,9 +8,16 @@ export default function ImageColumn({
   row: any;
   accessorKey: any;
 }) {
-  const imageUrl = row.getValue(`${accessorKey}`);
-  // const thum = row.getValue(`${accessorKey}`);
-  // console.log(imageUrl);
+  const rawUrl = row.getValue(`${accessorKey}`);
+  
+  const imageUrl =
+    typeof rawUrl === "string" &&
+    (rawUrl.startsWith("http") || rawUrl.startsWith("/"))
+      ? rawUrl
+      : rawUrl
+      ? `/${rawUrl}`
+      : "/placeholder.png";
+  
   return (
     <div className="shrink-0">
       <Image

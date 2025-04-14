@@ -26,6 +26,7 @@ import Link from "next/link";
 import { deleteUser } from "@/actions/users";
 import { deleteUnit } from "@/actions/units";
 import { deleteBrand } from "@/actions/brands";
+import { deleteCategory } from "@/actions/categories";
 
 type ActionColumnProps = {
   row: any;
@@ -46,7 +47,7 @@ export default function ActionColumn({
       if (model === "unit") {
         const res = await deleteUnit(id);
         if (res?.ok) {
-         
+          window.location.reload();
           toast.success(`${model} Deleted Successfully`);
         }
       
@@ -54,19 +55,29 @@ export default function ActionColumn({
         const res = await deleteUser(id);
         if (res?.ok) {
           window.location.reload();
+          toast.success(`${model} Deleted Successfully`);
         }
-        toast.success(`${model} Deleted Successfully`);
+        
       }
       else if (model === "brand") {
         const res = await deleteBrand(id);
         if (res?.ok) {
           window.location.reload();
+          toast.success(`${model} Deleted Successfully`);
         }
-        toast.success(`${model} Deleted Successfully`);
+        
+      }
+      else if (model === "category") {
+        const res = await deleteCategory(id);
+        if (res?.ok) {
+          window.location.reload();
+          toast.success(`${model} Deleted Successfully`);
+        }
+        
       }
     } catch (error) {
       console.log(error);
-      toast.error("Unit Couldn't be deleted");
+      toast.error("Brand Couldn't be deleted");
     }
   }
   return (

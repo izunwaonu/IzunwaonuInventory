@@ -10,8 +10,9 @@ import ImageColumn from "@/components/DataTableColumns/ImageColumn";
 import SortableColumn from "@/components/DataTableColumns/SortableColumn";
 import { ColumnDef } from "@tanstack/react-table";
 import ActionColumn from "@/components/DataTableColumns/ActionColumn";
-import { Category } from "@prisma/client";
-export const columns: ColumnDef<Category>[] = [
+
+import { CategoryDTO } from "@/types/types";
+export const columns: ColumnDef<CategoryDTO>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -57,7 +58,7 @@ export const columns: ColumnDef<Category>[] = [
         <ActionColumn
           row={row}
           model="category"
-          editEndpoint={`categories/update/${category.id}`}
+          editEndpoint={""}
           id={category.id}
         />
       );

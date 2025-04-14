@@ -58,7 +58,7 @@ export default function BlogEditForm({
       setLoading(false);
       toast.success("Updated Successfully!");
       reset();
-      setImageUrl("/placeholder.png");
+      setImageUrl("placeholder.png");
       setLoading(false);
     } catch (error) {
       setLoading(false);

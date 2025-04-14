@@ -54,37 +54,37 @@ export default function CategoryForm({
   const [imageUrl, setImageUrl] = useState(initialImage);
 
   async function saveCategory(data: CategoryProps) {
-    try {
-      setLoading(true);
-      data.slug = generateSlug(data.title);
-      data.imageUrl = imageUrl;
+  //   try {
+  //     setLoading(true);
+  //     data.slug = generateSlug(data.title);
+  //     data.imageUrl = imageUrl;
 
-      if (editingId) {
-        await updateCategoryById(editingId, data);
-        setLoading(false);
-        // Toast
-        toast.success("Updated Successfully!");
-        //reset
-        reset();
-        //route
-        router.push("/dashboard/categories");
-        setImageUrl("/placeholder.svg");
-      } else {
-        await createCategory(data);
-        setLoading(false);
-        // Toast
-        toast.success("Successfully Created!");
-        //reset
-        reset();
-        setImageUrl("/placeholder.svg");
-        //route
-        router.push("/dashboard/categories");
-      }
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    }
-  }
+  //     if (editingId) {
+  //       await updateCategoryById(editingId, data);
+  //       setLoading(false);
+  //       // Toast
+  //       toast.success("Updated Successfully!");
+  //       //reset
+  //       reset();
+  //       //route
+  //       router.push("/dashboard/categories");
+  //       setImageUrl("/placeholder.svg");
+  //     } else {
+  //       await createCategory(data);
+  //       setLoading(false);
+  //       // Toast
+  //       toast.success("Successfully Created!");
+  //       //reset
+  //       reset();
+  //       setImageUrl("/placeholder.svg");
+  //       //route
+  //       router.push("/dashboard/categories");
+  //     }
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.log(error);
+  //   }
+  // }
   // async function handleDeleteAll() {
   // setLoading(true);
   // try {
@@ -157,4 +157,4 @@ export default function CategoryForm({
       />
     </form>
   );
-}
+}}

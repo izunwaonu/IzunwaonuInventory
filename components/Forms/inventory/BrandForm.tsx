@@ -56,11 +56,12 @@ const {
       if (res.status!==200) {
         setLoading(false);
         toast.error(res.error);
-        
-        return
+        return;
       }
       setLoading(false);
       toast.success("Brand created successfully");
+      window.location.reload();
+      reset();
     } catch (error) {
       setLoading(false);
       toast.success("Something went wrong")

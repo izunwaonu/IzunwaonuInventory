@@ -10,7 +10,7 @@ export default async function page() {
   
   const user = await getAuthenticatedUser();
   const orgId = user.orgId;
-  const orgName = user?.orgName??"";
+
   const units = (await getOrgUnit(orgId)) || [];
   
   return (

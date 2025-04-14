@@ -1,5 +1,8 @@
 "use client";
+import { createBrand } from "@/actions/brands";
+import { createCategory } from "@/actions/categories";
 import { createUnit } from "@/actions/units";
+import TextArea from "@/components/FormInputs/TextAreaInput";
 
 import TextInput from "@/components/FormInputs/TextInput";
 import { Button } from "@/components/ui/button";
@@ -13,25 +16,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { generateSlug } from "@/lib/generateSlug";
 import { Check, LayoutGrid, Loader2, Plus, PlusCircle, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {toast} from "sonner";
-export type inviteData = {
-    email: string;
-    orgId: string;
-    orgName: string;
-    roleId: string;
-    roleName:string;
-}
-export type UnitFormProps = {
-  name: string;
-  symbol: string;
+
+export type CategoryFormProps = {
+  title: string;
+  slug: string;
   orgId: string;
+  description?: string;
+  imageUrl?: string;
 }
 
-export default function UnitForm ({
+export default function CategoryFormModal ({
   
   orgId,
 
@@ -44,27 +44,27 @@ const {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<UnitFormProps>();
+  } = useForm<CategoryFormProps>();
 
   
   const [loading, setLoading] = useState(false);
   
-  const saveUnit = async (data:UnitFormProps) => {
+  const saveBrand = async (data:CategoryFormProps) => {
     setLoading(true);
-    
+  data.slug = generateSlug(data.title) 
+  data.imageUrl = "placeholder.png" 
   data.orgId = orgId,
     console.log(data);
     try {
-      const res = await createUnit(data);
+      const res = await createCategory(data);
       console.log(res);
       if (res.status!==200) {
         setLoading(false);
         toast.error(res.error);
-        
-        return
+        return;
       }
       setLoading(false);
-      toast.success("Unit created successfully");
+      toast.success("Category created successfully");
       window.location.reload();
       reset();
     } catch (error) {
@@ -79,7 +79,7 @@ const {
         <Button size="sm" className="h-8 gap-1">
           <LayoutGrid className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-           Create Unit
+           Create Category
           </span>
           <span className="md:sr-only">Add</span>
         </Button>
@@ -90,23 +90,24 @@ const {
         </DialogHeader>
         <Card className="w-full ">
           <CardHeader>
-            <CardTitle>Create New Unit</CardTitle>
+            <CardTitle>Create New New Category</CardTitle>
           </CardHeader>
           <CardFooter className="flex flex-col gap-4">
-            <form onSubmit={handleSubmit(saveUnit)} className="flex flex-col w-full gap-2">
+            <form onSubmit={handleSubmit(saveBrand)} className="flex flex-col w-full gap-2">
               <TextInput
                   register={register}
                   errors={errors}
-                  label="Unit Title"
-                  name="name"
+                  label="Category Title"
+                  name="title"
                 />
-                <TextInput
-                  register={register}
-                  errors={errors}
-                  label="Unit Symbol"
-                  name="symbol"
-                />
-              
+                <TextArea
+                    register={register}
+                    errors={errors}
+                    label="Description"
+                    name="description"
+                    isRequired={false}
+                  />
+                              
               {loading ? (
                 <Button disabled>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
@@ -114,7 +115,7 @@ const {
                 </Button>
               ) : (
                 <Button>
-                  <Check className="mr-2 h-4 w-4" /> Create Unit
+                  <Check className="mr-2 h-4 w-4" /> Create Category
                 </Button>
               )}
             </form>
