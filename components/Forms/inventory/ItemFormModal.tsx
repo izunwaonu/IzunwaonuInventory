@@ -55,6 +55,8 @@ const {
   const saveBrand = async (data:ItemFormProps) => {
     setLoading(true);
   data.slug = generateSlug(data.name) 
+  data.sellingPrice = Number(data.sellingPrice)
+  data.costPrice = Number(data.costPrice)
   data.thumbnail = "placeholder.png" 
   data.orgId = orgId,
     console.log(data);
@@ -72,7 +74,7 @@ const {
       reset();
     } catch (error) {
       setLoading(false);
-      toast.success("Something went wrong")
+      toast.error("Something went wrong")
       console.log(error)
     }
   };
