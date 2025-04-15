@@ -161,6 +161,7 @@ model TaxRate {
 model Item {
   id                String         @id @default(cuid())
   name              String
+  slug              String         @unique
   sku               String         @unique
   barcode           String?        @unique
   description       String?
@@ -169,15 +170,15 @@ model Item {
   upc               String? //Twelve digit unique number associated with the bar code (Universal Product Code)
   ean               String? //Thirteen digit unique number (International Article Number)
   mpn               String? //Manufacturing Part Number unambiguously identifies a part design
-  isbn              String //Thirteen digit unique commercial book identifier (International Standard Book Number)
-  thumbnail        String?
+  isbn              String? //Thirteen digit unique commercial book identifier (International Standard Book Number)
+  thumbnail         String?
   imageUrls         String[]
   categoryId        String?
   category          Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   taxRateId         String?
   organization      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId             String
-  tax               Float?  @default(0) //tax rate
+  tax               Float?         @default(0) //tax rate
   taxRate           TaxRate?       @relation(fields: [taxRateId], references: [id])
   brandId           String?
   brand             Brand?         @relation(fields: [brandId], references: [id])

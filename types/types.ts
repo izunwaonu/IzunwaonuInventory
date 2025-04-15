@@ -90,6 +90,13 @@ export interface TaxDTO {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface BriefItemDTO {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  thumbnail: string | null;
+}
 export interface BrandDTO {
   id: string;
   name: string;
