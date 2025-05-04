@@ -1,55 +1,40 @@
 "use server";
 
 import { CategoryFormProps } from "@/components/Forms/inventory/CategoryFormModal";
-import { ItemFormProps } from "@/components/Forms/inventory/ItemFormModal";
+import { api } from "@/config/axios";
 import { db } from "@/prisma/db";
+import { BriefItemsResponse, ItemCreateDTO } from "@/types/item";
 import { CategoryProps } from "@/types/types";
+import axios from "axios";
 import { revalidatePath } from "next/cache";
 
-export async function createItem(data: ItemFormProps) {
-  const slug = data.slug;
+export async function createItem(data: ItemCreateDTO) {
+  
   try {
-    const existingItem = await db.item.findUnique({
-      where: {
-        slug,
-      },
-    });
-    if (existingItem) {
-      return {
-        status: 409,
-        data: null,
-        error: "Item already exists",
-      };
-    }
-    const newItem = await db.item.create({
-      data,
-    });
+    const res = await api.post("/items", data)
+    const item = res.data.data
+console.log(item)
     // console.log(newCategory);
-    revalidatePath("/dashboard/inventory/items");
+    
     return {
-      status: 200,
-      data: newItem,
+      success: true,
+      data: item,
       error: null,
     };
   } catch (error) {
     console.log(error);
     return {
-      status: 500,
-      error: "Something went wrong",
+      success: true,
+      error: "Failed to create an item",
       data: null,
     };
   }
 }
-export async function getOrgItems(orgId:string) {
+export async function getOrgItems(orgId:string, params={}) {
   try {
-    const items = await db.item.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      where:{
-        orgId
-      }
-    });
+    const res = await api.get(`/organisations/${orgId}/items`, {params})
+
+    const items = res.data.data
 
     return items;
   } catch (error) {
@@ -57,28 +42,19 @@ export async function getOrgItems(orgId:string) {
     return [];
   }
 }
-export async function getOrgBriefItems(orgId:string) {
+export async function getOrgBriefItems(orgId:string, params={}): Promise<BriefItemsResponse> {
   try {
-    const items = await db.item.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      where:{
-        orgId
-      },
-      select:{
-        id:true,
-        name:true,
-        slug:true,
-        thumbnail:true,
-        createdAt:true,
-      }
-    });
+    const res = await api.get(`/organisations/${orgId}/brief-items`, {params})
 
-    return items;
+    
+
+    return res.data;
   } catch (error) {
     console.log(error);
-    return [];
+    if(axios.isAxiosError(error)){
+      throw new Error(error.response?.data?.error || "Failed to fetch items");
+    }
+    throw new Error("An unexpected error occurred")
   }
 }
 export async function updateCategoryById(id: string, data: CategoryProps) {
@@ -109,6 +85,25 @@ export async function getCategoryById(id: string) {
 }
 export async function deleteItem(id: string) {
   try {
+    const item = await db.item.findUnique({
+      where:{
+        id
+      }
+    })
+    if(!item){
+      return {
+        success: false,
+        data: null,
+        error:"No Item found"
+      };
+    }
+    if (item.salesCount>0){
+      return {
+        success: false,
+        data: null,
+        error:"Items with sales cannot be deleted"
+      };
+    }
     const deleted = await db.item.delete({
       where: {
         id,
@@ -116,11 +111,20 @@ export async function deleteItem(id: string) {
     });
 
     return {
-      ok: true,
+      success: true,
       data: deleted,
+      error:null
     };
   } catch (error) {
+    
     console.log(error);
+    return {
+      success: false,
+      data: null,
+      error: "Failed to delete the item"
+    };
+
+    
   }
 }
 // export async function createBulkCategories(categories: CategoryProps[]) {

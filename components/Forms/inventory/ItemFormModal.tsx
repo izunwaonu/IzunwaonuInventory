@@ -18,21 +18,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { generateSlug } from "@/lib/generateSlug";
+import { ItemCreateDTO} from "@/types/item";
 import { Check, LayoutGrid, Loader2, Plus, PlusCircle, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {toast} from "sonner";
 
-export type ItemFormProps = {
-  name: string;
-  slug: string;
-  orgId: string;
-  sku: string;
-  costPrice: number;
-  sellingPrice: number;
-  thumbnail?: string;
-}
 
 export default function ItemFormModal ({
   
@@ -47,23 +39,22 @@ const {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ItemFormProps>();
+  } = useForm<ItemCreateDTO>();
 
   
   const [loading, setLoading] = useState(false);
   
-  const saveBrand = async (data:ItemFormProps) => {
+  const saveBrand = async (data:ItemCreateDTO) => {
     setLoading(true);
-  data.slug = generateSlug(data.name) 
   data.sellingPrice = Number(data.sellingPrice)
   data.costPrice = Number(data.costPrice)
-  data.thumbnail = "placeholder.png" 
+  data.thumbnail = "https://ji20b9tl3i.ufs.sh/f/pQAi6smwGNu2vALIcZP5Uyvn7WAtB6Rb93aC4zgXOMN1lwke" 
   data.orgId = orgId,
     console.log(data);
     try {
       const res = await createItem(data);
       console.log(res);
-      if (res.status!==200) {
+      if (res.success) {
         setLoading(false);
         toast.error(res.error);
         return;

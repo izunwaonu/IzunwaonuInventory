@@ -6,8 +6,9 @@ import ImageColumn from "@/components/DataTableColumns/ImageColumn";
 import SortableColumn from "@/components/DataTableColumns/SortableColumn";
 import { ColumnDef } from "@tanstack/react-table";
 import ActionColumn from "@/components/DataTableColumns/ActionColumn";
+import { BriefItemDTO } from "@/types/item";
 
-import { BriefItemDTO } from "@/types/types";
+// import { BriefItemDTO } from "@/types/types";
 export const columns: ColumnDef<BriefItemDTO>[] = [
   {
     id: "select",
@@ -41,11 +42,11 @@ export const columns: ColumnDef<BriefItemDTO>[] = [
     cell: ({ row }) => <ImageColumn row={row} accessorKey="thumbnail" />,
   },
 
-  {
-    accessorKey: "createdAt",
-    header: "Date Created",
-    cell: ({ row }) => <DateColumn row={row} accessorKey="createdAt" />,
-  },
+  // {
+  //   accessorKey: "createdAt",
+  //   header: "Date Created",
+  //   cell: ({ row }) => <DateColumn row={row} accessorKey="createdAt" />,
+  // },
   {
     id: "actions",
     cell: ({ row }) => {
