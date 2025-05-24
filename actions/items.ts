@@ -1,16 +1,19 @@
 "use server";
 
 import { CategoryFormProps } from "@/components/Forms/inventory/CategoryFormModal";
-import { api } from "@/config/axios";
+import { api, getAuthenticatedApi } from "@/config/axios";
 import { db } from "@/prisma/db";
-import { BriefItemsResponse, ItemCreateDTO } from "@/types/item";
+import { BriefItemsResponse, ItemCreateDTO, ProductData, ProductResponse } from "@/types/item";
 import { CategoryProps } from "@/types/types";
 import axios from "axios";
 import { revalidatePath } from "next/cache";
+import { getOrgKey } from "./apiKey";
+import { resolve } from "path";
 
 export async function createItem(data: ItemCreateDTO) {
   
   try {
+    const api = await getAuthenticatedApi();
     const res = await api.post("/items", data)
     const item = res.data.data
 console.log(item)
@@ -32,7 +35,12 @@ console.log(item)
 }
 export async function getOrgItems(orgId:string, params={}) {
   try {
-    const res = await api.get(`/organisations/${orgId}/items`, {params})
+    // const user = await getAuthenticatedUser()
+    const api = await getAuthenticatedApi();
+    const res = await api.get(`/organisations/${orgId}/items`, {
+      params,
+      
+    })
 
     const items = res.data.data
 
@@ -44,7 +52,14 @@ export async function getOrgItems(orgId:string, params={}) {
 }
 export async function getOrgBriefItems(orgId:string, params={}): Promise<BriefItemsResponse> {
   try {
-    const res = await api.get(`/organisations/${orgId}/brief-items`, {params})
+    const api = await getAuthenticatedApi();
+    
+    const res = await api.get(`/organisations/${orgId}/brief-items`, {
+      params,
+      // headers:{
+      //   "x-api-key": apiKey?? "",
+      // }
+    })
 
     
 
@@ -57,6 +72,47 @@ export async function getOrgBriefItems(orgId:string, params={}): Promise<BriefIt
     throw new Error("An unexpected error occurred")
   }
 }
+export async function getItemById(id:string,): Promise<ProductResponse> {
+  try {
+    const api = await getAuthenticatedApi();
+    
+    const res = await api.get(`/items/${id}`)
+
+    
+
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    if(axios.isAxiosError(error)){
+      throw new Error(error.response?.data?.error || "Failed to fetch items");
+    }
+    throw new Error("An unexpected error occurred")
+  }
+}
+
+export async function updateItemById(id: string, data: Partial<ProductData>){
+
+  try {
+    await db.item.update({
+    where:{
+      id,
+    },
+    data,
+  })
+
+  
+  console.log("Updating Item", id, data);
+  revalidatePath(`/dashboard/inventory/items/${id}`)
+  return {success:true}
+  } catch (error) {
+    console.log(error)
+    return{
+      success: false
+    }
+  }
+}
+
+
 export async function updateCategoryById(id: string, data: CategoryProps) {
   try {
     const updatedCategory = await db.category.update({

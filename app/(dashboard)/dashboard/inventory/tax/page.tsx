@@ -9,6 +9,7 @@ import TaxRateForm from "@/components/Forms/inventory/TaxRateForm";
 export default async function page() {
   
   const user = await getAuthenticatedUser();
+  
   const orgId = user.orgId;
 
   const taxes = (await getOrgTaxes(orgId)) || [];

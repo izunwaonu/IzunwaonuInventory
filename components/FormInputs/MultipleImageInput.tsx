@@ -35,7 +35,7 @@ export default function MultipleImageInput({
                 <div key={i}>
                   <Image
                     alt="Product image"
-                    className="aspect-square w-full rounded-md object-cover"
+                    className="aspect-square w-full rounded-md h-24  object-contain border"
                     height="84"
                     src={imageUrl}
                     width="84"

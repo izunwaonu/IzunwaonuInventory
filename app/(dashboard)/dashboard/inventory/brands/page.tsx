@@ -7,6 +7,8 @@ import  UnitForm  from "@/components/Forms/inventory/UnitForm";
 import { getOrgUnit } from "@/actions/units";
 import BrandForm from "@/components/Forms/inventory/BrandForm";
 import { getOrgBrand } from "@/actions/brands";
+import { Suspense } from "react";
+import TableLoading from "@/components/ui/data-table/table-loading";
 
 export default async function page() {
   
@@ -18,7 +20,8 @@ export default async function page() {
   return (
    
     <div className="p-8">
-         <ModalTableHeader
+          <Suspense fallback={<TableLoading title="Item Inventory" />}>
+            <ModalTableHeader
                 title="Brands"
                 linkTitle="Add Brand"
                 href="#"
@@ -26,7 +29,9 @@ export default async function page() {
                 model="brand"
                 modalForm={<BrandForm orgId={orgId}/>}
               />
-              <DataTable columns={columns} data={brands} />
+              <DataTable columns={columns} data={brands} />  
+          </Suspense>
+         
     </div>
     
   );

@@ -37,6 +37,7 @@ const routePermissions: Record<string, string[]> = {
   "/dashboard/products/create": ["products.create"],
   "/dashboard/categories": ["categories.read"],
   "/dashboard/brands": ["brands.read"],
+  "/dashboard/tax": ["tax.read"],
 
   // Customer management routes
   "/dashboard/customers": ["customers.read"],

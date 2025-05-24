@@ -1,5 +1,6 @@
 
 import { UploadButton } from "@/lib/uploadthing";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 
@@ -7,6 +8,8 @@ type ImageInputProps = {
   title: string;
   imageUrl: string;
   setImageUrl: any;
+  display: "horizontal" | "vertical"
+  size: "sm" | "lg"
   endpoint: any;
 };
 
@@ -15,10 +18,12 @@ export default function ImageUploadButton({
   imageUrl,
   setImageUrl,
   endpoint,
+  display ="vertical",
+  size ="sm"
 }: ImageInputProps) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative h-10 w-10 overflow-hidden rounded-md">
+    <div className={cn("flex  items-center gap-2", display==="horizontal"?"flex-row":"flex-col")}>
+      <div className={cn("relative overflow-hidden rounded-md", size==="sm"?" h-10 w-10":" h-20 w-20")}>
         <Image
           alt={title}
           className="object-cover"

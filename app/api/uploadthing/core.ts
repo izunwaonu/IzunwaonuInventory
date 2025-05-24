@@ -18,6 +18,12 @@ export const ourFileRouter = {
       return { uploadedBy: "JB" };
     }
   ),
+   itemImages: f({ image: { maxFileSize: "2MB", maxFileCount: 4 } }).onUploadComplete(
+    async ({ metadata, file }) => {
+      console.log("file url", file.url);
+      return { uploadedBy: "JB" };
+    }
+  ),
   blogImage: f({ image: { maxFileSize: "1MB" } }).onUploadComplete(
     async ({ metadata, file }) => {
       console.log("file url", file.url);

@@ -204,6 +204,11 @@ export const sidebarLinks: ISidebarLink[] = [
         permission: "inventory.read",
       },
       {
+        title: "Tax Rates",
+        href: "/dashboard/inventory/tax",
+        permission: "inventory.read",
+      },
+      {
         title: "Current Stock",
         href: "/dashboard/inventory/current-stock",
         permission: "inventory.read",
@@ -404,8 +409,8 @@ export const sidebarLinks: ISidebarLink[] = [
         permission: "integrations.read",
       },
       {
-        title: "API Keys",
-        href: "/dashboard/integrations/api-keys",
+        title: "API Management",
+        href: "/dashboard/integrations/api",
         permission: "integrations.read",
       },
     ],

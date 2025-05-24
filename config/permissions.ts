@@ -75,6 +75,16 @@ export const permissions: ModulePermissions[] = [
     },
   },
   {
+  display: "Tax Rates",
+  name: "tax",
+  permissions: {
+    create: "tax.create",
+    read: "tax.read",
+    update: "tax.update",
+    delete: "tax.delete",
+  },
+},
+  {
     display: "Serial Numbers",
     name: "serialNumbers",
     permissions: {
@@ -342,9 +352,11 @@ export const adminPermissions = [
   "categories.create", "categories.read", "categories.update", "categories.delete",
   "brands.create", "brands.read", "brands.update", "brands.delete",
   "units.create", "units.read", "units.update", "units.delete",
+  "tax.create", "tax.read", "tax.update", "tax.delete",
   "serialNumbers.create", "serialNumbers.read", "serialNumbers.update", "serialNumbers.delete",
   "transfers.create", "transfers.read", "transfers.update", "transfers.delete",
   "adjustments.create", "adjustments.read", "adjustments.update", "adjustments.delete",
+
   
   // Purchases and related
   "purchases.create", "purchases.read", "purchases.update", "purchases.delete",
@@ -367,7 +379,8 @@ export const adminPermissions = [
   "locations.create", "locations.read", "locations.update", "locations.delete",
   "users.create", "users.read", "users.update", "users.delete",
   "roles.create", "roles.read", "roles.update", "roles.delete",
-  "taxes.create", "taxes.read", "taxes.update", "taxes.delete",
+  "tax.settings.create", "tax.settings.read", "tax.settings.update", "tax.settings.delete",
+  // "taxes.create", "taxes.read", "taxes.update", "taxes.delete",
   "company.create", "company.read", "company.update", "company.delete",
   "profile.create", "profile.read", "profile.update", "profile.delete",
   
@@ -388,9 +401,11 @@ export const userPermissions = [
   "items.read",
   "categories.read",
   "brands.read",
+  "tax.read",
   "salesOrders.read",
   "salesOrders.create",
   "customers.read",
+  "tax.settings.read",
 ];
 // export type Permission = {
 //   create: string;

@@ -13,6 +13,7 @@ import VerifyEmail from "@/components/email-templates/verify-email";
 import { adminPermissions, userPermissions } from "@/config/permissions";
 import { inviteData } from "@/components/Forms/users/UserInvitationForm.";
 import UserInvitation from "@/components/email-templates/user-invite";
+import { generateApiKey } from "@/lib/generateAPIKey";
 
 // import { generateNumericToken } from "@/lib/token";
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -164,9 +165,6 @@ const ADMIN_USER_ROLE = {
 export async function createUser(data: UserProps, orgData: OrgData) {
   const { email, password, firstName, lastName, name, phone, image } = data;
 
-  console.log("🟢 Starting user creation process...");
-  console.log("Received data:", JSON.stringify(data, null, 2));
-  console.log("Received organization data:", JSON.stringify(orgData, null, 2));
 
   try {
     return await db.$transaction(async (tx) => {
@@ -219,6 +217,15 @@ export async function createUser(data: UserProps, orgData: OrgData) {
       console.log("✅ Organization created successfully:", org.id);
 
       console.log("🟢 Looking for default user role...");
+
+      //Create the Default API Key
+      await db.apiKey.create({
+        data:{
+          name: "Default Key",
+          key: generateApiKey(),
+          orgId: org.id
+        }
+      })
       //Find or Create a default Admin role
       let defaultRole = await tx.role.findFirst({ where: { roleName: ADMIN_USER_ROLE.roleName } });
 

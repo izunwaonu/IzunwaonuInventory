@@ -1,4 +1,5 @@
 import { db } from "@/prisma/db";
+import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 
@@ -8,6 +9,28 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+     const headersList = await headers();
+      const apiKey = headersList.get("x-api-key");
+    
+      if (!apiKey) {
+        return new Response(
+          JSON.stringify({data:null, error: "API Key is required", success: false }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" }
+        }
+        )
+       
+      }
+    
+      const validKey = await db.apiKey.findUnique({ where: { key: apiKey } });
+      if (!validKey) {
+        return new Response(
+          JSON.stringify({data:null, error: "Invalid API Key", success: false }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" }
+        }
+        )
+      }
     const orgId = (await params).id;
 
     //parse pagination parameter for URL
@@ -137,6 +160,8 @@ export async function GET(
     );
   }
 }
+
+
 
    
   export async function POST(request: Request) {

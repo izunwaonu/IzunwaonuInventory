@@ -30,6 +30,8 @@ import { useCreateItem, useDeleteItem, useOrgItem } from "@/hooks/useItemQueries
 import { BriefItemDTO, ItemCreateDTO } from "@/types/item";
 import NairaIcon from "@/components/NairaIcon";
 import ImageUploadButton from "@/components/FormInputs/ImageUploadButton";
+import { useRouter } from "next/navigation";
+// import { useRouter } from "next/router";
 
 
 
@@ -55,6 +57,7 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
   const createItemMutation = useCreateItem();
 //   const updateProductMutation = useUpdateProduct();
   const deleteItemMutation = useDeleteItem();
+ 
 
   // Local state
   const [imageUrl, setImageUrl] = useState("https://ji20b9tl3i.ufs.sh/f/pQAi6smwGNu2vALIcZP5Uyvn7WAtB6Rb93aC4zgXOMN1lwke")
@@ -156,12 +159,13 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
     setCurrentProduct(null);
     setFormDialogOpen(true);
   };
-
+  const router = useRouter()
   // Handle edit click
-  // const handleEditClick = (product: Product) => {
-  //   setCurrentProduct(product);
-  //   setFormDialogOpen(true);
-  // };
+  const handleEditClick = (product: BriefItemDTO) => {
+    // setCurrentProduct(product);
+    // setFormDialogOpen(true);
+    router.push(`/dashboard/inventory/items/${product.id}/edit`);
+  };
 
   // Handle delete click
   const handleDeleteClick = (product: BriefItemDTO) => {
@@ -212,7 +216,7 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
     {
       header: "Image",
       accessorKey: "thumbnail",
-      cell: (row) => <img className="w-10 h-10 rounded-full" src={row.thumbnail??"/placeholder.png"} alt={row.name} />,
+      cell: (row) => <img className="w-10 h-10 rounded-sm" src={row.thumbnail??"/placeholder.png"} alt={row.name} />,
     },
     {
         header: "Name",
@@ -274,7 +278,7 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
         }}
         renderRowActions={(item) => (
           <TableActions.RowActions
-            // onEdit={() => handleEditClick(item)}
+            onEdit={() => handleEditClick(item)}
             onDelete={() => handleDeleteClick(item)}
             // isDeleting={
             //   deleteProductMutation.isPending && productToDelete?.id === item.id
@@ -371,11 +375,10 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
         </div>
         <div className="col-span-5">
           <ImageUploadButton
-          title="Upload Image"
-           imageUrl={imageUrl}
-           setImageUrl={setImageUrl} 
-           endpoint="itemImage"
-          />
+              title="Upload Image"
+              imageUrl={imageUrl}
+              setImageUrl={setImageUrl}
+              endpoint="itemImage" display={"horizontal"} size={"sm"}          />
         </div>
       </div>
       </EntityForm>

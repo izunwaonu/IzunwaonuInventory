@@ -54,4 +54,57 @@ export interface BriefItemDTO {
   //   pagination: Pagination;
   // }
   // type BriefItemsResponse = PaginatedResponse <BriefItemDTO>
-  
+  // Product data interface
+interface ProductData {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  barcode?: string;
+  description?: string ;
+  dimensions?: string ;
+  weight?: number;
+  upc?: string ;
+  ean?: string ;
+  mpn?: string ;
+  isbn?: string ;
+  thumbnail: string;
+  imageUrls: string[];
+  categoryId?: string ;
+  salesCount: number;
+  salesTotal: number;
+  taxRateId?: string ;
+  orgId: string;
+  tax: number;
+  brandId?: string ;
+  unitId?: string;
+  unitOfMeasure?: string ;
+  costPrice: number;
+  sellingPrice: number;
+  minStockLevel: number;
+  maxStockLevel?: number ;
+  isActive: boolean;
+  isSerialTracked: boolean;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}
+
+// API response interface
+ interface ProductResponse {
+  success: boolean;
+  data: ProductData;
+  error: string | null;
+}
+
+interface ProductListResponse {
+  success: boolean;
+  data: ProductData[];
+  error: string | null;
+}
+
+export type{ProductData, ProductResponse, ProductListResponse};
+// Alternative generic response type if you have multiple similar endpoints
+
+
+// Usage example:
+// type ProductApiResponse = ApiResponse<Product>;
