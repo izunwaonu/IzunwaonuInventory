@@ -42,7 +42,7 @@ model Role {
   displayName  String // Human-readable name (e.g., "Store Manager")
   roleName     String       @unique // System name (e.g., "store_manager")
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  orgId        String
+  orgId        String 
   description  String?
   permissions  String[] // Array of permission strings
   users        User[]       @relation("UserRoles")
@@ -63,13 +63,10 @@ model User {
   image         String?
   jobTitle      String?
   roles         Role[]       @relation("UserRoles") // Updated to support multiple roles
-  role          UserRole     @default(USER)
   password      String?
   status        Boolean      @default(true)
   accounts      Account[]
   sessions      Session[]
-  savings       Saving[]
-  blogs         Blog[]
   orgName       String?
   organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId         String
@@ -81,14 +78,73 @@ model User {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   roleId        String?
-}
 
-enum UserRole {
-  USER
-  ADMIN
-  SERVICE_PROVIDER
+  //Relationship for transactions
+  createdPurchaseOrders PurchaseOrder[] @relation("PurchaseOrderCreatedBy")
+  approvedPurchaseOrders PurchaseOrder[] @relation("PurchaseOrderApprovedBy")
+  createdTransfers       Transfer[] @relation ("TransferCreatedBy")
+  approvedTransfers       Transfer[] @relation ("TransferApprovedBy")
+  createdSalesOrders      SalesOrder[] @relation ("SalesOrderCreatedBy")
+  createdAdjustments      Adjustment[] @relation ("AdjustmentCreatedBy")
+  approvedAdjustments      Adjustment[] @relation ("AdjustmentApprovedBy")
+  receivedGoodsReceipts  GoodsReceipt[] @relation ("GoodsReceiptReceivedBy")
 }
+model Organization {
+  id                 String     @id @default(cuid())
+  name               String
+  slug               String     @unique
+  industry           String?
+  country            String?
+  state              String?
+  address            String?
+  currency           String?
+  timeZone           String?
+  inventory          Inventory[] // Assuming this is a boolean flag, adjust if needed
+  startDate          DateTime?
+  inventoryStartDate DateTime?
+  fiscalYear         String?
+  users              User[]
+  units              Unit[]
+  categories         Category[]
+  invites            Invite[]
+  items              Item[]
+  locations          Location[]
+  brands             Brand[]
+  taxRates              TaxRate[]
+  suppliers          Supplier[]
+  purchaseOrders      PurchaseOrder[]
+  salesOrders         SalesOrder[]
+  transfers          Transfer[]
+  adjustments         Adjustment[]
+  customers           Customer[]
+  goodsReceipts     GoodsReceipt[]
+  role               Role[]
+  apiKeys             ApiKey[]
+ 
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
+  @@map("organizations") // Maps to "organizations" table in the database [^1]
+}
+model Invite {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  status       Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("invites")
+}
+model ApiKey {
+  id        String       @id @default(cuid())
+  orgId     String
+  key       String       @unique
+  name      String
+  createdAt DateTime     @default(now())
+  org       Organization @relation(fields: [orgId], references: [id])
+} 
 model Location {
   id           String       @id @default(cuid())
   name         String
@@ -97,18 +153,26 @@ model Location {
   phone        String?
   email        String?
   isActive     Boolean      @default(true)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  users        User[]
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId        String
-  // inventories   Inventory[]
-  // incomingTransfers Transfer[] @relation("ToLocation")
-  // outgoingTransfers Transfer[] @relation("FromLocation")
-  // purchaseOrders PurchaseOrder[] @relation("DeliveryLocation")
-  // salesOrders   SalesOrder[]   @relation("SalesLocation")
-}
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
+  //Relationships
+  users        User[]
+  inventories   Inventory[]
+  incomingTransfers Transfer[] @relation("ToLocation")
+  outgoingTransfers Transfer[] @relation("FromLocation")
+  purchaseOrders PurchaseOrder[] @relation("DeliveryLocation")
+  salesOrders   SalesOrder[]   @relation("SalesLocation")
+  goodsReceipts GoodsReceipt[]
+  adjustments Adjustment[]
+}
+enum LocationType {
+  WAREHOUSE
+  SHOP
+  VIRTUAL
+}
 model Category {
   id            String       @id @default(cuid())
   title         String
@@ -116,11 +180,11 @@ model Category {
   imageUrl      String?
   description   String?
   parentId      String?
-  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  orgId         String
   parent        Category?    @relation("SubCategories", fields: [parentId], references: [id])
   subCategories Category[]   @relation("SubCategories")
   items         Item[]
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId         String
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -135,7 +199,6 @@ model Unit {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
-
 model Brand {
   id           String       @id @default(cuid())
   name         String
@@ -167,6 +230,8 @@ model Item {
   description       String?
   dimensions        String?
   weight            Float?
+  salesCount  Int      @default(0)
+  salesTotal  Float    @default(0)
   upc               String? //Twelve digit unique number associated with the bar code (Universal Product Code)
   ean               String? //Thirteen digit unique number (International Article Number)
   mpn               String? //Manufacturing Part Number unambiguously identifies a part design
@@ -174,8 +239,6 @@ model Item {
   thumbnail         String? @default("https://ji20b9tl3i.ufs.sh/f/pQAi6smwGNu2vALIcZP5Uyvn7WAtB6Rb93aC4zgXOMN1lwke")
   imageUrls         String[]
   categoryId        String?
-  salesCount  Int      @default(0)
-  salesTotal  Float    @default(0)
   category          Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   taxRateId         String?
   organization      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -195,60 +258,17 @@ model Item {
   isSerialTracked   Boolean        @default(false)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  // inventories   Inventory[]
+
+  //Relationship
+  inventories   Inventory[]
   serialNumbers     SerialNumber[]
   suppliers         Supplier[]     @relation("SupplierItems")
   supplierRelations ItemSupplier[] // New relation
-  // purchaseOrderLines PurchaseOrderLine[]
-  // salesOrderLines SalesOrderLine[]
-  // transferLines  TransferLine[]
-  // adjustmentLines AdjustmentLine[]
-}
-
-// Serial number tracking
-model SerialNumber {
-  id              String       @id @default(cuid())
-  serialNumber    String       @unique
-  itemId          String
-  item            Item         @relation(fields: [itemId], references: [id])
-  status          SerialStatus @default(IN_STOCK)
-  locationId      String?
-  purchaseOrderId String?
-  salesOrderId    String?
-  notes           String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-}
-
-enum SerialStatus {
-  IN_STOCK
-  SOLD
-  RESERVED
-  DAMAGED
-  RETURNED
-}
-
-model ItemSupplier {
-  id               String    @id @default(cuid())
-  itemId           String
-  item             Item      @relation(fields: [itemId], references: [id])
-  supplierId       String
-  supplier         Supplier  @relation(fields: [supplierId], references: [id])
-  isPreferred      Boolean   @default(false)
-  supplierSku      String? // Supplier's own SKU for this item
-  leadTime         Int? // Typical lead time in days
-  minOrderQty      Int? // Minimum order quantity
-  unitCost         Decimal // Supplier-specific cost
-  lastPurchaseDate DateTime?
-  notes            String?
-
-  @@unique([itemId, supplierId])
-}
-
-enum LocationType {
-  WAREHOUSE
-  SHOP
-  VIRTUAL
+  purchaseOrderLines PurchaseOrderLine[]
+  salesOrderLines SalesOrderLine[]
+  transferLines  TransferLine[]
+  adjustmentLines AdjustmentLine[]
+  goodsReceiptLines GoodsReceiptLine[]
 }
 
 model Supplier {
@@ -266,102 +286,396 @@ model Supplier {
   isActive          Boolean        @default(true)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+
+  //Relationship
   items             Item[]         @relation("SupplierItems")
   supplierRelations ItemSupplier[] // New relation
-  // purchaseOrders PurchaseOrder[]
+  purchaseOrders PurchaseOrder[]
+}
+model ItemSupplier {
+  id               String    @id @default(cuid())
+  itemId           String
+  item             Item      @relation(fields: [itemId], references: [id])
+  supplierId       String
+  supplier         Supplier  @relation(fields: [supplierId], references: [id])
+  isPreferred      Boolean   @default(false)
+  supplierSku      String? // Supplier's own SKU for this item
+  leadTime         Int? // Typical lead time in days
+  minOrderQty      Int? // Minimum order quantity
+  unitCost         Decimal // Supplier-specific cost
+  lastPurchaseDate DateTime?
+  notes            String?
+
+  @@unique([itemId, supplierId])
 }
 
-model Organization {
-  id                 String     @id @default(cuid())
-  name               String
-  slug               String     @unique
-  industry           String?
-  country            String?
-  state              String?
-  address            String?
-  currency           String?
-  timeZone           String?
-  inventory          Boolean? // Assuming this is a boolean flag, adjust if needed
-  startDate          DateTime?
-  inventoryStartDate DateTime?
-  fiscalYear         String?
-  users              User[]
-  units              Unit[]
-  categories         Category[]
-  invites            Invite[]
-  items              Item[]
-  locations          Location[]
-  brands             Brand[]
-  taxes              TaxRate[]
-  suppliers          Supplier[]
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  role               Role[]
-  ApiKey             ApiKey[]
+model Inventory{
+  id            String      @id @default(cuid())
+  itemId        String
+  item          Item        @relation(fields: [itemId], references: [id])
+  locationId    String
+  location      Location    @relation(fields: [locationId], references: [id])
+  quantity      Int         @default(0)
+  reservedQuantity  Int     @default(0)
+  organization      Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId             String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
-  @@map("organizations") // Maps to "organizations" table in the database [^1]
+  @@unique([itemId, locationId])
+  @@index([itemId])
+  @@index(locationId)
+
+}
+// Serial number tracking
+model SerialNumber {
+  id              String       @id @default(cuid())
+  serialNumber    String       @unique
+  itemId          String
+  item            Item         @relation(fields: [itemId], references: [id])
+  status          SerialStatus @default(IN_STOCK)
+  locationId      String?
+  purchaseOrderId String?
+  salesOrderId    String?
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }
 
-model Invite {
-  id           String       @id @default(cuid())
-  email        String       @unique
+
+enum SerialStatus {
+  IN_STOCK
+  SOLD
+  RESERVED
+  DAMAGED
+  RETURNED
+}
+
+model PurchaseOrder{
+  id              String               @id @default(cuid())
+  poNumber        String               @unique
+  date            DateTime
+  supplierId      String
+  supplier        Supplier             @relation(fields: [supplierId], references:[id])
+  deliveryLocationId String
+  deliveryLocation       Location             @relation("DeliveryLocation", fields: [deliveryLocationId], references:[id])
+  status          PurchaseOrderStatus @default(DRAFT)
+  subtotal        Float               @default(0)
+  taxAmount       Float               @default(0)
+  shippingCost    Float?
+  discount        Float?
+  total           Float               @default(0)
+  notes           String?
+  paymentTerms    String?
+  expectedDeliveryDate DateTime?
+  organization    Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId           String
+  createdById     String
+  CreatedBy       User              @relation("PurchaseOrderCreatedBy", fields:[createdById], references: [id])
+  approvedById    String?
+  approvedBy       User?              @relation("PurchaseOrderApprovedBy", fields:[approvedById], references: [id])
+  lines           PurchaseOrderLine[]
+  goodsReceipts   GoodsReceipt[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([poNumber])
+  @@index(supplierId)
+  @@index([status])
+
+}
+
+enum PurchaseOrderStatus{
+  DRAFT
+  SUBMITTED
+  APPROVED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+  CLOSED
+
+}
+
+model PurchaseOrderLine{
+  id            String          @id @default(cuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields:[purchaseOrderId], references: [id], onDelete: Cascade)
+  itemId  String
+  item        Item              @relation(fields: [itemId], references: [id])
+  quantity        Int
+  unitPrice       Float
+  taxRate         Float         @default(0)
+  taxAmount       Float         @default(0)
+  discount        Float?
+  total           Float
+  notes           String?
+  receivedQuantity  Int         @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  goodsReceiptLines GoodsReceiptLine[]
+
+  @@index([purchaseOrderId])
+  @@index([itemId])
+
+
+}
+model GoodsReceipt{
+  id          String              @id @default(cuid())
+  receiptNumber String            @unique
+  date          DateTime
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references:[id])
+  locationId      String
+  location   Location @relation(fields: [locationId], references:[id])
+  status          GoodsReceiptStatus @default(PENDING)
+  notes           String?
+  organization   Organization @relation(fields: [orgId], references:[id], onDelete: Cascade)
+  orgId           String
+  receivedById    String
+  receivedBy      User @relation("GoodsReceiptReceivedBy", fields: [receivedById], references:[id])
+  lines           GoodsReceiptLine[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+
+  @@index([receiptNumber])
+  @@index([purchaseOrderId])
+  @@index([status])
+
+
+}
+
+enum GoodsReceiptStatus{
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+model GoodsReceiptLine{
+  id          String         @id @default(cuid())
+  goodsReceiptId String
+  goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId], references:[id], onDelete: Cascade)
+  purchaseOrderLineId String
+  purchaseOrderLine PurchaseOrderLine @relation(fields: [purchaseOrderLineId], references:[id])
+  itemId  String @unique
+  item     Item       @relation(fields: [itemId], references:[id])
+  receivedQuantity  Int
+  notes         String?
+  serialNumbers     String[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([goodsReceiptId])
+  @@index([purchaseOrderLineId])
+  @@index([itemId])
+}
+
+//======Sales Models======
+
+model Customer{
+  id          String              @id @default(cuid())
+  name        String?
+  email       String?
+  phone       String?
+  address     String?
+  taxId       String?
+  notes       String?
+  isActive    Boolean    @default(true)
+  organization  Organization @relation(fields: [orgId], references:[id], onDelete: Cascade)
+  orgId       String
+  salesOrders SalesOrder[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([email])
+  @@index([phone])
+
+}
+
+model SalesOrder{
+  id          String              @id @default(cuid())
+  orderNumber String              @unique
+  date        DateTime
+  customerId   String?
+  customer     Customer? @relation(fields: [customerId], references:[id])
+  locationId    String
+  location     Location @relation("SalesLocation",fields: [locationId], references:[id])
+  status      SalesOrderStatus @default(DRAFT)
+  subtotal    Float @default(0)
+  taxAmount   Float @default(0)
+  shippingCost  Float?
+  discount      Float?
+  total        Float @default(0)
+  paymentStatus PaymentStatus   @default(PENDING)
+  paymentMethod String?
+  notes       String?
+  organization  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId       String
+  createdById String  @unique
+  createdBy   User        @relation("SalesOrderCreatedBy", fields: [createdById], references: [id])
+  lines SalesOrderLine[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([orderNumber])
+  @@index([customerId])
+  @@index([status])
+  @@index([paymentStatus])
+
+
+}
+
+enum SalesOrderStatus{
+  DRAFT
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELED
+  RETURNED
+
+}
+
+enum PaymentStatus{
+  PENDING
+  PARTIAL
+  PAID
+  REFUNDED
+}
+
+model SalesOrderLine {
+  id          String   @id @default(cuid())
+  salesOrderId  String
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  itemId    String
+  item  Item @relation(fields: [itemId], references: [id])
+  quantity  Int
+  unitPrice Float
+  taxRate Float  @default(0)
+  taxAmount Float @default(0)
+  discount Float?
+  total Float
+  serialNumbers String[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  @@index([salesOrderId])
+  @@index([itemId])
+
+
+}
+
+//====Stock Movement Models =====
+
+model Transfer{
+  id          String   @id @default(cuid())
+  transferNumber  String @unique
+  date    DateTime
+  fromLocationId  String
+  fromLocation Location @relation("FromLocation",fields: [fromLocationId], references: [id])
+  toLocationId  String
+  toLocation Location @relation("ToLocation",fields: [toLocationId], references: [id])
+  status  TransferStatus  @default(DRAFT)
+  notes   String?
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  orgId        String
-  status       Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  orgId String
+  createdById String
+  createdBy User @relation("TransferCreatedBy",fields: [createdById], references: [id])
+  approvedById  String?
+  approvedBy User? @relation("TransferApprovedBy",fields: [approvedById], references: [id])
+  lines TransferLine[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  @@index([transferNumber])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([status])
 
-  @@map("invites")
+
 }
 
-model ApiKey {
-  id        String       @id @default(cuid())
-  orgId     String
-  key       String       @unique
-  name      String
-  createdAt DateTime     @default(now())
-  org       Organization @relation(fields: [orgId], references: [id])
+enum TransferStatus{
+  DRAFT
+  APPROVED
+  IN_TRANSIT
+  COMPLETED
+  CANCELED
 }
 
-model Saving {
-  id          String    @id @default(cuid())
-  amount      Int
-  month       String
-  name        String
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paymentDate DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
+model TransferLine{
+  id          String   @id @default(cuid())
+  transferId  String
+  transfer Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  itemId     String
+  item Item @relation(fields: [itemId], references: [id])
+  quantity  Int
+  notes String?
+  serialNumbers String[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+
+  @@index([transferId])
+  @@index([itemId])
+
 }
 
-model Blog {
-  id            String       @id @default(cuid())
-  title         String
-  slug          String       @unique
-  description   String?      @db.Text // Meta description for SEO
-  thumbnail     String?
-  content       String?      @db.Text
-  published     Boolean?     @default(false)
-  featured      Boolean?     @default(false)
-  author        User         @relation(fields: [authorId], references: [id])
-  authorId      String
-  authorName    String
-  authorImage   String?
-  authorTitle   String?
-  category      BlogCategory @relation(fields: [categoryId], references: [id])
-  categoryId    String
-  categoryTitle String
-  readingTime   Int? // Estimated reading time in minutes
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+model Adjustment{
+  id          String   @id @default(cuid())
+  adjustmentNumber String   @unique
+  date    DateTime
+  locationId  String
+  location Location @relation(fields: [locationId], references: [id])
+  adjustmentType  AdjustmentType
+  reason  String
+  notes String?
+  status  AdjustmentStatus  @default(DRAFT)
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgId  String
+  createdById String
+  createdBy User @relation("AdjustmentCreatedBy",fields: [createdById], references: [id])
+  approvedById  String?
+  approvedBy  User? @relation("AdjustmentApprovedBy",fields: [approvedById],references: [id])
+  lines AdjustmentLine[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([adjustmentNumber])
+  @@index([locationId])
+  @@index([adjustmentType])
+  @@index([status])
+
+
 }
 
-model BlogCategory {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  blogs     Blog[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum AdjustmentType{
+  STOCK_COUNT
+  DAMAGE
+  THEFT
+  EXPIRED
+  OTHER
 }
+enum AdjustmentStatus{
+  DRAFT
+  APPROVED
+  COMPLETED
+  CANCELED
+}
+
+model AdjustmentLine{
+  id          String   @id @default(cuid())
+  adjustmentId  String
+  adjustment Adjustment @relation(fields: [adjustmentId], references: [id], onDelete: Cascade)
+  itemId    String
+  item Item @relation(fields: [itemId], references: [id])
+  beforeQuantity  Int
+  afterQuantity  Int
+  adjustedQuantity  Int
+  notes   String
+  serialNumbers String[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([adjustmentId])
+  @@index([itemId])
+}
+
