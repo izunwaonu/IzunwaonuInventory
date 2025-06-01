@@ -1,9 +1,9 @@
-"use server";
+'use server';
 
-import { CategoryFormProps } from "@/components/Forms/inventory/CategoryFormModal";
-import { db } from "@/prisma/db";
-import { CategoryProps } from "@/types/types";
-import { revalidatePath } from "next/cache";
+import { CategoryFormProps } from '@/components/Forms/inventory/CategoryFormModal';
+import { db } from '@/prisma/db';
+import { CategoryProps } from '@/types/types';
+import { revalidatePath } from 'next/cache';
 
 export async function createCategory(data: CategoryFormProps) {
   const slug = data.slug;
@@ -17,14 +17,14 @@ export async function createCategory(data: CategoryFormProps) {
       return {
         status: 409,
         data: null,
-        error: "Category already exists",
+        error: 'Category already exists',
       };
     }
     const newCategory = await db.category.create({
       data,
     });
     // console.log(newCategory);
-    revalidatePath("/dashboard/inventory/categories");
+    revalidatePath('/dashboard/inventory/categories');
     return {
       status: 200,
       data: newCategory,
@@ -34,20 +34,20 @@ export async function createCategory(data: CategoryFormProps) {
     console.log(error);
     return {
       status: 500,
-      error: "Something went wrong",
+      error: 'Something went wrong',
       data: null,
     };
   }
 }
-export async function getOrgCategories(orgId:string) {
+export async function getOrgCategories(orgId: string) {
   try {
     const categories = await db.category.findMany({
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
-      where:{
-        orgId
-      }
+      where: {
+        orgId,
+      },
     });
 
     return categories;
@@ -64,7 +64,7 @@ export async function updateCategoryById(id: string, data: CategoryProps) {
       },
       data,
     });
-    revalidatePath("/dashboard/categories");
+    revalidatePath('/dashboard/categories');
     return updatedCategory;
   } catch (error) {
     console.log(error);

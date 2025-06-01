@@ -127,12 +127,12 @@ export const permissions: ModulePermissions[] = [
   },
   {
     display: 'Purchase Orders',
-    name: 'purchaseOrders',
+    name: 'purchase.orders',
     permissions: {
-      create: 'purchaseOrders.create',
-      read: 'purchaseOrders.read',
-      update: 'purchaseOrders.update',
-      delete: 'purchaseOrders.delete',
+      create: 'purchase.orders.create',
+      read: 'purchase.orders.read',
+      update: 'purchase.orders.update',
+      delete: 'purchase.orders.delete',
     },
   },
   {

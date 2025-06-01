@@ -196,7 +196,7 @@ export const sidebarLinks: ISidebarLink[] = [
       {
         title: 'Items',
         href: '/dashboard/inventory/items',
-        permission: 'inventory.read',
+        permission: 'items.read',
       },
       {
         title: 'Categories',
@@ -250,28 +250,28 @@ export const sidebarLinks: ISidebarLink[] = [
     icon: ShoppingCart,
     dropdown: true,
     href: '/dashboard/purchases',
-    permission: 'purchases.read',
+    permission: 'purchase.orders.read',
     dropdownMenu: [
       {
         title: 'Purchase Orders',
-        href: '/dashboard/purchases/orders',
-        permission: 'purchases.read',
+        href: '/dashboard/purchases/purchase-order',
+        permission: 'purchase.orders.read',
       },
       {
         title: 'Goods Receipt',
         href: '/dashboard/purchases/receipts',
-        permission: 'purchases.read',
+        permission: 'purchase.orders.read',
       },
       {
         title: 'Suppliers',
         href: '/dashboard/purchases/suppliers',
-        permission: 'suppliers.read',
+        permission: 'purchase.orders.read',
       },
-      {
-        title: 'Supplier Items',
-        href: '/dashboard/purchases/supplier-items',
-        permission: 'suppliers.read',
-      },
+      // {
+      //   title: 'Supplier Items',
+      //   href: '/dashboard/purchases/supplier-items',
+      //   permission: 'purchase.orders.read',
+      // },
     ],
   },
   {

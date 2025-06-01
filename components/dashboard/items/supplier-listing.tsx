@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { DollarSign, Barcode } from 'lucide-react';
+import { DollarSign, Barcode, Mail, PhoneCall } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import {
   DataTable,
@@ -31,50 +31,47 @@ import { BriefItemDTO, ItemCreateDTO } from '@/types/item';
 import NairaIcon from '@/components/NairaIcon';
 import ImageUploadButton from '@/components/FormInputs/ImageUploadButton';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useCreateSupplier, useDeleteSupplier, useOrgSuppliers } from '@/hooks/useSupplierQueries';
+import { BriefSupplierDTO, SupplierCreateDTO } from '@/types/types';
 // import { useRouter } from "next/router";
 
 interface ItemListingProps {
   title: string;
-  orgId: string;
 }
 
 // Form schema for editing/adding products
-const productFormSchema = z.object({
+const supplierFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  sellingPrice: z.string().min(1, 'Selling Price is required'),
-  costPrice: z.string().min(1, 'Cost Price is required'),
-  sku: z.string().min(1, 'SKU is required'),
+  contactPerson: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
 });
 
-type ProductFormValues = z.infer<typeof productFormSchema>;
+type SupplierFormValues = z.infer<typeof supplierFormSchema>;
 
-export default function ItemListing({ title, orgId }: ItemListingProps) {
+export default function SupplierListing({ title }: ItemListingProps) {
   // React Query hooks with Suspense - note that data is always defined
-  const { items, refetch } = useOrgItem(orgId);
-  const createItemMutation = useCreateItem();
+  const { suppliers, refetch } = useOrgSuppliers();
+  const createItemMutation = useCreateSupplier();
   //   const updateProductMutation = useUpdateProduct();
-  const deleteItemMutation = useDeleteItem();
+  const deleteItemMutation = useDeleteSupplier();
 
   // Local state
-  const [imageUrl, setImageUrl] = useState(
-    'https://ji20b9tl3i.ufs.sh/f/pQAi6smwGNu2vALIcZP5Uyvn7WAtB6Rb93aC4zgXOMN1lwke',
-  );
+
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState<BriefItemDTO | null>(null);
-  const [productToDelete, setProductToDelete] = useState<BriefItemDTO | null>(null);
+  const [currentProduct, setCurrentProduct] = useState<BriefSupplierDTO | null>(null);
+  const [productToDelete, setProductToDelete] = useState<BriefSupplierDTO | null>(null);
 
   // Form for editing/adding products
-  const form = useForm<ItemCreateDTO>({
-    resolver: zodResolver(productFormSchema),
+  const form = useForm<SupplierCreateDTO>({
+    resolver: zodResolver(supplierFormSchema),
     defaultValues: {
       name: '',
-      sellingPrice: 0,
-      costPrice: 0,
-      sku: '',
+      contactPerson: '',
+      email: '',
+      phone: '',
     },
   });
 
@@ -84,20 +81,20 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
       // Adding new - reset form
       form.reset({
         name: '',
-        sellingPrice: 0,
-        costPrice: 0,
-        sku: '',
+        contactPerson: '',
+        email: '',
+        phone: '',
       });
     } else {
       // Editing existing - populate form
       form.reset({
         name: currentProduct.name,
-        sellingPrice: currentProduct.sellingPrice,
+        phone: currentProduct?.phone ?? '',
+        contactPerson: currentProduct?.contactPerson ?? '',
+        email: currentProduct?.email ?? '',
       });
     }
   }, [currentProduct, form]);
-
-  const { data: session } = useSession();
 
   // Format date function
   const formatDate = (date: Date | string) => {
@@ -115,16 +112,15 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
   };
 
   // Export to Excel
-  const handleExport = async (filteredProducts: BriefItemDTO[]) => {
+  const handleExport = async (filteredProducts: BriefSupplierDTO[]) => {
     setIsExporting(true);
     try {
       // Prepare data for export
       const exportData = filteredProducts.map((product) => ({
         Name: product.name,
-
-        Price: product.sellingPrice,
-        'Sales Count': product.salesCount,
-        'Total Sales': formatCurrency(product.salesTotal),
+        ContactPerson: product?.contactPerson,
+        Email: product.email,
+        Phone: product.phone,
         'Date Added': formatDate(product.createdAt),
       }));
 
@@ -158,28 +154,24 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
   };
   const router = useRouter();
   // Handle edit click
-  const handleEditClick = (product: BriefItemDTO) => {
+  const handleEditClick = (supplier: BriefSupplierDTO) => {
     // setCurrentProduct(product);
     // setFormDialogOpen(true);
-    router.push(`/dashboard/inventory/items/${product.id}/edit`);
+    router.push(`/dashboard/purchases/suppliers/${supplier.id}/edit`);
   };
 
   // Handle delete click
-  const handleDeleteClick = (product: BriefItemDTO) => {
+  const handleDeleteClick = (product: BriefSupplierDTO) => {
     setProductToDelete(product);
     setDeleteDialogOpen(true);
   };
 
   // Handle form submission (edit or add)
-  const onSubmit = async (data: ItemCreateDTO) => {
+  const onSubmit = async (data: SupplierCreateDTO) => {
     if (!currentProduct) {
       // Add new product
       console.log(data);
-      data.costPrice = Number(data.costPrice);
-      data.sellingPrice = Number(data.sellingPrice);
-      data.orgId = orgId;
-      data.thumbnail = imageUrl;
-      console.log(data);
+
       createItemMutation.mutate(data);
       setFormDialogOpen(true);
       form.reset();
@@ -200,27 +192,8 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
     }
   };
 
-  // Calculate total products value
-  const getTotalValue = (products: BriefItemDTO[]) => {
-    return products.reduce((total, product) => {
-      const price = product.sellingPrice;
-      return total + price;
-    }, 0);
-  };
-
   // Define columns for the data table
-  const columns: Column<BriefItemDTO>[] = [
-    {
-      header: 'Image',
-      accessorKey: 'thumbnail',
-      cell: (row) => (
-        <img
-          className="w-10 h-10 rounded-sm"
-          src={row.thumbnail ?? '/placeholder.png'}
-          alt={row.name}
-        />
-      ),
-    },
+  const columns: Column<BriefSupplierDTO>[] = [
     {
       header: 'Name',
       accessorKey: 'name',
@@ -231,46 +204,44 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
       ),
     },
     {
-      header: 'Price',
-      accessorKey: 'sellingPrice',
-    },
-
-    {
-      header: 'Sales Count',
-      accessorKey: 'salesCount',
-    },
-    {
-      header: 'Total Sales',
-      accessorKey: (row) => formatCurrency(row.salesTotal),
-    },
-    {
-      header: 'Suppliers',
-      accessorKey: 'id',
+      header: 'Contact Person',
+      accessorKey: 'contactPerson',
       cell: (row) => (
-        <Button variant={'outline'}>
-          <Link href={`/dashboard/inventory/items/${row.id}/suppliers`}>View Suppliers</Link>
-        </Button>
+        <span className="font-medium line-clamp-1">
+          {row.name.length > 20 ? `${row.name.substring(0, 20)}...` : row.contactPerson}
+        </span>
       ),
     },
-    // {
-    //   header: 'Date Added',
-    //   accessorKey: (row) => formatDate(row.createdAt),
-    // },
+    {
+      header: 'Email',
+      accessorKey: 'email',
+      cell: (row) => (
+        <span className="font-medium line-clamp-1">
+          {row.name.length > 20 ? `${row.name.substring(0, 20)}...` : row.email}
+        </span>
+      ),
+    },
+    {
+      header: 'Phone',
+      accessorKey: 'phone',
+      cell: (row) => (
+        <span className="font-medium line-clamp-1">
+          {row.name.length > 20 ? `${row.name.substring(0, 20)}...` : row.phone}
+        </span>
+      ),
+    },
+    {
+      header: 'Date Added',
+      accessorKey: (row) => formatDate(row.createdAt),
+    },
   ];
-
-  // Generate subtitle with total value
-  const getSubtitle = (productCount: number, totalValue: number) => {
-    return `${productCount} ${
-      productCount === 1 ? 'item' : 'items'
-    } | Total Value: ${formatCurrency(totalValue)}`;
-  };
 
   return (
     <>
-      <DataTable<BriefItemDTO>
+      <DataTable<BriefSupplierDTO>
         title={title}
-        subtitle={items.length > 0 ? getSubtitle(items.length, getTotalValue(items)) : undefined}
-        data={items}
+        subtitle="Suppliers"
+        data={suppliers}
         columns={columns}
         keyField="id"
         isLoading={false} // With Suspense, we're guaranteed to have data
@@ -280,7 +251,7 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
           onExport: handleExport,
         }}
         filters={{
-          searchFields: ['name'],
+          searchFields: ['name', 'contactPerson', 'phone'],
           enableDateFilter: true,
           getItemDate: (item) => item.createdAt,
         }}
@@ -300,95 +271,77 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
         size="md"
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
-        title={currentProduct ? 'Edit Item' : 'Add New Item'}
+        title={currentProduct ? 'Edit Supplier' : 'Add New Supplier'}
         form={form}
         onSubmit={onSubmit}
         isSubmitting={createItemMutation.isPending}
         // isSubmitting={
         //   createItemMutation.isPending || updateProductMutation.isPending
         // }
-        submitLabel={currentProduct ? 'Save Changes' : 'Add Item'}
+        submitLabel={currentProduct ? 'Save Changes' : 'Add Supplier'}
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Item Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter item name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <div className="grid gap-3 grid-cols-2">
           <FormField
             control={form.control}
-            name="sellingPrice"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Selling Price</FormLabel>
+                <FormLabel>Supplier Name</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <NairaIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="25,000,000" className="pl-8" {...field} />
-                  </div>
+                  <Input placeholder="Enter supplier name" {...field} />
                 </FormControl>
-                <FormDescription>Enter the Item Selling Price in NGN</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="costPrice"
+            name="contactPerson"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cost Price</FormLabel>
+                <FormLabel>Supplier Contact Person</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <NairaIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="25,000,000" className="pl-8" {...field} />
-                  </div>
+                  <Input placeholder="Enter supplier contact person" {...field} />
                 </FormControl>
-                <FormDescription>Enter the Item Cost Price in NGN</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <div className="grid grid-cols-12 gap-3">
-          <div className="col-span-7">
-            <FormField
-              control={form.control}
-              name="sku"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Item SKU</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Barcode className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input placeholder="SKU-001" className="pl-8" {...field} />
-                    </div>
-                  </FormControl>
-                  <FormDescription>Enter the Item SKU</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="col-span-5">
-            <ImageUploadButton
-              title="Upload Image"
-              imageUrl={imageUrl}
-              setImageUrl={setImageUrl}
-              endpoint="itemImage"
-              display={'horizontal'}
-              size={'sm'}
-            />
-          </div>
+        <div className="grid gap-3 grid-cols-2">
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <PhoneCall className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="+234 8138 3906 81" className="pl-8" {...field} />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Mail className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Eg: izunwaonu2@gmail.com" className="pl-8" {...field} />
+                  </div>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </EntityForm>
 
@@ -396,7 +349,7 @@ export default function ItemListing({ title, orgId }: ItemListingProps) {
       <ConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title="Delete Item"
+        title="Delete Supplier"
         description={
           productToDelete ? (
             <>

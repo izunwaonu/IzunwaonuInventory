@@ -1,40 +1,51 @@
-"use client";
-import { Headset, Loader2, Lock, Mail, User, Warehouse } from "lucide-react";
-import React, { useState } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { InvitedUserProps, UserProps } from "@/types/types";
+'use client';
+import { Headset, Loader2, Lock, Mail, User, Warehouse } from 'lucide-react';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { InvitedUserProps, UserProps } from '@/types/types';
 export type OrgData = {
-    fiscalYear: null;
-    startDate: Date;
-    inventory: boolean;
-    industry: null;
-    address: null;
-    state: null;
+  fiscalYear: null;
+  startDate: Date;
+  inventory: boolean;
+  industry: null;
+  address: null;
+  state: null;
 
-    name: string;
-    slug: string;
-    country: string;
-    currency: string | undefined;
-    timezone: string | undefined;
+  name: string;
+  slug: string;
+  country: string;
+  currency: string | undefined;
+  timezone: string | undefined;
+};
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import TextInput from '../FormInputs/TextInput';
+import PasswordInput from '../FormInputs/PasswordInput';
+import SubmitButton from '../FormInputs/SubmitButton';
+import { createInvitedUser, createUser } from '@/actions/users';
+import CustomCarousel from '../frontend/custom-carousel';
+import { Button } from '../ui/button';
+import { signIn } from 'next-auth/react';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
+import Logo from '../global/Logo';
 
-}
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import TextInput from "../FormInputs/TextInput";
-import PasswordInput from "../FormInputs/PasswordInput";
-import SubmitButton from "../FormInputs/SubmitButton";
-import { createInvitedUser, createUser } from "@/actions/users";
-import CustomCarousel from "../frontend/custom-carousel";
-import { Button } from "../ui/button";
-import { signIn } from "next-auth/react";
-import { FaGithub, FaGoogle } from "react-icons/fa";
-import Logo from "../global/Logo";
-
-
-export default function RegisterInvitedUserForm({orgId, userEmail, orgName, roleId}:{orgId:string, userEmail:string, orgName:string, roleId:string}) {
+export default function RegisterInvitedUserForm({
+  orgId,
+  userEmail,
+  orgName,
+  roleId,
+  locationName,
+  locationId,
+}: {
+  orgId: string;
+  userEmail: string;
+  orgName: string;
+  roleId: string;
+  locationName: string;
+  locationId: string;
+}) {
   const [startDate, setStartDate] = useState(new Date());
-
 
   const [loading, setLoading] = useState(false);
   const [emailErr, setEmailErr] = useState<string | null>(null);
@@ -44,21 +55,21 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
     formState: { errors },
     reset,
   } = useForm<InvitedUserProps>({
-    defaultValues:{
-      email:userEmail,
+    defaultValues: {
+      email: userEmail,
     },
   });
   const router = useRouter();
   async function onSubmit(data: InvitedUserProps) {
     setLoading(true);
-    data.orgId=orgId;
-    data.roleId=roleId;
+    data.orgId = orgId;
+    data.roleId = roleId;
     data.name = `${data.firstName} ${data.lastName}`;
     data.orgName = orgName;
-    data.image =
-      "https://ji20b9tl3i.ufs.sh/f/pQAi6smwGNu28i62wKIrYt064OD3VAkgSKWyZFufbmBx2Pi7";
-     
-      
+    data.locationId = locationId;
+    data.locationName = locationName;
+    data.image = 'https://ji20b9tl3i.ufs.sh/f/pQAi6smwGNu28i62wKIrYt064OD3VAkgSKWyZFufbmBx2Pi7';
+
     try {
       const res = await createInvitedUser(data);
       if (res.status === 409) {
@@ -66,16 +77,18 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
         setEmailErr(res.error);
       } else if (res.status === 200) {
         setLoading(false);
-        toast.success("Account Created successfully", {description: "Your account has been created successfully, kindly login"});
-        router.push("/login");
+        toast.success('Account Created successfully', {
+          description: 'Your account has been created successfully, kindly login',
+        });
+        router.push('/login');
       } else {
         setLoading(false);
-        toast.error("Something went wrong");
+        toast.error('Something went wrong');
       }
     } catch (error) {
       setLoading(false);
-      console.error("Network Error:", error);
-      toast.error("Its seems something is wrong, try again");
+      console.error('Network Error:', error);
+      toast.error('Its seems something is wrong, try again');
     }
   }
   return (
@@ -123,6 +136,7 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
                 <div className="">
                   <TextInput
                     type="email"
+                    readonly={true}
                     register={register}
                     errors={errors}
                     label="Email Address"
@@ -145,9 +159,7 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
                 type="password"
               />
               <div className="">
-                {emailErr && (
-                  <p className="text-red-500 text-xs mt-2">{emailErr}</p>
-                )}
+                {emailErr && <p className="text-red-500 text-xs mt-2">{emailErr}</p>}
               </div>
               <div>
                 <SubmitButton
@@ -185,7 +197,7 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
               </Button>
             </div> */}
             <p className="mt-6 text-sm text-gray-500">
-              Already Registered ?{" "}
+              Already Registered ?{' '}
               <Link
                 href="/login"
                 className="font-semibold leading-6 text-rose-600 hover:text-rose-500"
@@ -195,10 +207,10 @@ export default function RegisterInvitedUserForm({orgId, userEmail, orgName, role
             </p>
           </div>
           <div className="flex items-center py-4 justify-center space-x-1 text-slate-900">
-              <div className="h-[1px] w-full bg-slate-200"></div>
-              <div className="uppercase"></div>
-              <div className="h-[1px] w-full bg-slate-200"></div>
-            </div>
+            <div className="h-[1px] w-full bg-slate-200"></div>
+            <div className="uppercase"></div>
+            <div className="h-[1px] w-full bg-slate-200"></div>
+          </div>
         </div>
       </div>
       <div className="hidden bg-muted lg:block relative">

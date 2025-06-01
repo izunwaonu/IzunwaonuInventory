@@ -1,4 +1,4 @@
-import { Role, User } from "@prisma/client";
+import { Role, User } from '@prisma/client';
 
 export type CategoryProps = {
   title: string;
@@ -27,6 +27,8 @@ export type InvitedUserProps = {
   name: string;
   orgId: string;
   orgName: string;
+  locationName: string;
+  locationId: string;
   roleId: string;
   firstName: string;
   lastName: string;
@@ -106,12 +108,43 @@ export interface BrandDTO {
 }
 export interface CategoryDTO {
   id: string;
-    orgId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    title: string;
-    slug: string;
-    imageUrl: string | null;
-    parentId: string | null;
+  orgId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  description: string | null;
+  title: string;
+  slug: string;
+  imageUrl: string | null;
+  parentId: string | null;
 }
+
+export type SupplierCreateDTO = {
+  name: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+};
+
+export interface SupplierDTO {
+  id: string;
+  name: string;
+  contactPerson: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  taxId: string | null;
+  paymentTerms: number | null;
+  notes: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type BriefSupplierDTO = {
+  id: string;
+  name: string;
+  contactPerson: string | null;
+  phone: string | null;
+  email: string | null;
+  createdAt: Date;
+};

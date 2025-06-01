@@ -302,7 +302,7 @@ model ItemSupplier {
   supplierSku      String? // Supplier's own SKU for this item
   leadTime         Int? // Typical lead time in days
   minOrderQty      Int? // Minimum order quantity
-  unitCost         Decimal // Supplier-specific cost
+  unitCost         Float? // Supplier-specific cost
   lastPurchaseDate DateTime?
   notes            String?
 
@@ -356,6 +356,7 @@ model PurchaseOrder{
   poNumber        String               @unique
   date            DateTime
   supplierId      String
+  supplierName     String?
   supplier        Supplier             @relation(fields: [supplierId], references:[id])
   deliveryLocationId String
   deliveryLocation       Location             @relation("DeliveryLocation", fields: [deliveryLocationId], references:[id])

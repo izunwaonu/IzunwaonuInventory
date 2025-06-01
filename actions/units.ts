@@ -1,9 +1,8 @@
-"use server";
+'use server';
 
-import { MetaPros } from "@/components/dashboard/blogs/blog-edit-form";
-import { UnitFormProps } from "@/components/Forms/inventory/UnitForm";
-import { db } from "@/prisma/db";
-import { revalidatePath } from "next/cache";
+import { UnitFormProps } from '@/components/Forms/inventory/UnitForm';
+import { db } from '@/prisma/db';
+import { revalidatePath } from 'next/cache';
 
 export type BlogCategoryProps = {
   name: string;
@@ -20,43 +19,41 @@ export type BriefBlog = {
 export async function createUnit(data: UnitFormProps) {
   try {
     const newUnit = await db.unit.create({
-        data:{
-          name: data.name,
-          symbol: data.symbol,
-          orgId: data.orgId,
-        }
-      });
+      data: {
+        name: data.name,
+        symbol: data.symbol,
+        orgId: data.orgId,
+      },
+    });
 
-      revalidatePath("/dashboard/inventory/units");
-      return{
-        status: 200,
-        data: newUnit,
-        error: null
-      } ;
+    revalidatePath('/dashboard/inventory/units');
+    return {
+      status: 200,
+      data: newUnit,
+      error: null,
+    };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return {
       status: 500,
       data: null,
-      error: "Something went wrong while creating unit"
-    }
-  };
- 
+      error: 'Something went wrong while creating unit',
+    };
+  }
 }
 
 export async function getOrgUnit(orgId: string) {
   try {
     const units = await db.unit.findMany({
-        where:{
-          orgId,
-        }
-      });
-      return units;
+      where: {
+        orgId,
+      },
+    });
+    return units;
   } catch (error) {
-    console.log(error)
-    return []
-  };
- 
+    console.log(error);
+    return [];
+  }
 }
 
 export async function deleteUnit(id: string) {
@@ -67,7 +64,7 @@ export async function deleteUnit(id: string) {
       },
     });
 
-    revalidatePath("/dashboard/inventory/units");
+    revalidatePath('/dashboard/inventory/units');
 
     return {
       ok: true,
@@ -77,4 +74,3 @@ export async function deleteUnit(id: string) {
     console.log(error);
   }
 }
-

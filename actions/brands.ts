@@ -1,64 +1,60 @@
-"use server";
+'use server';
 
-import { MetaPros } from "@/components/dashboard/blogs/blog-edit-form";
-import { BrandFormProps } from "@/components/Forms/inventory/BrandForm";
+import { BrandFormProps } from '@/components/Forms/inventory/BrandForm';
 
-import { db } from "@/prisma/db";
-import { revalidatePath } from "next/cache";
+import { db } from '@/prisma/db';
+import { revalidatePath } from 'next/cache';
 
 export async function createBrand(data: BrandFormProps) {
   try {
     const existingBrand = await db.brand.findUnique({
       where: {
-        slug: data.slug
-      }
-  })
-  if (existingBrand) {
-    return{
-      status:409,
-      data: null,
-      error: "Brand already exists"
-
+        slug: data.slug,
+      },
+    });
+    if (existingBrand) {
+      return {
+        status: 409,
+        data: null,
+        error: 'Brand already exists',
+      };
     }
-  }
     const newBrand = await db.brand.create({
-        data:{
-          name: data.name,
-          slug: data.slug,
-          orgId: data.orgId,
-        }
-      });
+      data: {
+        name: data.name,
+        slug: data.slug,
+        orgId: data.orgId,
+      },
+    });
 
-      revalidatePath("/dashboard/inventory/brands");
-      return{
-        status: 200,
-        data: newBrand,
-        error: null
-      } ;
+    revalidatePath('/dashboard/inventory/brands');
+    return {
+      status: 200,
+      data: newBrand,
+      error: null,
+    };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return {
       status: 500,
       data: null,
-      error: "Something went wrong while creating unit"
-    }
-  };
- 
+      error: 'Something went wrong while creating unit',
+    };
+  }
 }
 
 export async function getOrgBrand(orgId: string) {
   try {
     const brands = await db.brand.findMany({
-        where:{
-          orgId,
-        }
-      });
-      return brands;
+      where: {
+        orgId,
+      },
+    });
+    return brands;
   } catch (error) {
-    console.log(error)
-    return []
-  };
- 
+    console.log(error);
+    return [];
+  }
 }
 
 export async function deleteBrand(id: string) {
@@ -69,7 +65,7 @@ export async function deleteBrand(id: string) {
       },
     });
 
-    revalidatePath("/dashboard/inventory/brands");
+    revalidatePath('/dashboard/inventory/brands');
 
     return {
       ok: true,
@@ -79,4 +75,3 @@ export async function deleteBrand(id: string) {
     console.log(error);
   }
 }
-
