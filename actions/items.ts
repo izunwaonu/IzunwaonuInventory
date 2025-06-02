@@ -9,6 +9,7 @@ import axios from 'axios';
 import { revalidatePath } from 'next/cache';
 import { getOrgKey } from './apiKey';
 import { resolve } from 'path';
+import { getAuthenticatedUser } from '@/config/useAuth';
 
 export async function createItem(data: ItemCreateDTO) {
   try {
@@ -198,12 +199,121 @@ export async function deleteItem(id: string) {
     };
   }
 }
-// export async function createBulkCategories(categories: CategoryProps[]) {
-//   try {
-//     for (const category of categories) {
-//       await createCategory(category);
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
+
+export async function getItemSuppliers(itemId: string) {
+  try {
+    const user = await getAuthenticatedUser();
+    const orgId = user.orgId;
+
+    // Add timeout to prevent long-running queries
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Database query timeout')), 5000);
+    });
+
+    const queryPromise = db.itemSupplier.findMany({
+      where: {
+        itemId,
+        item: {
+          orgId,
+        },
+      },
+      include: {
+        supplier: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: [
+        { isPreferred: 'desc' }, // Preferred suppliers first
+        { supplier: { name: 'asc' } }, // Then alphabetically
+      ],
+    });
+
+    // Race between the query and the timeout
+    const itemSuppliers = (await Promise.race([queryPromise, timeoutPromise])) as any;
+
+    // Properly serialize Decimal values to numbers
+    return itemSuppliers.map((supplier: any) => ({
+      ...supplier,
+      unitCost: supplier.unitCost !== null ? Number(supplier.unitCost) : null,
+    }));
+  } catch (error) {
+    console.error('Error fetching item suppliers:', error);
+    // Return empty array instead of throwing to prevent page crashes
+    return [];
+  }
+}
+
+export async function updateItemSupplier(id: string, data: any) {
+  try {
+    const user = await getAuthenticatedUser();
+    const orgId = user.orgId;
+
+    // Verify the item supplier belongs to the user's organization
+    const itemSupplier = await db.itemSupplier.findFirst({
+      where: {
+        id,
+        item: {
+          orgId,
+        },
+      },
+    });
+
+    if (!itemSupplier) {
+      return {
+        success: false,
+        error: 'Item supplier not found',
+      };
+    }
+
+    const updatedSupplier = await db.itemSupplier.update({
+      where: { id },
+      data,
+    });
+
+    revalidatePath(`/dashboard/inventory/items/${itemSupplier.itemId}`);
+
+    return {
+      success: true,
+      data: updatedSupplier,
+    };
+  } catch (error) {
+    console.error('Error updating item supplier:', error);
+    return {
+      success: false,
+      error: 'Failed to update item supplier',
+    };
+  }
+}
+
+export async function deleteItemSupplier(id: string) {
+  try {
+    const user = await getAuthenticatedUser();
+    const orgId = user.orgId;
+
+    // Verify the item supplier belongs to the user's organization
+    const itemSupplier = await db.itemSupplier.findFirst({
+      where: {
+        id,
+        item: {
+          orgId,
+        },
+      },
+    });
+
+    if (!itemSupplier) {
+      throw new Error('Item supplier not found');
+    }
+
+    await db.itemSupplier.delete({
+      where: { id },
+    });
+
+    revalidatePath(`/dashboard/inventory/items/${itemSupplier.itemId}`);
+  } catch (error) {
+    console.error('Error deleting item supplier:', error);
+    throw error;
+  }
+}
