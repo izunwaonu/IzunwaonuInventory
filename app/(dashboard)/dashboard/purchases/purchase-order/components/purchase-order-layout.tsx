@@ -34,6 +34,8 @@
 //     id: string;
 //     name: string;
 //     email: string | null;
+//     contactPerson: string | null;
+//     phone: string | null;
 //   };
 //   deliveryLocation: {
 //     id: string;
@@ -255,6 +257,12 @@ interface PurchaseOrder {
   notes: string | null;
   paymentTerms: string | null;
   expectedDeliveryDate: string | null;
+  createdBy: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
   supplier: {
     id: string;
     name: string;

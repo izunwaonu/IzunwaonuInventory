@@ -1,18 +1,18 @@
 // 'use server';
 
 // import { db } from '@/prisma/db';
-// import type { PurchaseOrderStatus } from '@prisma/client';
+// import { PurchaseOrderStatus } from '@prisma/client';
 // import { revalidatePath } from 'next/cache';
-// // import { auth } from "@/auth"
+// import { getAuthenticatedUser } from '@/config/useAuth';
 
 // export async function getPurchaseOrders() {
 //   try {
-//     // Mock orgId for demo purposes - replace with actual auth when available
-//     const mockOrgId = 'demo-org-id';
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
 
 //     const purchaseOrders = await db.purchaseOrder.findMany({
 //       where: {
-//         // orgId: mockOrgId, // Commented out for demo
+//         orgId,
 //       },
 //       include: {
 //         supplier: {
@@ -72,19 +72,165 @@
 //       })),
 //     }));
 //   } catch (error) {
-//     console.error('Error fetching purchase orders:', String(error));
+//     console.log(error);
 //     return [];
+//   }
+// }
+
+// export async function receiveOrderItems(
+//   purchaseOrderId: string,
+//   receiveData: Array<{ lineId: string; receivedQuantity: number }>,
+// ) {
+//   try {
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
+
+//     // Verify the purchase order belongs to the user's organization
+//     const purchaseOrder = await db.purchaseOrder.findFirst({
+//       where: {
+//         id: purchaseOrderId,
+//         orgId,
+//       },
+//     });
+
+//     if (!purchaseOrder) {
+//       return {
+//         success: false,
+//         error: 'Purchase order not found',
+//       };
+//     }
+
+//     // Update each line item with received quantities
+//     for (const { lineId, receivedQuantity } of receiveData) {
+//       await db.purchaseOrderLine.update({
+//         where: {
+//           id: lineId,
+//         },
+//         data: {
+//           receivedQuantity: {
+//             increment: receivedQuantity,
+//           },
+//         },
+//       });
+//     }
+
+//     // Get updated purchase order with all lines
+//     const updatedPO = await db.purchaseOrder.findUnique({
+//       where: {
+//         id: purchaseOrderId,
+//       },
+//       include: {
+//         supplier: {
+//           select: {
+//             id: true,
+//             name: true,
+//             email: true,
+//             contactPerson: true,
+//             phone: true,
+//           },
+//         },
+//         deliveryLocation: {
+//           select: {
+//             id: true,
+//             name: true,
+//             address: true,
+//           },
+//         },
+//         lines: {
+//           include: {
+//             item: {
+//               select: {
+//                 id: true,
+//                 name: true,
+//                 sku: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//     });
+
+//     if (!updatedPO) {
+//       return {
+//         success: false,
+//         error: 'Purchase order not found',
+//       };
+//     }
+
+//     // Calculate if all items are received
+//     const allItemsReceived = updatedPO.lines.every(
+//       (line) => line.receivedQuantity >= line.quantity,
+//     );
+//     const someItemsReceived = updatedPO.lines.some((line) => line.receivedQuantity > 0);
+
+//     // Update PO status based on received quantities
+//     let newStatus: PurchaseOrderStatus = updatedPO.status as PurchaseOrderStatus;
+//     if (allItemsReceived) {
+//       newStatus = PurchaseOrderStatus.RECEIVED;
+//     } else if (someItemsReceived) {
+//       newStatus = PurchaseOrderStatus.PARTIALLY_RECEIVED;
+//     }
+
+//     // Update the PO status if it changed
+//     if (newStatus !== updatedPO.status) {
+//       await db.purchaseOrder.update({
+//         where: {
+//           id: purchaseOrderId,
+//         },
+//         data: {
+//           status: newStatus,
+//         },
+//       });
+//     }
+
+//     // Return the updated PO with proper serialization
+//     const serializedPO = {
+//       ...updatedPO,
+//       status: newStatus,
+//       subtotal: Number(updatedPO.subtotal),
+//       taxAmount: Number(updatedPO.taxAmount),
+//       total: Number(updatedPO.total),
+//       shippingCost: updatedPO.shippingCost ? Number(updatedPO.shippingCost) : null,
+//       discount: updatedPO.discount ? Number(updatedPO.discount) : null,
+//       date: updatedPO.date.toISOString(),
+//       expectedDeliveryDate: updatedPO.expectedDeliveryDate?.toISOString() || null,
+//       createdAt: updatedPO.createdAt.toISOString(),
+//       updatedAt: updatedPO.updatedAt.toISOString(),
+//       lines: updatedPO.lines.map((line) => ({
+//         ...line,
+//         unitPrice: Number(line.unitPrice),
+//         total: Number(line.total),
+//         taxAmount: Number(line.taxAmount),
+//         taxRate: Number(line.taxRate),
+//         discount: line.discount ? Number(line.discount) : null,
+//         createdAt: line.createdAt.toISOString(),
+//         updatedAt: line.updatedAt.toISOString(),
+//       })),
+//     };
+
+//     revalidatePath('/dashboard/purchase-orders');
+
+//     return {
+//       success: true,
+//       data: serializedPO,
+//     };
+//   } catch (error) {
+//     console.log(error);
+//     return {
+//       success: false,
+//       error: 'Failed to receive items',
+//     };
 //   }
 // }
 
 // export async function getSuppliers() {
 //   try {
-//     // Mock orgId for demo purposes - replace with actual auth when available
-//     const mockOrgId = 'demo-org-id';
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
 
 //     const suppliers = await db.supplier.findMany({
 //       where: {
-//         // orgId: mockOrgId, // Commented out for demo
+//         orgId,
 //       },
 //       select: {
 //         id: true,
@@ -99,19 +245,19 @@
 
 //     return suppliers;
 //   } catch (error) {
-//     console.error('Error fetching suppliers:', String(error));
+//     console.log(error);
 //     return [];
 //   }
 // }
 
 // export async function getLocations() {
 //   try {
-//     // Mock orgId for demo purposes - replace with actual auth when available
-//     const mockOrgId = 'demo-org-id';
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
 
 //     const locations = await db.location.findMany({
 //       where: {
-//         // orgId: mockOrgId, // Commented out for demo
+//         orgId,
 //       },
 //       select: {
 //         id: true,
@@ -125,19 +271,19 @@
 
 //     return locations;
 //   } catch (error) {
-//     console.error('Error fetching locations:', String(error));
+//     console.log(error);
 //     return [];
 //   }
 // }
 
 // export async function getItems() {
 //   try {
-//     // Mock orgId for demo purposes - replace with actual auth when available
-//     const mockOrgId = 'demo-org-id';
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
 
 //     const items = await db.item.findMany({
 //       where: {
-//         // orgId: mockOrgId, // Commented out for demo
+//         orgId,
 //       },
 //       select: {
 //         id: true,
@@ -152,7 +298,7 @@
 
 //     return items;
 //   } catch (error) {
-//     console.error('Error fetching items:', String(error));
+//     console.log(error);
 //     return [];
 //   }
 // }
@@ -173,13 +319,8 @@
 //   }>;
 // }) {
 //   try {
-//     // Mock session for demo purposes - replace with actual auth when available
-//     const mockSession = {
-//       user: {
-//         id: 'demo-user-id',
-//         orgId: 'demo-org-id',
-//       },
-//     };
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
 
 //     // Validate input data
 //     if (!data.supplierId || !data.deliveryLocationId || !data.lines || data.lines.length === 0) {
@@ -199,11 +340,11 @@
 //       }
 //     }
 
-//     // Get supplier name
-//     const supplier = await db.supplier.findUnique({
+//     // Get supplier name and verify it belongs to the organization
+//     const supplier = await db.supplier.findFirst({
 //       where: {
 //         id: data.supplierId,
-//         // orgId: mockSession.user.orgId, // Commented out for demo
+//         orgId,
 //       },
 //       select: { name: true },
 //     });
@@ -215,11 +356,11 @@
 //       };
 //     }
 
-//     // Verify delivery location exists
-//     const location = await db.location.findUnique({
+//     // Verify delivery location exists and belongs to the organization
+//     const location = await db.location.findFirst({
 //       where: {
 //         id: data.deliveryLocationId,
-//         // orgId: mockSession.user.orgId, // Commented out for demo
+//         orgId,
 //       },
 //       select: { id: true },
 //     });
@@ -233,9 +374,7 @@
 
 //     // Generate PO number
 //     const lastPO = await db.purchaseOrder.findFirst({
-//       where: {
-//         /*orgId: mockSession.user.orgId*/
-//       }, // Commented out for demo
+//       where: { orgId },
 //       orderBy: { createdAt: 'desc' },
 //       select: { poNumber: true },
 //     });
@@ -288,8 +427,8 @@
 //         taxAmount,
 //         discount: totalDiscount > 0 ? totalDiscount : null,
 //         total,
-//         orgId: mockSession.user.orgId,
-//         createdById: mockSession.user.id,
+//         orgId,
+//         createdById: user.id,
 //         lines: {
 //           create: lineCalculations.map((line) => ({
 //             itemId: line.itemId,
@@ -330,7 +469,7 @@
 //       },
 //     });
 
-//     revalidatePath('/dashboard/purchase-orders');
+//     revalidatePath('/dashboard/purchases/purchase-order');
 
 //     return {
 //       success: true,
@@ -340,8 +479,7 @@
 //       },
 //     };
 //   } catch (error) {
-//     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-//     console.error('Error creating purchase order:', errorMessage);
+//     console.log(error);
 //     return {
 //       success: false,
 //       error: 'Failed to create purchase order',
@@ -351,26 +489,25 @@
 
 // export async function updatePurchaseOrderStatus(id: string, status: PurchaseOrderStatus) {
 //   try {
-//     // Mock orgId for demo purposes - replace with actual auth when available
-//     const mockOrgId = 'demo-org-id';
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
 
 //     const purchaseOrder = await db.purchaseOrder.update({
 //       where: {
 //         id,
-//         // orgId: mockOrgId, // Commented out for demo
+//         orgId,
 //       },
 //       data: { status },
 //     });
 
-//     revalidatePath('/dashboard/purchase-orders');
+//     revalidatePath('/dashboard/purchases/purchase-order');
 
 //     return {
 //       success: true,
 //       data: purchaseOrder,
 //     };
 //   } catch (error) {
-//     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-//     console.error('Error updating purchase order status:', errorMessage);
+//     console.log(error);
 //     return {
 //       success: false,
 //       error: 'Failed to update purchase order status',
@@ -411,6 +548,14 @@ export async function getPurchaseOrders() {
             address: true,
           },
         },
+        CreatedBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
         lines: {
           include: {
             item: {
@@ -440,6 +585,14 @@ export async function getPurchaseOrders() {
       expectedDeliveryDate: po.expectedDeliveryDate?.toISOString() || null,
       createdAt: po.createdAt.toISOString(),
       updatedAt: po.updatedAt.toISOString(),
+      createdBy: po.CreatedBy
+        ? {
+            id: po.CreatedBy.id,
+            firstName: po.CreatedBy.firstName,
+            lastName: po.CreatedBy.lastName,
+            email: po.CreatedBy.email,
+          }
+        : null,
       lines: po.lines.map((line) => ({
         ...line,
         unitPrice: Number(line.unitPrice),
@@ -516,6 +669,14 @@ export async function receiveOrderItems(
             address: true,
           },
         },
+        CreatedBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
         lines: {
           include: {
             item: {
@@ -576,6 +737,14 @@ export async function receiveOrderItems(
       expectedDeliveryDate: updatedPO.expectedDeliveryDate?.toISOString() || null,
       createdAt: updatedPO.createdAt.toISOString(),
       updatedAt: updatedPO.updatedAt.toISOString(),
+      createdBy: updatedPO.CreatedBy
+        ? {
+            id: updatedPO.CreatedBy.id,
+            firstName: updatedPO.CreatedBy.firstName,
+            lastName: updatedPO.CreatedBy.lastName,
+            email: updatedPO.CreatedBy.email,
+          }
+        : null,
       lines: updatedPO.lines.map((line) => ({
         ...line,
         unitPrice: Number(line.unitPrice),
@@ -588,7 +757,7 @@ export async function receiveOrderItems(
       })),
     };
 
-    revalidatePath('/dashboard/purchase-orders');
+    revalidatePath('/dashboard/purchases/purchase-order');
 
     return {
       success: true,

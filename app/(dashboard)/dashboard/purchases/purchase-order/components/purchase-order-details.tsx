@@ -5,12 +5,20 @@
 // import { Badge } from '@/components/ui/badge';
 // import { Separator } from '@/components/ui/separator';
 // import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// import { Input } from '@/components/ui/input';
+// import { Label } from '@/components/ui/label';
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select';
 // import {
 //   Mail,
 //   Download,
 //   Package,
 //   Edit,
-//   MoreHorizontal,
 //   MapPin,
 //   User,
 //   FileText,
@@ -18,22 +26,23 @@
 //   Truck,
 //   Printer,
 //   Phone,
+//   Check,
 // } from 'lucide-react';
 // import { format } from 'date-fns';
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuTrigger,
-// } from '@/components/ui/dropdown-menu';
-// import { updatePurchaseOrderStatus } from '@/actions/purchase-orders';
+// import { updatePurchaseOrderStatus, receiveOrderItems } from '@/actions/purchase-orders';
 // import { sendPurchaseOrderEmail } from '@/actions/email';
-// import { PurchaseOrderStatus } from '@prisma/client';
+// import type { PurchaseOrderStatus } from '@prisma/client';
 // import { toast } from 'sonner';
-// import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogFooter,
+// } from '@/components/ui/dialog';
 // import { PurchaseOrderPDFViewer } from './purchase-order-pdf';
 
-// export interface PurchaseOrder {
+// interface PurchaseOrder {
 //   id: string;
 //   poNumber: string;
 //   date: string;
@@ -84,6 +93,16 @@
 //   CLOSED: 'bg-slate-100 text-slate-800',
 // };
 
+// const statusOptions = [
+//   { value: 'DRAFT', label: 'Draft' },
+//   { value: 'SUBMITTED', label: 'Submitted' },
+//   { value: 'APPROVED', label: 'Approved' },
+//   { value: 'PARTIALLY_RECEIVED', label: 'Partially Received' },
+//   { value: 'RECEIVED', label: 'Received' },
+//   { value: 'CANCELLED', label: 'Cancelled' },
+//   { value: 'CLOSED', label: 'Closed' },
+// ];
+
 // interface PurchaseOrderDetailsProps {
 //   purchaseOrder: PurchaseOrder;
 //   onUpdate?: (updatedPO: PurchaseOrder) => void;
@@ -97,7 +116,11 @@
 //   const [isUpdating, setIsUpdating] = useState(false);
 //   const [isSendingEmail, setIsSendingEmail] = useState(false);
 //   const [isPdfOpen, setIsPdfOpen] = useState(false);
+//   const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false);
+//   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
 //   const [supplierEmail, setSupplierEmail] = useState<string | null>(null);
+//   const [selectedStatus, setSelectedStatus] = useState(purchaseOrder.status);
+//   const [receivingQuantities, setReceivingQuantities] = useState<Record<string, number>>({});
 
 //   // Extract supplier email when component mounts or purchaseOrder changes
 //   useEffect(() => {
@@ -106,6 +129,16 @@
 //       setSupplierEmail(purchaseOrder.supplier.email);
 //     }
 //   }, [purchaseOrder]);
+
+//   // Initialize receiving quantities
+//   useEffect(() => {
+//     const initialQuantities: Record<string, number> = {};
+//     purchaseOrder.lines.forEach((line) => {
+//       const remainingQty = line.quantity - line.receivedQuantity;
+//       initialQuantities[line.id] = remainingQty > 0 ? remainingQty : 0;
+//     });
+//     setReceivingQuantities(initialQuantities);
+//   }, [purchaseOrder.lines]);
 
 //   const handleSendEmail = async () => {
 //     if (!supplierEmail) {
@@ -132,37 +165,57 @@
 //     setIsPdfOpen(true);
 //   };
 
-//   const handleReceive = async () => {
+//   const handleReceiveItems = async () => {
 //     setIsReceiving(true);
 //     try {
-//       const result = await updatePurchaseOrderStatus(
-//         purchaseOrder.id,
-//         PurchaseOrderStatus.RECEIVED,
-//       );
-//       if (result.success) {
-//         toast.success('Purchase order marked as received');
+//       const receiveData = Object.entries(receivingQuantities)
+//         .filter(([_, quantity]) => quantity > 0)
+//         .map(([lineId, quantity]) => ({
+//           lineId,
+//           receivedQuantity: quantity,
+//         }));
+
+//       if (receiveData.length === 0) {
+//         toast.error('Please enter quantities to receive');
+//         setIsReceiving(false);
+//         return;
+//       }
+
+//       const result = await receiveOrderItems(purchaseOrder.id, receiveData);
+//       if (result.success && result.data) {
+//         toast.success('Items received successfully');
 //         if (onUpdate) {
-//           onUpdate({ ...purchaseOrder, status: 'RECEIVED' });
+//           onUpdate(result.data);
 //         }
+//         setIsReceiveDialogOpen(false);
 //       } else {
-//         toast.error('Failed to update purchase order status');
+//         toast.error(result.error || 'Failed to receive items');
 //       }
 //     } catch (error) {
-//       toast.error('Failed to update purchase order status');
+//       toast.error('Failed to receive items');
 //     } finally {
 //       setIsReceiving(false);
 //     }
 //   };
 
-//   const handleStatusUpdate = async (status: PurchaseOrderStatus) => {
+//   const handleStatusUpdate = async () => {
+//     if (selectedStatus === purchaseOrder.status) {
+//       setIsStatusDialogOpen(false);
+//       return;
+//     }
+
 //     setIsUpdating(true);
 //     try {
-//       const result = await updatePurchaseOrderStatus(purchaseOrder.id, status);
+//       const result = await updatePurchaseOrderStatus(
+//         purchaseOrder.id,
+//         selectedStatus as PurchaseOrderStatus,
+//       );
 //       if (result.success) {
 //         toast.success('Purchase order status updated');
 //         if (onUpdate) {
-//           onUpdate({ ...purchaseOrder, status });
+//           onUpdate({ ...purchaseOrder, status: selectedStatus });
 //         }
+//         setIsStatusDialogOpen(false);
 //       } else {
 //         toast.error('Failed to update purchase order status');
 //       }
@@ -176,6 +229,18 @@
 //   const canReceive = ['APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
 //   const totalReceived = purchaseOrder.lines.reduce((sum, line) => sum + line.receivedQuantity, 0);
 //   const totalOrdered = purchaseOrder.lines.reduce((sum, line) => sum + line.quantity, 0);
+
+//   const updateReceivingQuantity = (lineId: string, quantity: number) => {
+//     const line = purchaseOrder.lines.find((l) => l.id === lineId);
+//     if (line) {
+//       const maxQuantity = line.quantity - line.receivedQuantity;
+//       const validQuantity = Math.max(0, Math.min(quantity, maxQuantity));
+//       setReceivingQuantities((prev) => ({
+//         ...prev,
+//         [lineId]: validQuantity,
+//       }));
+//     }
+//   };
 
 //   return (
 //     <div className="h-full flex flex-col">
@@ -211,34 +276,15 @@
 //               View/Print
 //             </Button>
 //             {canReceive && (
-//               <Button size="sm" onClick={handleReceive} disabled={isReceiving}>
+//               <Button size="sm" onClick={() => setIsReceiveDialogOpen(true)}>
 //                 <Package className="h-4 w-4 mr-2" />
-//                 {isReceiving ? 'Processing...' : 'Receive'}
+//                 Receive Items
 //               </Button>
 //             )}
-//             <DropdownMenu>
-//               <DropdownMenuTrigger asChild>
-//                 <Button variant="outline" size="sm" disabled={isUpdating}>
-//                   <MoreHorizontal className="h-4 w-4" />
-//                 </Button>
-//               </DropdownMenuTrigger>
-//               <DropdownMenuContent align="end">
-//                 <DropdownMenuItem>
-//                   <Edit className="h-4 w-4 mr-2" />
-//                   Edit
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem onClick={() => handleStatusUpdate(PurchaseOrderStatus.APPROVED)}>
-//                   <FileText className="h-4 w-4 mr-2" />
-//                   Approve
-//                 </DropdownMenuItem>
-//                 <DropdownMenuItem
-//                   onClick={() => handleStatusUpdate(PurchaseOrderStatus.CANCELLED)}
-//                   className="text-red-600"
-//                 >
-//                   Cancel Order
-//                 </DropdownMenuItem>
-//               </DropdownMenuContent>
-//             </DropdownMenu>
+//             <Button variant="outline" size="sm" onClick={() => setIsStatusDialogOpen(true)}>
+//               <Edit className="h-4 w-4 mr-2" />
+//               Change Status
+//             </Button>
 //           </div>
 //         </div>
 //       </div>
@@ -398,37 +444,57 @@
 //                     <th className="text-right py-3 px-2">Qty Received</th>
 //                     <th className="text-right py-3 px-2">Unit Price</th>
 //                     <th className="text-right py-3 px-2">Total</th>
+//                     <th className="text-center py-3 px-2">Status</th>
 //                   </tr>
 //                 </thead>
 //                 <tbody>
-//                   {purchaseOrder.lines.map((line) => (
-//                     <tr key={line.id} className="border-b">
-//                       <td className="py-3 px-2">
-//                         <div>
-//                           <p className="font-medium">{line.item.name}</p>
-//                           {line.item.sku && (
-//                             <p className="text-sm text-gray-500">SKU: {line.item.sku}</p>
+//                   {purchaseOrder.lines.map((line) => {
+//                     const isFullyReceived = line.receivedQuantity >= line.quantity;
+//                     const isPartiallyReceived =
+//                       line.receivedQuantity > 0 && line.receivedQuantity < line.quantity;
+//                     return (
+//                       <tr key={line.id} className="border-b">
+//                         <td className="py-3 px-2">
+//                           <div>
+//                             <p className="font-medium">{line.item.name}</p>
+//                             {line.item.sku && (
+//                               <p className="text-sm text-gray-500">SKU: {line.item.sku}</p>
+//                             )}
+//                           </div>
+//                         </td>
+//                         <td className="text-right py-3 px-2">{line.quantity}</td>
+//                         <td className="text-right py-3 px-2">
+//                           <span
+//                             className={
+//                               isFullyReceived
+//                                 ? 'text-green-600 font-medium'
+//                                 : isPartiallyReceived
+//                                 ? 'text-orange-600 font-medium'
+//                                 : 'text-gray-600'
+//                             }
+//                           >
+//                             {line.receivedQuantity}
+//                           </span>
+//                         </td>
+//                         <td className="text-right py-3 px-2">${line.unitPrice.toLocaleString()}</td>
+//                         <td className="text-right py-3 px-2 font-medium">
+//                           ${line.total.toLocaleString()}
+//                         </td>
+//                         <td className="text-center py-3 px-2">
+//                           {isFullyReceived ? (
+//                             <Badge className="bg-green-100 text-green-800">
+//                               <Check className="h-3 w-3 mr-1" />
+//                               Complete
+//                             </Badge>
+//                           ) : isPartiallyReceived ? (
+//                             <Badge className="bg-orange-100 text-orange-800">Partial</Badge>
+//                           ) : (
+//                             <Badge className="bg-gray-100 text-gray-800">Pending</Badge>
 //                           )}
-//                         </div>
-//                       </td>
-//                       <td className="text-right py-3 px-2">{line.quantity}</td>
-//                       <td className="text-right py-3 px-2">
-//                         <span
-//                           className={
-//                             line.receivedQuantity === line.quantity
-//                               ? 'text-green-600'
-//                               : 'text-orange-600'
-//                           }
-//                         >
-//                           {line.receivedQuantity}
-//                         </span>
-//                       </td>
-//                       <td className="text-right py-3 px-2">${line.unitPrice.toLocaleString()}</td>
-//                       <td className="text-right py-3 px-2 font-medium">
-//                         ${line.total.toLocaleString()}
-//                       </td>
-//                     </tr>
-//                   ))}
+//                         </td>
+//                       </tr>
+//                     );
+//                   })}
 //                 </tbody>
 //               </table>
 //             </div>
@@ -447,6 +513,113 @@
 //           </Card>
 //         )}
 //       </div>
+
+//       {/* Receive Items Dialog */}
+//       <Dialog open={isReceiveDialogOpen} onOpenChange={setIsReceiveDialogOpen}>
+//         <DialogContent className="max-w-4xl">
+//           <DialogHeader>
+//             <DialogTitle>Receive Items - {purchaseOrder.poNumber}</DialogTitle>
+//           </DialogHeader>
+//           <div className="space-y-4">
+//             <div className="overflow-x-auto">
+//               <table className="w-full">
+//                 <thead>
+//                   <tr className="border-b">
+//                     <th className="text-left py-2">Item</th>
+//                     <th className="text-center py-2">Ordered</th>
+//                     <th className="text-center py-2">Already Received</th>
+//                     <th className="text-center py-2">Remaining</th>
+//                     <th className="text-center py-2">Receive Now</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {purchaseOrder.lines.map((line) => {
+//                     const remaining = line.quantity - line.receivedQuantity;
+//                     return (
+//                       <tr key={line.id} className="border-b">
+//                         <td className="py-3">
+//                           <div>
+//                             <p className="font-medium">{line.item.name}</p>
+//                             {line.item.sku && (
+//                               <p className="text-sm text-gray-500">SKU: {line.item.sku}</p>
+//                             )}
+//                           </div>
+//                         </td>
+//                         <td className="text-center py-3">{line.quantity}</td>
+//                         <td className="text-center py-3">{line.receivedQuantity}</td>
+//                         <td className="text-center py-3 font-medium">{remaining}</td>
+//                         <td className="text-center py-3">
+//                           <Input
+//                             type="number"
+//                             min="0"
+//                             max={remaining}
+//                             value={receivingQuantities[line.id] || 0}
+//                             onChange={(e) =>
+//                               updateReceivingQuantity(line.id, Number.parseInt(e.target.value) || 0)
+//                             }
+//                             className="w-20 mx-auto"
+//                             disabled={remaining <= 0}
+//                           />
+//                         </td>
+//                       </tr>
+//                     );
+//                   })}
+//                 </tbody>
+//               </table>
+//             </div>
+//           </div>
+//           <DialogFooter>
+//             <Button variant="outline" onClick={() => setIsReceiveDialogOpen(false)}>
+//               Cancel
+//             </Button>
+//             <Button onClick={handleReceiveItems} disabled={isReceiving}>
+//               {isReceiving ? 'Processing...' : 'Receive Items'}
+//             </Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+
+//       {/* Status Change Dialog */}
+//       <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+//         <DialogContent>
+//           <DialogHeader>
+//             <DialogTitle>Change Status - {purchaseOrder.poNumber}</DialogTitle>
+//           </DialogHeader>
+//           <div className="space-y-4">
+//             <div>
+//               <Label htmlFor="status">Select New Status</Label>
+//               <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+//                 <SelectTrigger>
+//                   <SelectValue placeholder="Select status" />
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                   {statusOptions.map((option) => (
+//                     <SelectItem key={option.value} value={option.value}>
+//                       <div className="flex items-center gap-2">
+//                         <Badge className={statusColors[option.value as keyof typeof statusColors]}>
+//                           {option.label}
+//                         </Badge>
+//                       </div>
+//                     </SelectItem>
+//                   ))}
+//                 </SelectContent>
+//               </Select>
+//             </div>
+//             <div className="text-sm text-gray-600">
+//               Current status:{' '}
+//               <span className="font-medium">{purchaseOrder.status.replace('_', ' ')}</span>
+//             </div>
+//           </div>
+//           <DialogFooter>
+//             <Button variant="outline" onClick={() => setIsStatusDialogOpen(false)}>
+//               Cancel
+//             </Button>
+//             <Button onClick={handleStatusUpdate} disabled={isUpdating}>
+//               {isUpdating ? 'Updating...' : 'Update Status'}
+//             </Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
 
 //       {/* PDF Dialog */}
 //       <Dialog open={isPdfOpen} onOpenChange={setIsPdfOpen}>
@@ -500,6 +673,7 @@ import {
   Printer,
   Phone,
   Check,
+  Calendar,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { updatePurchaseOrderStatus, receiveOrderItems } from '@/actions/purchase-orders';
@@ -530,6 +704,12 @@ interface PurchaseOrder {
   notes: string | null;
   paymentTerms: string | null;
   expectedDeliveryDate: string | null;
+  createdBy: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
   supplier: {
     id: string;
     name: string;
@@ -624,6 +804,14 @@ export default function PurchaseOrderDetails({
       const result = await sendPurchaseOrderEmail(purchaseOrder.id);
       if (result.success) {
         toast.success(`Email sent successfully to ${result.data?.sentTo || supplierEmail}`);
+
+        // Update the purchase order status locally if it was DRAFT
+        if (purchaseOrder.status === 'DRAFT' && onUpdate) {
+          onUpdate({
+            ...purchaseOrder,
+            status: 'SUBMITTED',
+          });
+        }
       } else {
         toast.error(result.error || 'Failed to send email');
       }
@@ -863,6 +1051,56 @@ export default function PurchaseOrderDetails({
                   <span className="text-sm text-gray-600">
                     Payment Terms: {purchaseOrder.paymentTerms}
                   </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Order Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-600">Created by:</span>
+                <span className="font-medium">
+                  {purchaseOrder.createdBy
+                    ? `${purchaseOrder.createdBy.firstName} ${purchaseOrder.createdBy.lastName}`
+                    : 'System'}
+                </span>
+              </div>
+
+              {purchaseOrder.createdBy?.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">{purchaseOrder.createdBy.email}</span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-600">Order Date:</span>
+                <span className="font-medium">
+                  {format(new Date(purchaseOrder.date), 'MMM dd, yyyy')}
+                </span>
+              </div>
+
+              {purchaseOrder.expectedDeliveryDate && (
+                <div className="flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">Expected Delivery:</span>
+                  <span className="font-medium">
+                    {format(new Date(purchaseOrder.expectedDeliveryDate), 'MMM dd, yyyy')}
+                  </span>
+                </div>
+              )}
+
+              {purchaseOrder.paymentTerms && (
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600">Payment Terms:</span>
+                  <span className="font-medium">{purchaseOrder.paymentTerms}</span>
                 </div>
               )}
             </CardContent>
