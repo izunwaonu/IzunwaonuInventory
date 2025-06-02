@@ -27,6 +27,7 @@
 //   Printer,
 //   Phone,
 //   Check,
+//   Calendar,
 // } from 'lucide-react';
 // import { format } from 'date-fns';
 // import { updatePurchaseOrderStatus, receiveOrderItems } from '@/actions/purchase-orders';
@@ -57,6 +58,12 @@
 //   notes: string | null;
 //   paymentTerms: string | null;
 //   expectedDeliveryDate: string | null;
+//   createdBy: {
+//     id: string;
+//     firstName: string;
+//     lastName: string;
+//     email: string;
+//   } | null;
 //   supplier: {
 //     id: string;
 //     name: string;
@@ -151,6 +158,14 @@
 //       const result = await sendPurchaseOrderEmail(purchaseOrder.id);
 //       if (result.success) {
 //         toast.success(`Email sent successfully to ${result.data?.sentTo || supplierEmail}`);
+
+//         // Update the purchase order status locally if it was DRAFT
+//         if (purchaseOrder.status === 'DRAFT' && onUpdate) {
+//           onUpdate({
+//             ...purchaseOrder,
+//             status: 'SUBMITTED',
+//           });
+//         }
 //       } else {
 //         toast.error(result.error || 'Failed to send email');
 //       }
@@ -226,7 +241,10 @@
 //     }
 //   };
 
-//   const canReceive = ['APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
+//   // Determine which buttons to show based on status
+//   const canReceive = ['SUBMITTED', 'APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
+//   const canSendEmail = ['DRAFT', 'SUBMITTED'].includes(purchaseOrder.status);
+
 //   const totalReceived = purchaseOrder.lines.reduce((sum, line) => sum + line.receivedQuantity, 0);
 //   const totalOrdered = purchaseOrder.lines.reduce((sum, line) => sum + line.quantity, 0);
 
@@ -261,22 +279,28 @@
 
 //           {/* Action Buttons */}
 //           <div className="flex flex-wrap gap-2">
-//             <Button
-//               variant="outline"
-//               size="sm"
-//               onClick={handleSendEmail}
-//               disabled={isSendingEmail || !supplierEmail}
-//               title={!supplierEmail ? 'Supplier email not available' : 'Send email to supplier'}
-//             >
-//               <Mail className="h-4 w-4 mr-2" />
-//               {isSendingEmail ? 'Sending...' : 'Send Email'}
-//             </Button>
+//             {canSendEmail && (
+//               <Button
+//                 variant="outline"
+//                 size="sm"
+//                 onClick={handleSendEmail}
+//                 disabled={isSendingEmail || !supplierEmail}
+//                 title={!supplierEmail ? 'Supplier email not available' : 'Send email to supplier'}
+//               >
+//                 <Mail className="h-4 w-4 mr-2" />
+//                 {isSendingEmail ? 'Sending...' : 'Send Email'}
+//               </Button>
+//             )}
 //             <Button variant="outline" size="sm" onClick={handleViewPDF}>
 //               <Printer className="h-4 w-4 mr-2" />
 //               View/Print
 //             </Button>
 //             {canReceive && (
-//               <Button size="sm" onClick={() => setIsReceiveDialogOpen(true)}>
+//               <Button
+//                 size="sm"
+//                 onClick={() => setIsReceiveDialogOpen(true)}
+//                 className="bg-green-600 hover:bg-green-700"
+//               >
 //                 <Package className="h-4 w-4 mr-2" />
 //                 Receive Items
 //               </Button>
@@ -390,6 +414,56 @@
 //                   <span className="text-sm text-gray-600">
 //                     Payment Terms: {purchaseOrder.paymentTerms}
 //                   </span>
+//                 </div>
+//               )}
+//             </CardContent>
+//           </Card>
+
+//           <Card>
+//             <CardHeader>
+//               <CardTitle className="text-lg">Order Information</CardTitle>
+//             </CardHeader>
+//             <CardContent className="space-y-3">
+//               <div className="flex items-center gap-2">
+//                 <User className="h-4 w-4 text-gray-500" />
+//                 <span className="text-sm text-gray-600">Created by:</span>
+//                 <span className="font-medium">
+//                   {purchaseOrder.createdBy
+//                     ? `${purchaseOrder.createdBy.firstName} ${purchaseOrder.createdBy.lastName}`
+//                     : 'System'}
+//                 </span>
+//               </div>
+
+//               {purchaseOrder.createdBy?.email && (
+//                 <div className="flex items-center gap-2">
+//                   <Mail className="h-4 w-4 text-gray-500" />
+//                   <span className="text-sm text-gray-600">{purchaseOrder.createdBy.email}</span>
+//                 </div>
+//               )}
+
+//               <div className="flex items-center gap-2">
+//                 <Calendar className="h-4 w-4 text-gray-500" />
+//                 <span className="text-sm text-gray-600">Order Date:</span>
+//                 <span className="font-medium">
+//                   {format(new Date(purchaseOrder.date), 'MMM dd, yyyy')}
+//                 </span>
+//               </div>
+
+//               {purchaseOrder.expectedDeliveryDate && (
+//                 <div className="flex items-center gap-2">
+//                   <Truck className="h-4 w-4 text-gray-500" />
+//                   <span className="text-sm text-gray-600">Expected Delivery:</span>
+//                   <span className="font-medium">
+//                     {format(new Date(purchaseOrder.expectedDeliveryDate), 'MMM dd, yyyy')}
+//                   </span>
+//                 </div>
+//               )}
+
+//               {purchaseOrder.paymentTerms && (
+//                 <div className="flex items-center gap-2">
+//                   <FileText className="h-4 w-4 text-gray-500" />
+//                   <span className="text-sm text-gray-600">Payment Terms:</span>
+//                   <span className="font-medium">{purchaseOrder.paymentTerms}</span>
 //                 </div>
 //               )}
 //             </CardContent>
@@ -572,7 +646,11 @@
 //             <Button variant="outline" onClick={() => setIsReceiveDialogOpen(false)}>
 //               Cancel
 //             </Button>
-//             <Button onClick={handleReceiveItems} disabled={isReceiving}>
+//             <Button
+//               onClick={handleReceiveItems}
+//               disabled={isReceiving}
+//               className="bg-green-600 hover:bg-green-700"
+//             >
 //               {isReceiving ? 'Processing...' : 'Receive Items'}
 //             </Button>
 //           </DialogFooter>
@@ -643,9 +721,10 @@
 //     </div>
 //   );
 // }
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -675,7 +754,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { updatePurchaseOrderStatus, receiveOrderItems } from '@/actions/purchase-orders';
+import { receiveOrderItems, updatePurchaseOrderStatus } from '@/actions/purchase-orders';
 import { sendPurchaseOrderEmail } from '@/actions/email';
 import type { PurchaseOrderStatus } from '@prisma/client';
 import { toast } from 'sonner';
@@ -774,9 +853,13 @@ export default function PurchaseOrderDetails({
   const [selectedStatus, setSelectedStatus] = useState(purchaseOrder.status);
   const [receivingQuantities, setReceivingQuantities] = useState<Record<string, number>>({});
 
+  // Calculate if any items remain to be received
+  const hasItemsToReceive = useMemo(() => {
+    return purchaseOrder.lines.some((line) => line.receivedQuantity < line.quantity);
+  }, [purchaseOrder.lines]);
+
   // Extract supplier email when component mounts or purchaseOrder changes
   useEffect(() => {
-    console.log('Supplier data:', purchaseOrder.supplier);
     if (purchaseOrder?.supplier?.email) {
       setSupplierEmail(purchaseOrder.supplier.email);
     }
@@ -886,9 +969,13 @@ export default function PurchaseOrderDetails({
     }
   };
 
-  // Determine which buttons to show based on status
-  const canReceive = ['SUBMITTED', 'APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
+  // Determine which buttons to show based on status and remaining items
   const canSendEmail = ['DRAFT', 'SUBMITTED'].includes(purchaseOrder.status);
+
+  // Show receive button if there are items to receive, regardless of status
+  // (except for DRAFT, CANCELLED, or CLOSED)
+  const canReceive =
+    hasItemsToReceive && !['DRAFT', 'CANCELLED', 'CLOSED'].includes(purchaseOrder.status);
 
   const totalReceived = purchaseOrder.lines.reduce((sum, line) => sum + line.receivedQuantity, 0);
   const totalOrdered = purchaseOrder.lines.reduce((sum, line) => sum + line.quantity, 0);
@@ -1150,8 +1237,18 @@ export default function PurchaseOrderDetails({
 
         {/* Order Lines */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Order Items</CardTitle>
+            {canReceive && (
+              <Button
+                size="sm"
+                onClick={() => setIsReceiveDialogOpen(true)}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Receive Items
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
