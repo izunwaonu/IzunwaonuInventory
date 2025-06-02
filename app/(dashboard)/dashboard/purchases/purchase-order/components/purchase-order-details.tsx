@@ -643,7 +643,6 @@
 //     </div>
 //   );
 // }
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -887,7 +886,10 @@ export default function PurchaseOrderDetails({
     }
   };
 
-  const canReceive = ['APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
+  // Determine which buttons to show based on status
+  const canReceive = ['SUBMITTED', 'APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
+  const canSendEmail = ['DRAFT', 'SUBMITTED'].includes(purchaseOrder.status);
+
   const totalReceived = purchaseOrder.lines.reduce((sum, line) => sum + line.receivedQuantity, 0);
   const totalOrdered = purchaseOrder.lines.reduce((sum, line) => sum + line.quantity, 0);
 
@@ -922,22 +924,28 @@ export default function PurchaseOrderDetails({
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSendEmail}
-              disabled={isSendingEmail || !supplierEmail}
-              title={!supplierEmail ? 'Supplier email not available' : 'Send email to supplier'}
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              {isSendingEmail ? 'Sending...' : 'Send Email'}
-            </Button>
+            {canSendEmail && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSendEmail}
+                disabled={isSendingEmail || !supplierEmail}
+                title={!supplierEmail ? 'Supplier email not available' : 'Send email to supplier'}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                {isSendingEmail ? 'Sending...' : 'Send Email'}
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={handleViewPDF}>
               <Printer className="h-4 w-4 mr-2" />
               View/Print
             </Button>
             {canReceive && (
-              <Button size="sm" onClick={() => setIsReceiveDialogOpen(true)}>
+              <Button
+                size="sm"
+                onClick={() => setIsReceiveDialogOpen(true)}
+                className="bg-green-600 hover:bg-green-700"
+              >
                 <Package className="h-4 w-4 mr-2" />
                 Receive Items
               </Button>
@@ -1283,7 +1291,11 @@ export default function PurchaseOrderDetails({
             <Button variant="outline" onClick={() => setIsReceiveDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleReceiveItems} disabled={isReceiving}>
+            <Button
+              onClick={handleReceiveItems}
+              disabled={isReceiving}
+              className="bg-green-600 hover:bg-green-700"
+            >
               {isReceiving ? 'Processing...' : 'Receive Items'}
             </Button>
           </DialogFooter>

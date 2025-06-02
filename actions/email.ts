@@ -18,6 +18,13 @@
 //       include: {
 //         supplier: true,
 //         deliveryLocation: true,
+//         CreatedBy: {
+//           select: {
+//             firstName: true,
+//             lastName: true,
+//             email: true,
+//           },
+//         },
 //         lines: {
 //           include: {
 //             item: true,
@@ -31,6 +38,14 @@
 //         success: false,
 //         error: 'Purchase order not found',
 //       };
+//     }
+
+//     // Auto-update status from DRAFT to SUBMITTED when email is sent
+//     if (purchaseOrder.status === 'DRAFT') {
+//       await db.purchaseOrder.update({
+//         where: { id: purchaseOrderId },
+//         data: { status: 'SUBMITTED' },
+//       });
 //     }
 
 //     // Log supplier data to debug
@@ -62,13 +77,18 @@
 //       }`,
 //       deliveryAddress:
 //         purchaseOrder.deliveryLocation.address || purchaseOrder.deliveryLocation.name,
+//       createdByName: purchaseOrder.CreatedBy
+//         ? `${purchaseOrder.CreatedBy.firstName} ${purchaseOrder.CreatedBy.lastName}`
+//         : 'System',
+//       createdByEmail: purchaseOrder.CreatedBy?.email || 'izunwaonu2@gmail.com',
 //       items: purchaseOrder.lines.map((line) => ({
 //         name: line.item.name,
+//         sku: line.item.sku,
 //         quantity: line.quantity,
 //         unitPrice: Number(line.unitPrice),
 //         total: Number(line.total),
 //       })),
-//       buyerEmail: 'izunwaonu2@gmail.com',
+//       buyerEmail: 'contact@izuinventory.com',
 //       companyAddress: '123 Business Street, Suite 100, Business City, BC 12345',
 //       companyPhone: '+1 (555) 123-4567',
 //       notes: purchaseOrder.notes || undefined,
@@ -115,6 +135,7 @@ import { Resend } from 'resend';
 import { db } from '@/prisma/db';
 import PurchaseOrderEmail from '@/emails/purchase-order-email';
 import { format } from 'date-fns';
+import { updatePurchaseOrderStatus } from './purchase-orders';
 
 // Initialize Resend with your API key
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -153,10 +174,7 @@ export async function sendPurchaseOrderEmail(purchaseOrderId: string) {
 
     // Auto-update status from DRAFT to SUBMITTED when email is sent
     if (purchaseOrder.status === 'DRAFT') {
-      await db.purchaseOrder.update({
-        where: { id: purchaseOrderId },
-        data: { status: 'SUBMITTED' },
-      });
+      await updatePurchaseOrderStatus(purchaseOrderId, 'SUBMITTED');
     }
 
     // Log supplier data to debug
@@ -191,7 +209,7 @@ export async function sendPurchaseOrderEmail(purchaseOrderId: string) {
       createdByName: purchaseOrder.CreatedBy
         ? `${purchaseOrder.CreatedBy.firstName} ${purchaseOrder.CreatedBy.lastName}`
         : 'System',
-      createdByEmail: purchaseOrder.CreatedBy?.email || 'izunwaonu2@gmail.com',
+      createdByEmail: purchaseOrder.CreatedBy?.email || 'contact@izuinventory.com',
       items: purchaseOrder.lines.map((line) => ({
         name: line.item.name,
         sku: line.item.sku,

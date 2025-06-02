@@ -457,7 +457,7 @@ model GoodsReceiptLine{
   goodsReceipt GoodsReceipt @relation(fields: [goodsReceiptId], references:[id], onDelete: Cascade)
   purchaseOrderLineId String
   purchaseOrderLine PurchaseOrderLine @relation(fields: [purchaseOrderLineId], references:[id])
-  itemId  String @unique
+  itemId  String 
   item     Item       @relation(fields: [itemId], references:[id])
   receivedQuantity  Int
   notes         String?

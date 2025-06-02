@@ -259,7 +259,7 @@ export const sidebarLinks: ISidebarLink[] = [
       },
       {
         title: 'Goods Receipt',
-        href: '/dashboard/purchases/receipts',
+        href: '/dashboard/purchases/goods-receipts',
         permission: 'purchase.orders.read',
       },
       {
