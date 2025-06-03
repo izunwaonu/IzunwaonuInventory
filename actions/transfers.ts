@@ -16,12 +16,6 @@
 //   }>;
 // }
 
-// interface TransferLineData {
-//   itemId: string;
-//   quantity: number;
-//   notes?: string;
-// }
-
 // export async function getTransfers() {
 //   try {
 //     const user = await getAuthenticatedUser();
@@ -36,12 +30,14 @@
 //           select: {
 //             id: true,
 //             name: true,
+//             address: true,
 //           },
 //         },
 //         toLocation: {
 //           select: {
 //             id: true,
 //             name: true,
+//             address: true,
 //           },
 //         },
 //         createdBy: {
@@ -67,6 +63,7 @@
 //                 id: true,
 //                 name: true,
 //                 sku: true,
+//                 thumbnail: true,
 //               },
 //             },
 //           },
@@ -171,6 +168,71 @@
 //   }
 // }
 
+// export async function getLocations() {
+//   try {
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
+
+//     const locations = await db.location.findMany({
+//       where: {
+//         orgId,
+//         isActive: true,
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         address: true,
+//       },
+//       orderBy: {
+//         name: 'asc',
+//       },
+//     });
+
+//     return locations;
+//   } catch (error) {
+//     console.error('Error fetching locations:', error);
+//     return [];
+//   }
+// }
+
+// export async function getItemsWithInventory() {
+//   try {
+//     const user = await getAuthenticatedUser();
+//     const orgId = user.orgId;
+
+//     const items = await db.item.findMany({
+//       where: {
+//         orgId,
+//         isActive: true,
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         sku: true,
+//         thumbnail: true,
+//         inventories: {
+//           include: {
+//             location: {
+//               select: {
+//                 id: true,
+//                 name: true,
+//               },
+//             },
+//           },
+//         },
+//       },
+//       orderBy: {
+//         name: 'asc',
+//       },
+//     });
+
+//     return items;
+//   } catch (error) {
+//     console.error('Error fetching items with inventory:', error);
+//     return [];
+//   }
+// }
+
 // export async function createTransfer(data: CreateTransferData) {
 //   try {
 //     const user = await getAuthenticatedUser();
@@ -199,32 +261,8 @@
 //           error: 'Invalid line item data',
 //         };
 //       }
-//     }
 
-//     // Verify locations exist and belong to the organization
-//     const fromLocation = await db.location.findFirst({
-//       where: {
-//         id: data.fromLocationId,
-//         orgId,
-//       },
-//     });
-
-//     const toLocation = await db.location.findFirst({
-//       where: {
-//         id: data.toLocationId,
-//         orgId,
-//       },
-//     });
-
-//     if (!fromLocation || !toLocation) {
-//       return {
-//         success: false,
-//         error: 'Invalid locations',
-//       };
-//     }
-
-//     // Check inventory availability for each item
-//     for (const line of data.lines) {
+//       // Check if item has sufficient inventory at from location
 //       const inventory = await db.inventory.findFirst({
 //         where: {
 //           itemId: line.itemId,
@@ -233,19 +271,35 @@
 //         },
 //       });
 
-//       const availableQuantity = inventory ? inventory.quantity - inventory.reservedQuantity : 0;
-//       if (availableQuantity < line.quantity) {
+//       if (!inventory || inventory.quantity - inventory.reservedQuantity < line.quantity) {
 //         const item = await db.item.findUnique({
 //           where: { id: line.itemId },
 //           select: { name: true },
 //         });
 //         return {
 //           success: false,
-//           error: `Insufficient inventory for ${
-//             item?.name || 'item'
-//           }. Available: ${availableQuantity}, Requested: ${line.quantity}`,
+//           error: `Insufficient inventory for ${item?.name || 'item'}`,
 //         };
 //       }
+//     }
+
+//     // Verify locations exist and belong to the organization
+//     const [fromLocation, toLocation] = await Promise.all([
+//       db.location.findFirst({
+//         where: { id: data.fromLocationId, orgId },
+//         select: { id: true },
+//       }),
+//       db.location.findFirst({
+//         where: { id: data.toLocationId, orgId },
+//         select: { id: true },
+//       }),
+//     ]);
+
+//     if (!fromLocation || !toLocation) {
+//       return {
+//         success: false,
+//         error: 'Invalid location(s)',
+//       };
 //     }
 
 //     // Generate transfer number
@@ -274,7 +328,7 @@
 //         orgId,
 //         createdById: user.id,
 //         lines: {
-//           create: data.lines.map((line: TransferLineData) => ({
+//           create: data.lines.map((line) => ({
 //             itemId: line.itemId,
 //             quantity: line.quantity,
 //             notes: line.notes || null,
@@ -327,7 +381,7 @@
 //   }
 // }
 
-// export async function updateTransferStatus(id: string, status: TransferStatus) {
+// export async function updateTransferStatus(transferId: string, status: TransferStatus) {
 //   try {
 //     const user = await getAuthenticatedUser();
 //     const orgId = user.orgId;
@@ -335,7 +389,7 @@
 //     // Get the transfer with its lines
 //     const transfer = await db.transfer.findFirst({
 //       where: {
-//         id,
+//         id: transferId,
 //         orgId,
 //       },
 //       include: {
@@ -359,25 +413,22 @@
 //       };
 //     }
 
-//     // Use transaction for status update and inventory changes
+//     // Use transaction for status updates that affect inventory
 //     const result = await db.$transaction(async (tx) => {
 //       // Update transfer status
 //       const updatedTransfer = await tx.transfer.update({
-//         where: {
-//           id,
-//           orgId,
-//         },
+//         where: { id: transferId },
 //         data: {
 //           status,
-//           approvedById: status === 'APPROVED' ? user.id : undefined,
+//           approvedById: status === 'APPROVED' ? user.id : transfer.approvedById,
 //         },
 //       });
 
 //       // If completing the transfer, update inventory
 //       if (status === 'COMPLETED') {
 //         for (const line of transfer.lines) {
-//           // Reduce inventory at source location
-//           const sourceInventory = await tx.inventory.findFirst({
+//           // Reduce inventory at from location
+//           const fromInventory = await tx.inventory.findFirst({
 //             where: {
 //               itemId: line.itemId,
 //               locationId: transfer.fromLocationId,
@@ -385,9 +436,9 @@
 //             },
 //           });
 
-//           if (sourceInventory) {
+//           if (fromInventory) {
 //             await tx.inventory.update({
-//               where: { id: sourceInventory.id },
+//               where: { id: fromInventory.id },
 //               data: {
 //                 quantity: {
 //                   decrement: line.quantity,
@@ -396,8 +447,8 @@
 //             });
 //           }
 
-//           // Increase inventory at destination location
-//           const destInventory = await tx.inventory.findFirst({
+//           // Increase inventory at to location
+//           const toInventory = await tx.inventory.findFirst({
 //             where: {
 //               itemId: line.itemId,
 //               locationId: transfer.toLocationId,
@@ -405,9 +456,10 @@
 //             },
 //           });
 
-//           if (destInventory) {
+//           if (toInventory) {
+//             // Update existing inventory
 //             await tx.inventory.update({
-//               where: { id: destInventory.id },
+//               where: { id: toInventory.id },
 //               data: {
 //                 quantity: {
 //                   increment: line.quantity,
@@ -415,7 +467,7 @@
 //               },
 //             });
 //           } else {
-//             // Create new inventory record at destination
+//             // Create new inventory record
 //             await tx.inventory.create({
 //               data: {
 //                 itemId: line.itemId,
@@ -433,7 +485,7 @@
 //     });
 
 //     revalidatePath('/dashboard/inventory/transfers');
-//     revalidatePath(`/dashboard/inventory/transfers/${id}`);
+//     revalidatePath(`/dashboard/inventory/transfers/${transferId}`);
 //     revalidatePath('/dashboard/inventory/inventory');
 
 //     return {
@@ -446,81 +498,6 @@
 //       success: false,
 //       error: 'Failed to update transfer status',
 //     };
-//   }
-// }
-
-// export async function getLocationsForTransfer() {
-//   try {
-//     const user = await getAuthenticatedUser();
-//     const orgId = user.orgId;
-
-//     const locations = await db.location.findMany({
-//       where: {
-//         orgId,
-//         isActive: true,
-//       },
-//       select: {
-//         id: true,
-//         name: true,
-//         address: true,
-//       },
-//       orderBy: {
-//         name: 'asc',
-//       },
-//     });
-
-//     return locations;
-//   } catch (error) {
-//     console.error('Error fetching locations:', error);
-//     return [];
-//   }
-// }
-
-// export async function getItemsWithInventory(locationId?: string) {
-//   try {
-//     const user = await getAuthenticatedUser();
-//     const orgId = user.orgId;
-
-//     const items = await db.item.findMany({
-//       where: {
-//         orgId,
-//         isActive: true,
-//       },
-//       include: {
-//         inventories: {
-//           where: locationId ? { locationId } : undefined,
-//           include: {
-//             location: {
-//               select: {
-//                 id: true,
-//                 name: true,
-//               },
-//             },
-//           },
-//         },
-//       },
-//       orderBy: {
-//         name: 'asc',
-//       },
-//     });
-
-//     return items.map((item) => ({
-//       ...item,
-//       costPrice: Number(item.costPrice),
-//       sellingPrice: Number(item.sellingPrice),
-//       tax: item.tax ? Number(item.tax) : null,
-//       weight: item.weight ? Number(item.weight) : null,
-//       createdAt: item.createdAt.toISOString(),
-//       updatedAt: item.updatedAt.toISOString(),
-//       inventories: item.inventories.map((inv) => ({
-//         ...inv,
-//         createdAt: inv.createdAt.toISOString(),
-//         updatedAt: inv.updatedAt.toISOString(),
-//       })),
-//     }));
-//   } catch (error) {
-//     console.error('Error fetching items with inventory:', error);
-//     return [];
 //   }
 // }
 
@@ -828,20 +805,56 @@ export async function createTransfer(data: CreateTransferData) {
       };
     }
 
-    // Generate transfer number
+    // Generate organization-specific transfer number
     const lastTransfer = await db.transfer.findFirst({
       where: { orgId },
       orderBy: { createdAt: 'desc' },
       select: { transferNumber: true },
     });
 
-    let transferNumber = 'TR-00001';
+    // Get organization prefix (first 4 characters of orgId)
+    const orgPrefix = orgId.substring(0, 4).toUpperCase();
+
+    let transferNumber = `TR-${orgPrefix}-00001`;
     if (lastTransfer && lastTransfer.transferNumber) {
-      const lastNumber = Number.parseInt(lastTransfer.transferNumber.split('-')[1]);
-      if (!isNaN(lastNumber)) {
-        transferNumber = `TR-${String(lastNumber + 1).padStart(5, '0')}`;
+      // Check if the last transfer number has the new format with org prefix
+      if (lastTransfer.transferNumber.includes(`TR-${orgPrefix}-`)) {
+        // Extract number from new format: TR-ORGX-00001
+        const parts = lastTransfer.transferNumber.split('-');
+        if (parts.length === 3) {
+          const lastNumber = Number.parseInt(parts[2]);
+          if (!isNaN(lastNumber)) {
+            transferNumber = `TR-${orgPrefix}-${String(lastNumber + 1).padStart(5, '0')}`;
+          }
+        }
+      } else {
+        // Handle old format or mixed formats
+        const allOrgTransfers = await db.transfer.findMany({
+          where: {
+            orgId,
+            transferNumber: {
+              startsWith: `TR-${orgPrefix}-`,
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          select: { transferNumber: true },
+          take: 1,
+        });
+
+        if (allOrgTransfers.length > 0) {
+          const parts = allOrgTransfers[0].transferNumber.split('-');
+          if (parts.length === 3) {
+            const lastNumber = Number.parseInt(parts[2]);
+            if (!isNaN(lastNumber)) {
+              transferNumber = `TR-${orgPrefix}-${String(lastNumber + 1).padStart(5, '0')}`;
+            }
+          }
+        }
+        // If no org-specific transfers found, start with 00001
       }
     }
+
+    console.log(`Generated transfer number: ${transferNumber} for organization: ${orgId}`);
 
     // Create transfer
     const transfer = await db.transfer.create({
@@ -889,7 +902,7 @@ export async function createTransfer(data: CreateTransferData) {
       },
     });
 
-    revalidatePath('/dashboard/inventory/transfers');
+    revalidatePath('/dashboard/transfers');
 
     return {
       success: true,
@@ -1010,9 +1023,9 @@ export async function updateTransferStatus(transferId: string, status: TransferS
       return updatedTransfer;
     });
 
-    revalidatePath('/dashboard/inventory/transfers');
-    revalidatePath(`/dashboard/inventory/transfers/${transferId}`);
-    revalidatePath('/dashboard/inventory/inventory');
+    revalidatePath('/dashboard/transfers');
+    revalidatePath(`/dashboard/transfers/${transferId}`);
+    revalidatePath('/dashboard/inventory');
 
     return {
       success: true,
