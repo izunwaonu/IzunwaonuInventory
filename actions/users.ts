@@ -232,7 +232,7 @@ export async function createUser(data: UserProps, orgData: OrgData) {
       console.log('🟢 Looking for default user role...');
 
       //Create the Default API Key
-      await db.apiKey.create({
+      await tx.apiKey.create({
         data: {
           name: 'Default Key',
           key: generateApiKey(),

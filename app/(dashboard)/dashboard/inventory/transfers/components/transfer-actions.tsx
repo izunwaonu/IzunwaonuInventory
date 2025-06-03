@@ -83,7 +83,7 @@ export function TransferActions({
           <Button
             size={size}
             onClick={() => setIsApproveDialogOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-pink-600 hover:bg-pink-700"
           >
             <Check className="h-4 w-4 mr-2" />
             Approve Transfer
@@ -93,7 +93,7 @@ export function TransferActions({
           <Button
             size={size}
             onClick={() => setIsCompleteDialogOpen(true)}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-pink-600 hover:bg-pink-700"
           >
             <Truck className="h-4 w-4 mr-2" />
             Complete Transfer
@@ -122,7 +122,7 @@ export function TransferActions({
             <Button
               onClick={handleApprove}
               disabled={isApproving}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-pink-600 hover:bg-pink-700"
             >
               {isApproving ? (
                 <>
@@ -165,7 +165,7 @@ export function TransferActions({
             <Button
               onClick={handleComplete}
               disabled={isCompleting}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-pink-600 hover:bg-pink-700"
             >
               {isCompleting ? (
                 <>
