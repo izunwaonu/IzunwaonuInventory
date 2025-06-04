@@ -79,7 +79,7 @@ async function AdjustmentsList() {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Link href="/dashboard/adjustments/create" className="w-full sm:w-auto">
+          <Link href="/dashboard/inventory/adjustments/create" className="w-full sm:w-auto">
             <Button className="w-full bg-red-600 hover:bg-red-700">
               <Plus className="h-4 w-4 mr-2" />
               Add New
@@ -124,7 +124,7 @@ async function AdjustmentsList() {
               <p className="text-gray-600 mb-4">
                 Get started by creating your first stock adjustment
               </p>
-              <Link href="/dashboard/adjustments/create">
+              <Link href="/dashboard/inventory/adjustments/create">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Adjustment

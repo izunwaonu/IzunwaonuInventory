@@ -375,7 +375,7 @@ export async function createAdjustment(data: CreateAdjustmentData) {
       },
     });
 
-    revalidatePath('/dashboard/adjustments');
+    revalidatePath('/dashboard/inventory/adjustments');
 
     return {
       success: true,
@@ -474,9 +474,9 @@ export async function updateAdjustmentStatus(adjustmentId: string, status: Adjus
       return updatedAdjustment;
     });
 
-    revalidatePath('/dashboard/adjustments');
-    revalidatePath(`/dashboard/adjustments/${adjustmentId}`);
-    revalidatePath('/dashboard/inventory');
+    revalidatePath('/dashboard/inventory/adjustments');
+    revalidatePath(`/dashboard/inventory/adjustments/${adjustmentId}`);
+    revalidatePath('/dashboard/inventory/adjustments');
 
     return {
       success: true,
