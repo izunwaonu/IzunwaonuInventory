@@ -158,7 +158,7 @@ export function CreateAdjustmentForm({
 
       if (result.success && result.data) {
         toast.success('Adjustment created successfully');
-        router.push(`/dashboard/adjustments/${result.data.id}`);
+        router.push(`/dashboard/inventory/adjustments/${result.data.id}`);
       } else {
         toast.error(result.error || 'Failed to create adjustment');
       }

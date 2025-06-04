@@ -54,7 +54,7 @@ async function AdjustmentDetails({ adjustmentId }: { adjustmentId: string }) {
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/adjustments">
+          <Link href="/dashboard/inventory/adjustments">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back

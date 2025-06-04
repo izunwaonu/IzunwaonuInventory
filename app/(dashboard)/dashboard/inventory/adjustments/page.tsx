@@ -199,7 +199,7 @@ async function AdjustmentsList() {
                           </Badge>
                         </td>
                         <td className="py-3 px-2 text-center">
-                          <Link href={`/dashboard/adjustments/${adjustment.id}`}>
+                          <Link href={`/dashboard/inventory/adjustments/${adjustment.id}`}>
                             <Button variant="outline" size="sm">
                               <Eye className="h-4 w-4 mr-1" />
                               View
