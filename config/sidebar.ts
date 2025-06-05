@@ -378,7 +378,7 @@ export const sidebarLinks: ISidebarLink[] = [
       {
         title: 'API Keys',
         href: '/dashboard/integrations/api',
-        permission: 'integrations.api.access',
+        permission: 'integrations.api.read',
       },
       {
         title: 'E-Commerce Integration',

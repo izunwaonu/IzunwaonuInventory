@@ -120,8 +120,8 @@ export async function updateCustomerById(id: string, data: Partial<CustomerDTO>)
       data,
     });
 
-    console.log('Updating Customer', id, data);
     revalidatePath(`/dashboard/sales/customers/${id}`);
+    revalidatePath(`/dashboard/sales/customers`);
     return { success: true };
   } catch (error) {
     console.log(error);

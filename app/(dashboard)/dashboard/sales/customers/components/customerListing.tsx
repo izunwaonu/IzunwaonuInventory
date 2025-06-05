@@ -26,16 +26,8 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-
-import ImageUploadButton from '@/components/FormInputs/ImageUploadButton';
 import { useRouter } from 'next/navigation';
-import { useCreateSupplier, useDeleteSupplier, useOrgSuppliers } from '@/hooks/useSupplierQueries';
-import {
-  BriefCustomerDTO,
-  BriefSupplierDTO,
-  CustomerCreateDTO,
-  SupplierCreateDTO,
-} from '@/types/types';
+import { BriefCustomerDTO, CustomerCreateDTO } from '@/types/types';
 import { useCreateCustomer, useDeleteCustomer, useOrgCustomers } from '@/hooks/useCustomerQueries';
 // import { useRouter } from "next/router";
 
@@ -153,6 +145,9 @@ export default function CustomerListing({ title }: ItemListingProps) {
     router.push(`/dashboard/sales/customers/${customer.id}/edit`);
   };
 
+  const handleViewClick = (customer: BriefCustomerDTO) => {
+    router.push(`/dashboard/sales/customers/${customer.id}`);
+  };
   // Handle delete click
   const handleDeleteClick = (customer: BriefCustomerDTO) => {
     setCustomerToDelete(customer);
@@ -260,10 +255,9 @@ export default function CustomerListing({ title }: ItemListingProps) {
         renderRowActions={(item) => (
           <TableActions.RowActions
             onEdit={() => handleEditClick(item)}
+            onView={() => handleViewClick(item)}
             onDelete={() => handleDeleteClick(item)}
-            // isDeleting={
-            //   deleteProductMutation.isPending && productToDelete?.id === item.id
-            // }
+            isDeleting={deleteCustomerMutation.isPending && customerToDelete?.id === item.id}
           />
         )}
       />

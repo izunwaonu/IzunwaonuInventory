@@ -1,14 +1,6 @@
 'use server';
 
-import { CategoryFormProps } from '@/components/Forms/inventory/CategoryFormModal';
-import { api, getAuthenticatedApi } from '@/config/axios';
 import { db } from '@/prisma/db';
-import { BriefItemsResponse, ItemCreateDTO, ProductData, ProductResponse } from '@/types/item';
-import { CategoryProps } from '@/types/types';
-import axios from 'axios';
-import { revalidatePath } from 'next/cache';
-import { getOrgKey } from './apiKey';
-import { resolve } from 'path';
 import { LocationCreateDTO, LocationDTO } from '@/types/location';
 import { getAuthenticatedUser } from '@/config/useAuth';
 import { LocationType } from '@prisma/client';
