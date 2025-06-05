@@ -4,7 +4,13 @@ import { CategoryFormProps } from '@/components/Forms/inventory/CategoryFormModa
 import { api, getAuthenticatedApi } from '@/config/axios';
 import { db } from '@/prisma/db';
 import { BriefItemsResponse, ItemCreateDTO, ProductData, ProductResponse } from '@/types/item';
-import { CategoryProps, SupplierCreateDTO, SupplierDTO } from '@/types/types';
+import {
+  CategoryProps,
+  CustomerCreateDTO,
+  CustomerDTO,
+  SupplierCreateDTO,
+  SupplierDTO,
+} from '@/types/types';
 import axios from 'axios';
 import { revalidatePath } from 'next/cache';
 import { getOrgKey } from './apiKey';
@@ -13,11 +19,11 @@ import { LocationCreateDTO, LocationDTO } from '@/types/location';
 import { getAuthenticatedUser } from '@/config/useAuth';
 import { LocationType } from '@prisma/client';
 
-export async function createSupplier(data: SupplierCreateDTO) {
+export async function createCustomer(data: CustomerCreateDTO) {
   try {
     const user = await getAuthenticatedUser();
     const orgId = user.orgId;
-    const suppliers = await db.supplier.create({
+    const customers = await db.customer.create({
       data: {
         ...data,
         orgId,
@@ -27,23 +33,23 @@ export async function createSupplier(data: SupplierCreateDTO) {
 
     return {
       success: true,
-      data: suppliers,
+      data: customers,
       error: null,
     };
   } catch (error) {
     console.log(error);
     return {
       success: true,
-      error: 'Failed to create an item',
+      error: 'Failed to create an customer',
       data: null,
     };
   }
 }
-export async function getOrgSuppliers() {
+export async function getOrgCustomers() {
   try {
     const user = await getAuthenticatedUser();
     const orgId = user.orgId;
-    const suppliers = await db.supplier.findMany({
+    const customers = await db.customer.findMany({
       where: {
         orgId,
       },
@@ -53,24 +59,24 @@ export async function getOrgSuppliers() {
       select: {
         id: true,
         name: true,
-        contactPerson: true,
+        address: true,
         phone: true,
         email: true,
         createdAt: true,
       },
     });
 
-    return suppliers;
+    return customers;
   } catch (error) {
     console.log(error);
     return [];
   }
 }
-export async function getBriefSuppliers() {
+export async function getBriefCustomers() {
   try {
     const user = await getAuthenticatedUser();
     const orgId = user.orgId;
-    const suppliers = await db.supplier.findMany({
+    const customers = await db.customer.findMany({
       where: {
         orgId,
       },
@@ -83,21 +89,21 @@ export async function getBriefSuppliers() {
       },
     });
 
-    return suppliers;
+    return customers;
   } catch (error) {
     console.log(error);
     return [];
   }
 }
-export async function getSupplierById(id: string) {
+export async function getCustomerId(id: string) {
   try {
-    const supplier = await db.supplier.findUnique({
+    const customers = await db.customer.findUnique({
       where: {
         id,
       },
     });
 
-    return supplier;
+    return customers;
   } catch (error) {
     console.log(error);
 
@@ -105,17 +111,17 @@ export async function getSupplierById(id: string) {
   }
 }
 
-export async function updateSupplierById(id: string, data: Partial<SupplierDTO>) {
+export async function updateCustomerById(id: string, data: Partial<CustomerDTO>) {
   try {
-    await db.supplier.update({
+    await db.customer.update({
       where: {
         id,
       },
       data,
     });
 
-    console.log('Updating Supplier', id, data);
-    revalidatePath(`/dashboard/purchases/orders/${id}`);
+    console.log('Updating Customer', id, data);
+    revalidatePath(`/dashboard/sales/customers/${id}`);
     return { success: true };
   } catch (error) {
     console.log(error);
@@ -125,32 +131,32 @@ export async function updateSupplierById(id: string, data: Partial<SupplierDTO>)
   }
 }
 
-export async function deleteSupplier(id: string) {
+export async function deleteCustomer(id: string) {
   try {
-    const supplier = await db.supplier.findUnique({
+    const customer = await db.customer.findUnique({
       where: {
         id,
       },
       include: {
-        items: true,
+        salesOrders: true,
       },
     });
-    if (!supplier) {
+    if (!customer) {
       return {
         success: false,
         data: null,
-        error: 'No Supplier found',
+        error: 'No Customer found',
       };
     }
-    if (supplier.items.length > 0) {
+    if (customer.salesOrders.length > 0) {
       return {
         success: false,
         data: null,
-        error: 'Supplier with item can not be deleted',
+        error: 'Customer with sales  can not be deleted',
       };
     }
 
-    const deleted = await db.supplier.delete({
+    const deleted = await db.customer.delete({
       where: {
         id,
       },
@@ -166,7 +172,7 @@ export async function deleteSupplier(id: string) {
     return {
       success: false,
       data: null,
-      error: 'Failed to delete the supplier',
+      error: 'Failed to delete the customer',
     };
   }
 }

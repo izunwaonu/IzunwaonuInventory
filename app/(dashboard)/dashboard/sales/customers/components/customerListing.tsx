@@ -26,9 +26,17 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+
+import ImageUploadButton from '@/components/FormInputs/ImageUploadButton';
 import { useRouter } from 'next/navigation';
 import { useCreateSupplier, useDeleteSupplier, useOrgSuppliers } from '@/hooks/useSupplierQueries';
-import { BriefSupplierDTO, SupplierCreateDTO } from '@/types/types';
+import {
+  BriefCustomerDTO,
+  BriefSupplierDTO,
+  CustomerCreateDTO,
+  SupplierCreateDTO,
+} from '@/types/types';
+import { useCreateCustomer, useDeleteCustomer, useOrgCustomers } from '@/hooks/useCustomerQueries';
 // import { useRouter } from "next/router";
 
 interface ItemListingProps {
@@ -36,36 +44,34 @@ interface ItemListingProps {
 }
 
 // Form schema for editing/adding products
-const supplierFormSchema = z.object({
+const customerFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  contactPerson: z.string().optional(),
+  //   address: z.string().optional(),
   email: z.string().optional(),
   phone: z.string().optional(),
 });
 
-type SupplierFormValues = z.infer<typeof supplierFormSchema>;
-
-export default function SupplierListing({ title }: ItemListingProps) {
+export default function CustomerListing({ title }: ItemListingProps) {
   // React Query hooks with Suspense - note that data is always defined
-  const { suppliers, refetch } = useOrgSuppliers();
-  const createItemMutation = useCreateSupplier();
+  const { customers, refetch } = useOrgCustomers();
+  const createCustomerMutation = useCreateCustomer();
   //   const updateProductMutation = useUpdateProduct();
-  const deleteItemMutation = useDeleteSupplier();
+  const deleteCustomerMutation = useDeleteCustomer();
 
   // Local state
 
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState<BriefSupplierDTO | null>(null);
-  const [productToDelete, setProductToDelete] = useState<BriefSupplierDTO | null>(null);
+  const [currentCustomer, setCurrentCustomer] = useState<BriefCustomerDTO | null>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<BriefCustomerDTO | null>(null);
 
   // Form for editing/adding products
-  const form = useForm<SupplierCreateDTO>({
-    resolver: zodResolver(supplierFormSchema),
+  const form = useForm<CustomerCreateDTO>({
+    resolver: zodResolver(customerFormSchema),
     defaultValues: {
       name: '',
-      contactPerson: '',
+      //   address: '',
       email: '',
       phone: '',
     },
@@ -73,24 +79,24 @@ export default function SupplierListing({ title }: ItemListingProps) {
 
   // Update form when current product changes
   useEffect(() => {
-    if (!currentProduct) {
+    if (!currentCustomer) {
       // Adding new - reset form
       form.reset({
         name: '',
-        contactPerson: '',
+        // address: '',
         email: '',
         phone: '',
       });
     } else {
       // Editing existing - populate form
       form.reset({
-        name: currentProduct.name,
-        phone: currentProduct?.phone ?? '',
-        contactPerson: currentProduct?.contactPerson ?? '',
-        email: currentProduct?.email ?? '',
+        name: currentCustomer.name,
+        phone: currentCustomer?.phone ?? '',
+        // address: currentCustomer?.address ?? '',
+        email: currentCustomer?.email ?? '',
       });
     }
-  }, [currentProduct, form]);
+  }, [currentCustomer, form]);
 
   // Format date function
   const formatDate = (date: Date | string) => {
@@ -98,26 +104,17 @@ export default function SupplierListing({ title }: ItemListingProps) {
     return format(dateObj, 'MMM dd, yyyy');
   };
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-UG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
   // Export to Excel
-  const handleExport = async (filteredProducts: BriefSupplierDTO[]) => {
+  const handleExport = async (filteredCustomers: BriefCustomerDTO[]) => {
     setIsExporting(true);
     try {
       // Prepare data for export
-      const exportData = filteredProducts.map((product) => ({
-        Name: product.name,
-        ContactPerson: product?.contactPerson,
-        Email: product.email,
-        Phone: product.phone,
-        'Date Added': formatDate(product.createdAt),
+      const exportData = filteredCustomers.map((customer) => ({
+        Name: customer.name,
+        address: customer?.address,
+        Email: customer.email,
+        Phone: customer.phone,
+        'Date Added': formatDate(customer.createdAt),
       }));
 
       // Create workbook and worksheet
@@ -145,30 +142,30 @@ export default function SupplierListing({ title }: ItemListingProps) {
 
   // Handle add new click
   const handleAddClick = () => {
-    setCurrentProduct(null);
+    setCurrentCustomer(null);
     setFormDialogOpen(true);
   };
   const router = useRouter();
   // Handle edit click
-  const handleEditClick = (supplier: BriefSupplierDTO) => {
+  const handleEditClick = (customer: BriefCustomerDTO) => {
     // setCurrentProduct(product);
     // setFormDialogOpen(true);
-    router.push(`/dashboard/purchases/suppliers/${supplier.id}/edit`);
+    router.push(`/dashboard/sales/customers/${customer.id}/edit`);
   };
 
   // Handle delete click
-  const handleDeleteClick = (product: BriefSupplierDTO) => {
-    setProductToDelete(product);
+  const handleDeleteClick = (customer: BriefCustomerDTO) => {
+    setCustomerToDelete(customer);
     setDeleteDialogOpen(true);
   };
 
   // Handle form submission (edit or add)
-  const onSubmit = async (data: SupplierCreateDTO) => {
-    if (!currentProduct) {
+  const onSubmit = async (data: CustomerCreateDTO) => {
+    if (!currentCustomer) {
       // Add new product
       console.log(data);
 
-      createItemMutation.mutate(data);
+      createCustomerMutation.mutate(data);
       setFormDialogOpen(true);
       form.reset();
     } else {
@@ -182,15 +179,14 @@ export default function SupplierListing({ title }: ItemListingProps) {
 
   // Handle confirming delete
   const handleConfirmDelete = () => {
-    if (productToDelete) {
-      deleteItemMutation.mutate(productToDelete.id);
-
+    if (customerToDelete) {
+      deleteCustomerMutation.mutate(customerToDelete.id);
       setDeleteDialogOpen(false);
     }
   };
 
   // Define columns for the data table
-  const columns: Column<BriefSupplierDTO>[] = [
+  const columns: Column<BriefCustomerDTO>[] = [
     {
       header: 'Name',
       accessorKey: 'name',
@@ -199,18 +195,6 @@ export default function SupplierListing({ title }: ItemListingProps) {
           {row.name.length > 20 ? `${row.name.substring(0, 20)}...` : row.name}
         </span>
       ),
-    },
-    {
-      header: 'Contact Person',
-      accessorKey: 'contactPerson',
-      cell: (row) => {
-        const contactPerson = row?.contactPerson ?? '';
-        return (
-          <span className="font-medium line-clamp-1">
-            {contactPerson.length > 20 ? `${contactPerson.substring(0, 20)}...` : row.contactPerson}
-          </span>
-        );
-      },
     },
     {
       header: 'Email',
@@ -227,12 +211,27 @@ export default function SupplierListing({ title }: ItemListingProps) {
     {
       header: 'Phone',
       accessorKey: 'phone',
-      cell: (row) => (
-        <span className="font-medium line-clamp-1">
-          {row.name.length > 20 ? `${row.name.substring(0, 20)}...` : row.phone}
-        </span>
-      ),
+      cell: (row) => {
+        const phone = row?.phone ?? '';
+        return (
+          <span className="font-medium line-clamp-1">
+            {phone.length > 20 ? `${phone.substring(0, 20)}...` : row.phone}
+          </span>
+        );
+      },
     },
+    // {
+    //   header: 'Address',
+    //   accessorKey: 'address',
+    //   cell: (row) => {
+    //     const address = row?.address ?? '';
+    //     return (
+    //       <span className="font-medium line-clamp-1">
+    //         {address.length > 20 ? `${address.substring(0, 20)}...` : row.address}
+    //       </span>
+    //     );
+    //   },
+    // },
     {
       header: 'Date Added',
       accessorKey: (row) => formatDate(row.createdAt),
@@ -241,10 +240,10 @@ export default function SupplierListing({ title }: ItemListingProps) {
 
   return (
     <>
-      <DataTable<BriefSupplierDTO>
+      <DataTable<BriefCustomerDTO>
         title={title}
-        subtitle="Suppliers"
-        data={suppliers}
+        subtitle="Customers"
+        data={customers}
         columns={columns}
         keyField="id"
         isLoading={false} // With Suspense, we're guaranteed to have data
@@ -254,7 +253,7 @@ export default function SupplierListing({ title }: ItemListingProps) {
           onExport: handleExport,
         }}
         filters={{
-          searchFields: ['name', 'contactPerson', 'phone'],
+          searchFields: ['name', 'email', 'phone'],
           enableDateFilter: true,
           getItemDate: (item) => item.createdAt,
         }}
@@ -274,42 +273,42 @@ export default function SupplierListing({ title }: ItemListingProps) {
         size="md"
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
-        title={currentProduct ? 'Edit Supplier' : 'Add New Supplier'}
+        title={currentCustomer ? 'Edit Customer' : 'Add New Customer'}
         form={form}
         onSubmit={onSubmit}
-        isSubmitting={createItemMutation.isPending}
+        isSubmitting={createCustomerMutation.isPending}
         // isSubmitting={
         //   createItemMutation.isPending || updateProductMutation.isPending
         // }
-        submitLabel={currentProduct ? 'Save Changes' : 'Add Supplier'}
+        submitLabel={currentCustomer ? 'Save Changes' : 'Add Customer'}
       >
-        <div className="grid gap-3 grid-cols-2">
+        <div className="grid">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Supplier Name</FormLabel>
+                <FormLabel>Customer Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter supplier name" {...field} />
+                  <Input placeholder="Enter Customer name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
-            name="contactPerson"
+            name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Supplier Contact Person</FormLabel>
+                <FormLabel>Customer address</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter supplier contact person" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
         </div>
         <div className="grid gap-3 grid-cols-2">
           <FormField
@@ -352,11 +351,11 @@ export default function SupplierListing({ title }: ItemListingProps) {
       <ConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title="Delete Supplier"
+        title="Delete Customer"
         description={
-          productToDelete ? (
+          customerToDelete ? (
             <>
-              Are you sure you want to delete <strong>{productToDelete.name}?</strong> This action
+              Are you sure you want to delete <strong>{customerToDelete.name}?</strong> This action
               cannot be undone.
             </>
           ) : (
@@ -364,7 +363,7 @@ export default function SupplierListing({ title }: ItemListingProps) {
           )
         }
         onConfirm={handleConfirmDelete}
-        isConfirming={deleteItemMutation.isPending}
+        isConfirming={deleteCustomerMutation.isPending}
         confirmLabel="Delete"
         variant="destructive"
       />

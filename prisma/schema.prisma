@@ -474,7 +474,7 @@ model GoodsReceiptLine{
 
 model Customer{
   id          String              @id @default(cuid())
-  name        String?
+  name        String
   email       String?
   phone       String?
   address     String?

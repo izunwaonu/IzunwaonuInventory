@@ -124,6 +124,12 @@ export type SupplierCreateDTO = {
   email?: string;
   phone?: string;
 };
+export type CustomerCreateDTO = {
+  name: string;
+  address?: string;
+  email?: string;
+  phone?: string;
+};
 
 export interface SupplierDTO {
   id: string;
@@ -139,11 +145,31 @@ export interface SupplierDTO {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface CustomerDTO {
+  id: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  taxId: string | null;
+  notes: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export type BriefSupplierDTO = {
   id: string;
   name: string;
   contactPerson: string | null;
+  phone: string | null;
+  email: string | null;
+  createdAt: Date;
+};
+export type BriefCustomerDTO = {
+  id: string;
+  name: string;
+  address: string | null;
   phone: string | null;
   email: string | null;
   createdAt: Date;

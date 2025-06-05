@@ -2,15 +2,15 @@
 import { Suspense } from 'react';
 
 import { TableLoading } from '@/components/ui/data-table';
-import ItemListing from '@/components/dashboard/items/item-listing';
+
 import { getAuthenticatedUser } from '@/config/useAuth';
-import SupplierListing from '@/components/dashboard/items/supplier-listing';
+import CustomerListing from './components/customerListing';
 
 export default async function ProductsPage() {
   return (
     <div className="container py-8">
-      <Suspense fallback={<TableLoading title="Item Inventory" />}>
-        <SupplierListing title="Suppliers" />
+      <Suspense fallback={<TableLoading title="Customers" />}>
+        <CustomerListing title="Customers" />
       </Suspense>
     </div>
   );
