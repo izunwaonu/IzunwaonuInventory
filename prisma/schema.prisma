@@ -511,7 +511,7 @@ model SalesOrder{
   notes       String?
   organization  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
   orgId       String
-  createdById String  @unique
+  createdById String  
   createdBy   User        @relation("SalesOrderCreatedBy", fields: [createdById], references: [id])
   lines SalesOrderLine[]
   createdAt   DateTime     @default(now())
