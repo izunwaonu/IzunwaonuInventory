@@ -152,7 +152,7 @@ export function InventoryManagement() {
         </div>
 
         {/* Items List */}
-        <Card className="flex-1">
+        {/* <Card className="flex-1">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Items ({loading ? '...' : items.length})</CardTitle>
           </CardHeader>
@@ -203,6 +203,70 @@ export function InventoryManagement() {
                             </div>
                             <div className="flex items-center justify-between mt-1">
                               <p className="text-xs text-gray-500">{item.sku}</p>
+                              <Badge className={cn('text-xs', status.color)}>{status.label}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card> */}
+        <Card className="flex-1 w-full">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Items ({loading ? '...' : items.length})</CardTitle>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            <ScrollArea className="max-h-[70vh] md:max-h-[calc(100vh-320px)] overflow-y-auto">
+              <div className="space-y-1 p-4 pt-0">
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => <ItemCardSkeleton key={i} />)
+                ) : items.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Package className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>No items found</p>
+                  </div>
+                ) : (
+                  items.map((item) => {
+                    const status = getStockStatus(item);
+                    const isSelected = selectedItem?.id === item.id;
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => loadItemDetails(item.id)}
+                        className={cn(
+                          'p-3 rounded-lg border cursor-pointer transition-all hover:shadow-sm',
+                          isSelected
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300',
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            {item.thumbnail ? (
+                              <img
+                                src={item.thumbnail || '/placeholder.svg?height=40&width=40'}
+                                alt={item.name}
+                                className="w-8 h-8 object-cover rounded"
+                              />
+                            ) : (
+                              <Package className="h-5 w-5 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-medium text-sm truncate">{item.name}</h3>
+                              <span className="text-lg font-bold text-gray-900 ml-2">
+                                {item.totalStock}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between mt-1">
+                              <p className="text-xs text-gray-500 truncate">{item.sku}</p>
                               <Badge className={cn('text-xs', status.color)}>{status.label}</Badge>
                             </div>
                           </div>
