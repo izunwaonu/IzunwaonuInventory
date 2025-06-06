@@ -268,7 +268,7 @@ export function InventoryManagement() {
                         <Package className="h-8 w-8 text-gray-400" />
                       )}
                     </div>
-                    <div>
+                    {/* <div>
                       <h1 className="text-2xl font-bold">{selectedItem.name}</h1>
                       <p className="text-gray-600">SKU: {selectedItem.sku}</p>
                       {selectedItem.category && (
@@ -276,6 +276,29 @@ export function InventoryManagement() {
                           {selectedItem.category.name}
                         </Badge>
                       )}
+                    </div> */}
+                    <div>
+                      <h1 className="text-2xl font-bold">{selectedItem.name}</h1>
+                      <p className="text-gray-600">SKU: {selectedItem.sku}</p>
+
+                      {selectedItem.category && (
+                        <Badge variant="outline" className="mt-1">
+                          {selectedItem.category.name}
+                        </Badge>
+                      )}
+
+                      <p className="mt-2 text-sm text-gray-800">
+                        Total in stock:{' '}
+                        <span className="font-semibold">{selectedItem.totalStock}</span>
+                      </p>
+
+                      <p
+                        className={`mt-1 text-sm font-medium ${
+                          selectedItem.available > 0 ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {selectedItem.available > 0 ? 'In Stock' : 'Out of Stock'}
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-2">
