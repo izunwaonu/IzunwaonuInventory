@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Printer, Mail, Download, X, FileText } from 'lucide-react';
+import { Printer, Mail, Eye, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { pdf } from '@react-pdf/renderer';
+
 import { sendInvoiceEmail } from '@/actions/email';
 import InvoicePDF from './invoice-pdf';
 
@@ -68,43 +69,29 @@ export function ReceiptDialog({ isOpen, onClose, order }: ReceiptDialogProps) {
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handlePreviewPDF = async () => {
     setGeneratingPDF(true);
     try {
       const blob = await pdf(<InvoicePDF invoiceData={order} />).toBlob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `invoice-${order.order.orderNumber}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success('Invoice PDF downloaded');
+
+      // Open PDF in new tab for preview
+      const previewWindow = window.open(url, '_blank');
+      if (previewWindow) {
+        previewWindow.onload = () => {
+          URL.revokeObjectURL(url);
+        };
+      } else {
+        URL.revokeObjectURL(url);
+        toast.error('Please allow popups to preview the PDF');
+      }
+
+      toast.success('PDF opened for preview');
     } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast.error('Failed to download PDF');
+      console.error('Error previewing PDF:', error);
+      toast.error('Failed to preview PDF');
     } finally {
       setGeneratingPDF(false);
-    }
-  };
-
-  const handleDownloadHTML = () => {
-    try {
-      const receiptHTML = generateReceiptHTML();
-      const blob = new Blob([receiptHTML], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `receipt-${order.order.orderNumber}.html`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success('Receipt HTML downloaded');
-    } catch (error) {
-      console.error('Error downloading HTML:', error);
-      toast.error('Failed to download HTML');
     }
   };
 
@@ -224,6 +211,9 @@ export function ReceiptDialog({ isOpen, onClose, order }: ReceiptDialogProps) {
     ? `${orderData.createdBy.firstName || ''} ${orderData.createdBy.lastName || ''}`.trim()
     : 'Staff';
 
+  // Check if customer email is available
+  const hasCustomerEmail = orderData.customer?.email;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-auto">
@@ -330,23 +320,27 @@ export function ReceiptDialog({ isOpen, onClose, order }: ReceiptDialogProps) {
               {printing ? 'Printing...' : 'Print Receipt'}
             </Button>
 
-            <Button variant="outline" onClick={handleDownloadPDF} disabled={generatingPDF}>
-              <FileText className="h-4 w-4 mr-2" />
-              {generatingPDF ? 'Generating...' : 'Download PDF'}
+            <Button variant="outline" onClick={handlePreviewPDF} disabled={generatingPDF}>
+              <Eye className="h-4 w-4 mr-2" />
+              {generatingPDF ? 'Loading...' : 'Preview PDF'}
             </Button>
 
-            {orderData.customer?.email && (
-              <Button variant="outline" onClick={handleEmail} disabled={emailing}>
-                <Mail className="h-4 w-4 mr-2" />
-                {emailing ? 'Sending...' : 'Email Invoice'}
-              </Button>
-            )}
-
-            <Button variant="outline" onClick={handleDownloadHTML}>
-              <Download className="h-4 w-4 mr-2" />
-              Download HTML
+            <Button
+              variant="outline"
+              onClick={handleEmail}
+              disabled={emailing || !hasCustomerEmail}
+              className="col-span-2"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              {emailing ? 'Sending...' : hasCustomerEmail ? 'Send Email' : 'No Customer Email'}
             </Button>
           </div>
+
+          {!hasCustomerEmail && (
+            <p className="text-xs text-gray-500 text-center">
+              Add customer email to enable email functionality
+            </p>
+          )}
         </div>
       </DialogContent>
     </Dialog>
