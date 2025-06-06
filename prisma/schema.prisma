@@ -497,6 +497,7 @@ model SalesOrder{
   orderNumber String              @unique
   date        DateTime
   customerId   String?
+  source    Source @default(SALES_ORDER)
   customer     Customer? @relation(fields: [customerId], references:[id])
   locationId    String
   location     Location @relation("SalesLocation",fields: [locationId], references:[id])
@@ -534,6 +535,11 @@ enum SalesOrderStatus{
   COMPLETED
   CANCELED
   RETURNED
+
+}
+enum Source{
+ POS
+ SALES_ORDER
 
 }
 
