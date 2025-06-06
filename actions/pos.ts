@@ -158,10 +158,7 @@ export async function processPOSSale(data: {
       const defaultLocation = await db.location.findFirst({
         where: {
           orgId,
-          OR: [
-            { name: { contains: 'default', mode: 'insensitive' as const } },
-            { description: { contains: 'default', mode: 'insensitive' as const } },
-          ],
+          OR: [{ name: { contains: 'default', mode: 'insensitive' as const } }],
         },
         select: { id: true },
       });
