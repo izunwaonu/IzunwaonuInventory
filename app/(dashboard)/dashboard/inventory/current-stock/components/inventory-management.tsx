@@ -253,7 +253,7 @@ export function InventoryManagement() {
         ) : selectedItem ? (
           <>
             {/* Item Header */}
-            <Card>
+            {/* <Card>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
@@ -268,15 +268,7 @@ export function InventoryManagement() {
                         <Package className="h-8 w-8 text-gray-400" />
                       )}
                     </div>
-                    {/* <div>
-                      <h1 className="text-2xl font-bold">{selectedItem.name}</h1>
-                      <p className="text-gray-600">SKU: {selectedItem.sku}</p>
-                      {selectedItem.category && (
-                        <Badge variant="outline" className="mt-1">
-                          {selectedItem.category.name}
-                        </Badge>
-                      )}
-                    </div> */}
+                    
                     <div>
                       <h1 className="text-2xl font-bold">{selectedItem.name}</h1>
                       <p className="text-gray-600">SKU: {selectedItem.sku}</p>
@@ -313,10 +305,111 @@ export function InventoryManagement() {
                   </div>
                 </div>
               </CardContent>
+            </Card> */}
+            <Card>
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  {/* Left side: Thumbnail + Info */}
+                  <div className="flex flex-col sm:flex-row items-start gap-4 flex-1">
+                    {/* Thumbnail */}
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                      {selectedItem.thumbnail ? (
+                        <img
+                          src={selectedItem.thumbnail || '/placeholder.svg?height=64&width=64'}
+                          alt={selectedItem.name}
+                          className="w-14 h-14 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <Package className="h-8 w-8 text-gray-400" />
+                      )}
+                    </div>
+
+                    {/* Item Info */}
+                    <div>
+                      <h1 className="text-xl sm:text-2xl font-bold">{selectedItem.name}</h1>
+                      <p className="text-gray-600 text-sm sm:text-base">SKU: {selectedItem.sku}</p>
+
+                      {selectedItem.category && (
+                        <Badge variant="outline" className="mt-1">
+                          {selectedItem.category.name}
+                        </Badge>
+                      )}
+
+                      <p className="mt-2 text-sm text-gray-800">
+                        Total in stock:{' '}
+                        <span className="font-semibold">{selectedItem.totalStock}</span>
+                      </p>
+
+                      <p
+                        className={`mt-1 text-sm font-medium ${
+                          selectedItem.available > 0 ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {selectedItem.available > 0 ? 'In Stock' : 'Out of Stock'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right side: Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Details
+                    </Button>
+                    <Button size="sm" className="w-full sm:w-auto">
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Transfer Stock
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
 
             {/* Stock Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Total Stock</p>
+                    <p className="text-sm text-gray-500">Across all locations</p>
+                    <p className="text-3xl font-bold">{selectedItem.totalStock}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Available</p>
+                    <p className="text-sm text-gray-500">Not reserved</p>
+                    <p className="text-3xl font-bold text-green-600">{selectedItem.available}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Reserved</p>
+                    <p className="text-sm text-gray-500">For orders</p>
+                    <p className="text-3xl font-bold text-orange-600">
+                      {selectedItem.totalReserved}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Sales Count</p>
+                    <p className="text-sm text-gray-500">Total sold</p>
+                    <p className="text-3xl font-bold text-blue-600">{selectedItem.salesCount}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="p-4">
                   <div className="space-y-2">
