@@ -184,7 +184,7 @@ export default function GoodsReceiptDetails({ goodsReceipt, onUpdate }: GoodsRec
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total Value</p>
-                  <p className="text-xl font-bold">${goodsReceipt.totalValue.toLocaleString()}</p>
+                  <p className="text-xl font-bold">₦{goodsReceipt.totalValue.toLocaleString()}</p>
                 </div>
               </div>
             </CardContent>
@@ -351,10 +351,10 @@ export default function GoodsReceiptDetails({ goodsReceipt, onUpdate }: GoodsRec
                       </td>
                       <td className="text-right py-3 px-2 font-medium">{line.receivedQuantity}</td>
                       <td className="text-right py-3 px-2">
-                        ${line.purchaseOrderLine.unitPrice.toLocaleString()}
+                        ₦{line.purchaseOrderLine.unitPrice.toLocaleString()}
                       </td>
                       <td className="text-right py-3 px-2 font-medium">
-                        $
+                        ₦
                         {(
                           line.receivedQuantity * line.purchaseOrderLine.unitPrice
                         ).toLocaleString()}
