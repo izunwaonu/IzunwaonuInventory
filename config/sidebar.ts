@@ -399,11 +399,11 @@ export const sidebarLinks: ISidebarLink[] = [
         href: '/dashboard/settings/locations',
         permission: 'settings.read',
       },
-      {
-        title: 'Tax Rates',
-        href: '/dashboard/settings/tax-rates',
-        permission: 'taxes.read',
-      },
+      // {
+      //   title: 'Tax Rates',
+      //   href: '/dashboard/settings/tax-rates',
+      //   permission: 'taxes.read',
+      // },
       // {
       //   title: "Add Tax Rates",
       //   href: "/dashboard/settings/tax-rates",
