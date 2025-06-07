@@ -1,15 +1,15 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { RoleFormData } from "@/types/types";
-import { getAllPermissions, isValidPermission } from "@/config/permissions";
-import { db } from "@/prisma/db";
-import { createRoleName } from "@/lib/createRoleName";
-import { UpdateUserRoleResponse } from "@/types/types";
+import { revalidatePath } from 'next/cache';
+import { RoleFormData } from '@/types/types';
+import { getAllPermissions, isValidPermission } from '@/config/permissions';
+import { db } from '@/prisma/db';
+import { createRoleName } from '@/lib/createRoleName';
+import { UpdateUserRoleResponse } from '@/types/types';
 
 export async function updateUserRole(
   userId: string,
-  roleId: string
+  roleId: string,
 ): Promise<UpdateUserRoleResponse> {
   try {
     // Check if user exists
@@ -20,7 +20,7 @@ export async function updateUserRole(
 
     if (!existingUser) {
       return {
-        error: "User not found",
+        error: 'User not found',
         status: 404,
         data: null,
       };
@@ -33,7 +33,7 @@ export async function updateUserRole(
 
     if (!role) {
       return {
-        error: "Role not found",
+        error: 'Role not found',
         status: 404,
         data: null,
       };
@@ -54,8 +54,9 @@ export async function updateUserRole(
     });
 
     // Revalidate relevant paths
-    revalidatePath("/dashboard/users");
-    revalidatePath(`/dashboard/users/${userId}`);
+    revalidatePath('/dashboard/setting/roles');
+    revalidatePath(`/dashboard/settings/roles/${userId}`);
+    ///dashboard/settings/roles
 
     return {
       error: null,
@@ -63,9 +64,9 @@ export async function updateUserRole(
       data: updatedUser,
     };
   } catch (error) {
-    console.error("Error updating user role:", error);
+    console.error('Error updating user role:', error);
     return {
-      error: "Failed to update user role",
+      error: 'Failed to update user role',
       status: 500,
       data: null,
     };
@@ -76,13 +77,11 @@ export async function createRole(data: RoleFormData) {
     // Validate permissions
     const validPermissions = getAllPermissions();
     const invalidPermissions = data.permissions.filter(
-      (permission) => !validPermissions.includes(permission)
+      (permission) => !validPermissions.includes(permission),
     );
 
     if (invalidPermissions.length > 0) {
-      throw new Error(
-        `Invalid permissions detected: ${invalidPermissions.join(", ")}`
-      );
+      throw new Error(`Invalid permissions detected: ${invalidPermissions.join(', ')}`);
     }
 
     // Check if role with same name exists
@@ -93,7 +92,7 @@ export async function createRole(data: RoleFormData) {
     });
 
     if (existingRole) {
-      throw new Error("A role with this name already exists");
+      throw new Error('A role with this name already exists');
     }
 
     // Create role with permissions
@@ -103,17 +102,17 @@ export async function createRole(data: RoleFormData) {
         roleName: createRoleName(data.displayName),
         description: data.description,
         permissions: data.permissions,
-        orgId:data.orgId,
+        orgId: data.orgId,
       },
     });
 
-    revalidatePath("/dashboard/users/roles");
+    revalidatePath('/dashboard/settings/roles');
     return { success: true, data: role };
   } catch (error) {
-    console.error("Error creating role:", error);
+    console.error('Error creating role:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create role",
+      error: error instanceof Error ? error.message : 'Failed to create role',
     };
   }
 }
@@ -124,13 +123,11 @@ export async function updateRole(id: string, data: Partial<RoleFormData>) {
     if (data.permissions) {
       const validPermissions = getAllPermissions();
       const invalidPermissions = data.permissions.filter(
-        (permission) => !validPermissions.includes(permission)
+        (permission) => !validPermissions.includes(permission),
       );
 
       if (invalidPermissions.length > 0) {
-        throw new Error(
-          `Invalid permissions detected: ${invalidPermissions.join(", ")}`
-        );
+        throw new Error(`Invalid permissions detected: ${invalidPermissions.join(', ')}`);
       }
     }
 
@@ -146,7 +143,7 @@ export async function updateRole(id: string, data: Partial<RoleFormData>) {
       });
 
       if (existingRole) {
-        throw new Error("A role with this name already exists");
+        throw new Error('A role with this name already exists');
       }
     }
 
@@ -163,13 +160,13 @@ export async function updateRole(id: string, data: Partial<RoleFormData>) {
       },
     });
 
-    revalidatePath("/dashboard/users/roles");
+    revalidatePath('/dashboard/settings/roles');
     return { success: true, data: role };
   } catch (error) {
-    console.error("Error updating role:", error);
+    console.error('Error updating role:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update role",
+      error: error instanceof Error ? error.message : 'Failed to update role',
     };
   }
 }
@@ -191,20 +188,20 @@ export async function deleteRole(id: string) {
     });
 
     if (usersWithRole.length > 0) {
-      throw new Error("Cannot delete role as it is assigned to users");
+      throw new Error('Cannot delete role as it is assigned to users');
     }
 
     // Delete role
     await db.role.delete({
       where: { id },
     });
-    revalidatePath("/dashboard/users/roles");
+    revalidatePath('/dashboard/settings/roles');
     return { success: true };
   } catch (error) {
-    console.error("Error deleting role:", error);
+    console.error('Error deleting role:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to delete role",
+      error: error instanceof Error ? error.message : 'Failed to delete role',
     };
   }
 }
@@ -213,35 +210,35 @@ export async function getRoles() {
   try {
     const roles = await db.role.findMany({
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
     return { success: true, data: roles };
   } catch (error) {
-    console.error("Error fetching roles:", error);
+    console.error('Error fetching roles:', error);
     return {
       success: false,
-      error: "Failed to fetch roles",
+      error: 'Failed to fetch roles',
     };
   }
 }
 
-export async function getOrgRoles(orgId:string) {
+export async function getOrgRoles(orgId: string) {
   try {
     const roles = await db.role.findMany({
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
-      where:{
+      where: {
         orgId,
-      }
+      },
     });
     return { success: true, data: roles };
   } catch (error) {
-    console.error("Error fetching roles:", error);
+    console.error('Error fetching roles:', error);
     return {
       success: false,
-      error: "Failed to fetch roles",
+      error: 'Failed to fetch roles',
     };
   }
 }
@@ -253,15 +250,15 @@ export async function getRoleById(id: string) {
     });
 
     if (!role) {
-      throw new Error("Role not found");
+      throw new Error('Role not found');
     }
 
     return { success: true, data: role };
   } catch (error) {
-    console.error("Error fetching role:", error);
+    console.error('Error fetching role:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch role",
+      error: error instanceof Error ? error.message : 'Failed to fetch role',
     };
   }
 }
@@ -286,10 +283,10 @@ export async function getUsersByRole(roleId: string) {
 
     return { success: true, data: users };
   } catch (error) {
-    console.error("Error fetching users by role:", error);
+    console.error('Error fetching users by role:', error);
     return {
       success: false,
-      error: "Failed to fetch users",
+      error: 'Failed to fetch users',
     };
   }
 }
