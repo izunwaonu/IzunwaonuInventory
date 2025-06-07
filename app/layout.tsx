@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import Providers from '@/components/Providers';
 import Head from 'next/head';
 import PWAServiceWorker from '@/components/PWAServiceWorker'; // Import the client component
+import RegisterSW from '@/components/register-sw';
 
 const inter = Rethink_Sans({ subsets: ['latin'], display: 'swap' });
 
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <Toaster richColors />
+          <RegisterSW />
           {children}
         </Providers>
         <PWAServiceWorker /> {/* ✅ Register SW from a client component */}
