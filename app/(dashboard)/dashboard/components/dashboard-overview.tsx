@@ -29,6 +29,7 @@ import { InventoryAlerts } from './inventory-alerts';
 import { TopProducts } from './top-products';
 import { LocationOverview } from './location-overview';
 import { QuickActions } from './quick-actions';
+import Link from 'next/link';
 
 export function DashboardOverview() {
   const [stats, setStats] = useState<any>(null);
@@ -110,10 +111,12 @@ export function DashboardOverview() {
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse" />
               Live Data
             </Badge>
-            <Button variant="outline" size="sm" className="text-xs h-7">
-              <Eye className="h-3 w-3 mr-1.5" />
-              View Reports
-            </Button>
+            <Link href="/dashboard/reports/sales">
+              <Button variant="outline" size="sm" className="text-xs h-7">
+                <Eye className="h-3 w-3 mr-1.5" />
+                View Reports
+              </Button>
+            </Link>
           </div>
         </div>
 
