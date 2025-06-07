@@ -1,16 +1,18 @@
-import type { Metadata } from "next";
-import { Rethink_Sans } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import Providers from "@/components/Providers";
-import Head from "next/head";
-import PWAServiceWorker from "@/components/PWAServiceWorker"; // Import the client component
+import type { Metadata } from 'next';
+import { Rethink_Sans } from 'next/font/google';
+import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
+import Providers from '@/components/Providers';
+import Head from 'next/head';
+import PWAServiceWorker from '@/components/PWAServiceWorker'; // Import the client component
 
-const inter = Rethink_Sans({ subsets: ["latin"], display: "swap" });
+const inter = Rethink_Sans({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
-  title: "IzuInventory",
-  description: "Simplify Stock, Amplify Business",
+  title: 'IzuInventory',
+  description: 'Simplify Stock, Amplify Business',
+  themeColor: '#0f172a',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -34,10 +36,9 @@ export default function RootLayout({
       </Head>
       <body className={inter.className}>
         <Providers>
-        <Toaster richColors />
+          <Toaster richColors />
           {children}
         </Providers>
-        
         <PWAServiceWorker /> {/* ✅ Register SW from a client component */}
       </body>
     </html>
