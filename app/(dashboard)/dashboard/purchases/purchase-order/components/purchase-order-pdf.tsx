@@ -315,8 +315,8 @@ const PurchaseOrderPDF = ({ purchaseOrder }: { purchaseOrder: PurchaseOrderData 
             <View style={styles.tableHeader}>
               <Text style={styles.tableCol1}>Item Description</Text>
               <Text style={styles.tableCol2}>Quantity</Text>
-              <Text style={styles.tableCol3}>Unit Price</Text>
-              <Text style={styles.tableCol4}>Total</Text>
+              <Text style={styles.tableCol3}>Unit Price(NGN)</Text>
+              <Text style={styles.tableCol4}>Total (NGN)</Text>
             </View>
 
             {/* Table Rows */}
@@ -332,8 +332,8 @@ const PurchaseOrderPDF = ({ purchaseOrder }: { purchaseOrder: PurchaseOrderData 
                   )}
                 </View>
                 <Text style={styles.tableCol2}>{line.quantity}</Text>
-                <Text style={styles.tableCol3}>NGN{Number(line.unitPrice).toFixed(2)}</Text>
-                <Text style={styles.tableCol4}>NGN{Number(line.total).toFixed(2)}</Text>
+                <Text style={styles.tableCol3}>{Number(line.unitPrice).toFixed(2)}</Text>
+                <Text style={styles.tableCol4}>{Number(line.total).toFixed(2)}</Text>
               </View>
             ))}
           </View>
