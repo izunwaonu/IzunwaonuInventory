@@ -1,6 +1,6 @@
 // 'use client';
 
-// import { useState, useEffect } from 'react';
+// import { useState, useEffect, useMemo } from 'react';
 // import { Button } from '@/components/ui/button';
 // import { Badge } from '@/components/ui/badge';
 // import { Separator } from '@/components/ui/separator';
@@ -30,7 +30,7 @@
 //   Calendar,
 // } from 'lucide-react';
 // import { format } from 'date-fns';
-// import { updatePurchaseOrderStatus, receiveOrderItems } from '@/actions/purchase-orders';
+// import { receiveOrderItems, updatePurchaseOrderStatus } from '@/actions/purchase-orders';
 // import { sendPurchaseOrderEmail } from '@/actions/email';
 // import type { PurchaseOrderStatus } from '@prisma/client';
 // import { toast } from 'sonner';
@@ -129,9 +129,13 @@
 //   const [selectedStatus, setSelectedStatus] = useState(purchaseOrder.status);
 //   const [receivingQuantities, setReceivingQuantities] = useState<Record<string, number>>({});
 
+//   // Calculate if any items remain to be received
+//   const hasItemsToReceive = useMemo(() => {
+//     return purchaseOrder.lines.some((line) => line.receivedQuantity < line.quantity);
+//   }, [purchaseOrder.lines]);
+
 //   // Extract supplier email when component mounts or purchaseOrder changes
 //   useEffect(() => {
-//     console.log('Supplier data:', purchaseOrder.supplier);
 //     if (purchaseOrder?.supplier?.email) {
 //       setSupplierEmail(purchaseOrder.supplier.email);
 //     }
@@ -241,9 +245,13 @@
 //     }
 //   };
 
-//   // Determine which buttons to show based on status
-//   const canReceive = ['SUBMITTED', 'APPROVED', 'PARTIALLY_RECEIVED'].includes(purchaseOrder.status);
+//   // Determine which buttons to show based on status and remaining items
 //   const canSendEmail = ['DRAFT', 'SUBMITTED'].includes(purchaseOrder.status);
+
+//   // Show receive button if there are items to receive, regardless of status
+//   // (except for DRAFT, CANCELLED, or CLOSED)
+//   const canReceive =
+//     hasItemsToReceive && !['DRAFT', 'CANCELLED', 'CLOSED'].includes(purchaseOrder.status);
 
 //   const totalReceived = purchaseOrder.lines.reduce((sum, line) => sum + line.receivedQuantity, 0);
 //   const totalOrdered = purchaseOrder.lines.reduce((sum, line) => sum + line.quantity, 0);
@@ -325,7 +333,7 @@
 //                 </div>
 //                 <div>
 //                   <p className="text-sm text-gray-600">Total Amount</p>
-//                   <p className="text-xl font-bold">${purchaseOrder.total.toLocaleString()}</p>
+//                   <p className="text-xl font-bold">₦{purchaseOrder.total.toLocaleString()}</p>
 //                 </div>
 //               </div>
 //             </CardContent>
@@ -476,28 +484,28 @@
 //             <CardContent className="space-y-3">
 //               <div className="flex justify-between">
 //                 <span className="text-gray-600">Subtotal:</span>
-//                 <span>${purchaseOrder.subtotal.toLocaleString()}</span>
+//                 <span>₦{purchaseOrder.subtotal.toLocaleString()}</span>
 //               </div>
 //               <div className="flex justify-between">
 //                 <span className="text-gray-600">Tax:</span>
-//                 <span>${purchaseOrder.taxAmount.toLocaleString()}</span>
+//                 <span>₦{purchaseOrder.taxAmount.toLocaleString()}</span>
 //               </div>
 //               {purchaseOrder.shippingCost && (
 //                 <div className="flex justify-between">
 //                   <span className="text-gray-600">Shipping:</span>
-//                   <span>${purchaseOrder.shippingCost.toLocaleString()}</span>
+//                   <span>₦{purchaseOrder.shippingCost.toLocaleString()}</span>
 //                 </div>
 //               )}
 //               {purchaseOrder.discount && (
 //                 <div className="flex justify-between text-green-600">
 //                   <span>Discount:</span>
-//                   <span>-${purchaseOrder.discount.toLocaleString()}</span>
+//                   <span>-₦{purchaseOrder.discount.toLocaleString()}</span>
 //                 </div>
 //               )}
 //               <Separator />
 //               <div className="flex justify-between font-bold text-lg">
 //                 <span>Total:</span>
-//                 <span>${purchaseOrder.total.toLocaleString()}</span>
+//                 <span>₦{purchaseOrder.total.toLocaleString()}</span>
 //               </div>
 //             </CardContent>
 //           </Card>
@@ -505,8 +513,18 @@
 
 //         {/* Order Lines */}
 //         <Card>
-//           <CardHeader>
+//           <CardHeader className="flex flex-row items-center justify-between">
 //             <CardTitle className="text-lg">Order Items</CardTitle>
+//             {canReceive && (
+//               <Button
+//                 size="sm"
+//                 onClick={() => setIsReceiveDialogOpen(true)}
+//                 className="bg-green-600 hover:bg-green-700"
+//               >
+//                 <Package className="h-4 w-4 mr-2" />
+//                 Receive Items
+//               </Button>
+//             )}
 //           </CardHeader>
 //           <CardContent>
 //             <div className="overflow-x-auto">
@@ -552,7 +570,7 @@
 //                         </td>
 //                         <td className="text-right py-3 px-2">${line.unitPrice.toLocaleString()}</td>
 //                         <td className="text-right py-3 px-2 font-medium">
-//                           ${line.total.toLocaleString()}
+//                           ₦{line.total.toLocaleString()}
 //                         </td>
 //                         <td className="text-center py-3 px-2">
 //                           {isFullyReceived ? (
@@ -751,8 +769,14 @@ import {
   Printer,
   Phone,
   Check,
-  Calendar,
+  MoreVertical,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { receiveOrderItems, updatePurchaseOrderStatus } from '@/actions/purchase-orders';
 import { sendPurchaseOrderEmail } from '@/actions/email';
@@ -971,9 +995,6 @@ export default function PurchaseOrderDetails({
 
   // Determine which buttons to show based on status and remaining items
   const canSendEmail = ['DRAFT', 'SUBMITTED'].includes(purchaseOrder.status);
-
-  // Show receive button if there are items to receive, regardless of status
-  // (except for DRAFT, CANCELLED, or CLOSED)
   const canReceive =
     hasItemsToReceive && !['DRAFT', 'CANCELLED', 'CLOSED'].includes(purchaseOrder.status);
 
@@ -995,84 +1016,110 @@ export default function PurchaseOrderDetails({
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-6 border-b bg-gray-50">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{purchaseOrder.poNumber}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge className={statusColors[purchaseOrder.status as keyof typeof statusColors]}>
-                {purchaseOrder.status.replace('_', ' ')}
-              </Badge>
-              <span className="text-sm text-gray-500">
-                {format(new Date(purchaseOrder.date), 'MMM dd, yyyy')}
-              </span>
+      <div className="p-4 sm:p-6 border-b bg-gray-50 flex-shrink-0">
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                {purchaseOrder.poNumber}
+              </h1>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <Badge className={statusColors[purchaseOrder.status as keyof typeof statusColors]}>
+                  {purchaseOrder.status.replace('_', ' ')}
+                </Badge>
+                <span className="text-sm text-gray-500">
+                  {format(new Date(purchaseOrder.date), 'MMM dd, yyyy')}
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2">
-            {canSendEmail && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSendEmail}
-                disabled={isSendingEmail || !supplierEmail}
-                title={!supplierEmail ? 'Supplier email not available' : 'Send email to supplier'}
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                {isSendingEmail ? 'Sending...' : 'Send Email'}
+            {/* Action Buttons - Desktop */}
+            <div className="hidden sm:flex flex-wrap gap-2">
+              {canSendEmail && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSendEmail}
+                  disabled={isSendingEmail || !supplierEmail}
+                  title={!supplierEmail ? 'Supplier email not available' : 'Send email to supplier'}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  {isSendingEmail ? 'Sending...' : 'Send Email'}
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={handleViewPDF}>
+                <Printer className="h-4 w-4 mr-2" />
+                View/Print
               </Button>
-            )}
-            <Button variant="outline" size="sm" onClick={handleViewPDF}>
-              <Printer className="h-4 w-4 mr-2" />
-              View/Print
-            </Button>
-            {canReceive && (
-              <Button
-                size="sm"
-                onClick={() => setIsReceiveDialogOpen(true)}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Package className="h-4 w-4 mr-2" />
-                Receive Items
+              {canReceive && (
+                <Button
+                  size="sm"
+                  onClick={() => setIsReceiveDialogOpen(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Receive Items
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setIsStatusDialogOpen(true)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Change Status
               </Button>
-            )}
-            <Button variant="outline" size="sm" onClick={() => setIsStatusDialogOpen(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Change Status
-            </Button>
+            </div>
+
+            {/* Action Buttons - Mobile Dropdown */}
+            <div className="sm:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {canSendEmail && (
+                    <DropdownMenuItem
+                      onClick={handleSendEmail}
+                      disabled={isSendingEmail || !supplierEmail}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      {isSendingEmail ? 'Sending...' : 'Send Email'}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={handleViewPDF}>
+                    <Printer className="h-4 w-4 mr-2" />
+                    View/Print
+                  </DropdownMenuItem>
+                  {canReceive && (
+                    <DropdownMenuItem onClick={() => setIsReceiveDialogOpen(true)}>
+                      <Package className="h-4 w-4 mr-2" />
+                      Receive Items
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => setIsStatusDialogOpen(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Change Status
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
                   <DollarSign className="h-5 w-5 text-blue-600" />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-gray-600">Total Amount</p>
-                  <p className="text-xl font-bold">${purchaseOrder.total.toLocaleString()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Package className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Items Received</p>
-                  <p className="text-xl font-bold">
-                    {totalReceived}/{totalOrdered}
+                  <p className="text-lg sm:text-xl font-bold truncate">
+                    ₦{purchaseOrder.total.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -1082,12 +1129,28 @@ export default function PurchaseOrderDetails({
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
+                <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                  <Package className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-gray-600">Items Received</p>
+                  <p className="text-lg sm:text-xl font-bold">
+                    {totalReceived}/{totalOrdered}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="sm:col-span-2 lg:col-span-1">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 rounded-lg flex-shrink-0">
                   <Truck className="h-5 w-5 text-orange-600" />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-sm text-gray-600">Expected Delivery</p>
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-medium truncate">
                     {purchaseOrder.expectedDeliveryDate
                       ? format(new Date(purchaseOrder.expectedDeliveryDate), 'MMM dd, yyyy')
                       : 'Not set'}
@@ -1099,21 +1162,21 @@ export default function PurchaseOrderDetails({
         </div>
 
         {/* Order Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Supplier Information</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Supplier Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-500" />
-                <span className="font-medium">{purchaseOrder.supplier.name}</span>
+                <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                <span className="font-medium truncate">{purchaseOrder.supplier.name}</span>
               </div>
 
               {purchaseOrder.supplier.contactPerson && (
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">
+                  <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 truncate">
                     Contact: {purchaseOrder.supplier.contactPerson}
                   </span>
                 </div>
@@ -1121,29 +1184,31 @@ export default function PurchaseOrderDetails({
 
               {supplierEmail && (
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{supplierEmail}</span>
+                  <Mail className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 truncate">{supplierEmail}</span>
                 </div>
               )}
 
               {purchaseOrder.supplier.phone && (
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{purchaseOrder.supplier.phone}</span>
+                  <Phone className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 truncate">
+                    {purchaseOrder.supplier.phone}
+                  </span>
                 </div>
               )}
 
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
+                <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                <span className="text-sm text-gray-600 truncate">
                   Delivery to: {purchaseOrder.deliveryLocation.name}
                 </span>
               </div>
 
               {purchaseOrder.paymentTerms && (
                 <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">
+                  <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 truncate">
                     Payment Terms: {purchaseOrder.paymentTerms}
                   </span>
                 </div>
@@ -1153,83 +1218,33 @@ export default function PurchaseOrderDetails({
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Order Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Created by:</span>
-                <span className="font-medium">
-                  {purchaseOrder.createdBy
-                    ? `${purchaseOrder.createdBy.firstName} ${purchaseOrder.createdBy.lastName}`
-                    : 'System'}
-                </span>
-              </div>
-
-              {purchaseOrder.createdBy?.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{purchaseOrder.createdBy.email}</span>
-                </div>
-              )}
-
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Order Date:</span>
-                <span className="font-medium">
-                  {format(new Date(purchaseOrder.date), 'MMM dd, yyyy')}
-                </span>
-              </div>
-
-              {purchaseOrder.expectedDeliveryDate && (
-                <div className="flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">Expected Delivery:</span>
-                  <span className="font-medium">
-                    {format(new Date(purchaseOrder.expectedDeliveryDate), 'MMM dd, yyyy')}
-                  </span>
-                </div>
-              )}
-
-              {purchaseOrder.paymentTerms && (
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">Payment Terms:</span>
-                  <span className="font-medium">{purchaseOrder.paymentTerms}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Order Summary</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal:</span>
-                <span>${purchaseOrder.subtotal.toLocaleString()}</span>
+                <span>₦{purchaseOrder.subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Tax:</span>
-                <span>${purchaseOrder.taxAmount.toLocaleString()}</span>
+                <span>₦{purchaseOrder.taxAmount.toLocaleString()}</span>
               </div>
               {purchaseOrder.shippingCost && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping:</span>
-                  <span>${purchaseOrder.shippingCost.toLocaleString()}</span>
+                  <span>₦{purchaseOrder.shippingCost.toLocaleString()}</span>
                 </div>
               )}
               {purchaseOrder.discount && (
                 <div className="flex justify-between text-green-600">
                   <span>Discount:</span>
-                  <span>-${purchaseOrder.discount.toLocaleString()}</span>
+                  <span>-₦{purchaseOrder.discount.toLocaleString()}</span>
                 </div>
               )}
               <Separator />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>${purchaseOrder.total.toLocaleString()}</span>
+                <span>₦{purchaseOrder.total.toLocaleString()}</span>
               </div>
             </CardContent>
           </Card>
@@ -1237,13 +1252,13 @@ export default function PurchaseOrderDetails({
 
         {/* Order Lines */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Order Items</CardTitle>
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <CardTitle className="text-base sm:text-lg">Order Items</CardTitle>
             {canReceive && (
               <Button
                 size="sm"
                 onClick={() => setIsReceiveDialogOpen(true)}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
               >
                 <Package className="h-4 w-4 mr-2" />
                 Receive Items
@@ -1251,7 +1266,74 @@ export default function PurchaseOrderDetails({
             )}
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            {/* Mobile Card View */}
+            <div className="block sm:hidden space-y-4">
+              {purchaseOrder.lines.map((line) => {
+                const isFullyReceived = line.receivedQuantity >= line.quantity;
+                const isPartiallyReceived =
+                  line.receivedQuantity > 0 && line.receivedQuantity < line.quantity;
+                return (
+                  <Card key={line.id} className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">{line.item.name}</p>
+                          {line.item.sku && (
+                            <p className="text-sm text-gray-500">SKU: {line.item.sku}</p>
+                          )}
+                        </div>
+                        {isFullyReceived ? (
+                          <Badge className="bg-green-100 text-green-800 flex-shrink-0">
+                            <Check className="h-3 w-3 mr-1" />
+                            Complete
+                          </Badge>
+                        ) : isPartiallyReceived ? (
+                          <Badge className="bg-orange-100 text-orange-800 flex-shrink-0">
+                            Partial
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-gray-100 text-gray-800 flex-shrink-0">Pending</Badge>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Ordered:</span>
+                          <span className="ml-2 font-medium">{line.quantity}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Received:</span>
+                          <span
+                            className={`ml-2 font-medium ${
+                              isFullyReceived
+                                ? 'text-green-600'
+                                : isPartiallyReceived
+                                ? 'text-orange-600'
+                                : 'text-gray-600'
+                            }`}
+                          >
+                            {line.receivedQuantity}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Unit Price:</span>
+                          <span className="ml-2 font-medium">
+                            ₦{line.unitPrice.toLocaleString()}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Total:</span>
+                          <span className="ml-2 font-medium">₦{line.total.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -1292,9 +1374,9 @@ export default function PurchaseOrderDetails({
                             {line.receivedQuantity}
                           </span>
                         </td>
-                        <td className="text-right py-3 px-2">${line.unitPrice.toLocaleString()}</td>
+                        <td className="text-right py-3 px-2">₦{line.unitPrice.toLocaleString()}</td>
                         <td className="text-right py-3 px-2 font-medium">
-                          ${line.total.toLocaleString()}
+                          ₦{line.total.toLocaleString()}
                         </td>
                         <td className="text-center py-3 px-2">
                           {isFullyReceived ? (
@@ -1321,10 +1403,10 @@ export default function PurchaseOrderDetails({
         {purchaseOrder.notes && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Notes</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Notes</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700">{purchaseOrder.notes}</p>
+              <p className="text-gray-700 text-sm sm:text-base">{purchaseOrder.notes}</p>
             </CardContent>
           </Card>
         )}
@@ -1332,12 +1414,66 @@ export default function PurchaseOrderDetails({
 
       {/* Receive Items Dialog */}
       <Dialog open={isReceiveDialogOpen} onOpenChange={setIsReceiveDialogOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Receive Items - {purchaseOrder.poNumber}</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">
+              Receive Items - {purchaseOrder.poNumber}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="overflow-x-auto">
+            {/* Mobile Card View */}
+            <div className="block sm:hidden space-y-4">
+              {purchaseOrder.lines.map((line) => {
+                const remaining = line.quantity - line.receivedQuantity;
+                return (
+                  <Card key={line.id} className="p-4">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-medium">{line.item.name}</p>
+                        {line.item.sku && (
+                          <p className="text-sm text-gray-500">SKU: {line.item.sku}</p>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Ordered:</span>
+                          <span className="ml-2 font-medium">{line.quantity}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Received:</span>
+                          <span className="ml-2 font-medium">{line.receivedQuantity}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Remaining:</span>
+                          <span className="ml-2 font-medium">{remaining}</span>
+                        </div>
+                        <div>
+                          <Label htmlFor={`receive-${line.id}`} className="text-gray-600">
+                            Receive Now:
+                          </Label>
+                          <Input
+                            id={`receive-${line.id}`}
+                            type="number"
+                            min="0"
+                            max={remaining}
+                            value={receivingQuantities[line.id] || 0}
+                            onChange={(e) =>
+                              updateReceivingQuantity(line.id, Number.parseInt(e.target.value) || 0)
+                            }
+                            className="mt-1"
+                            disabled={remaining <= 0}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
@@ -1384,14 +1520,18 @@ export default function PurchaseOrderDetails({
               </table>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsReceiveDialogOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsReceiveDialogOpen(false)}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleReceiveItems}
               disabled={isReceiving}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
             >
               {isReceiving ? 'Processing...' : 'Receive Items'}
             </Button>
@@ -1401,9 +1541,9 @@ export default function PurchaseOrderDetails({
 
       {/* Status Change Dialog */}
       <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Change Status - {purchaseOrder.poNumber}</DialogTitle>
+            <DialogTitle className="text-lg">Change Status - {purchaseOrder.poNumber}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -1430,11 +1570,15 @@ export default function PurchaseOrderDetails({
               <span className="font-medium">{purchaseOrder.status.replace('_', ' ')}</span>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsStatusDialogOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsStatusDialogOpen(false)}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
-            <Button onClick={handleStatusUpdate} disabled={isUpdating}>
+            <Button onClick={handleStatusUpdate} disabled={isUpdating} className="w-full sm:w-auto">
               {isUpdating ? 'Updating...' : 'Update Status'}
             </Button>
           </DialogFooter>

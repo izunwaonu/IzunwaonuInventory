@@ -448,11 +448,11 @@ export function InventoryManagement() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">Cost Price</p>
-                    <p className="font-medium">${selectedItem.costPrice.toFixed(2)}</p>
+                    <p className="font-medium">₦{selectedItem.costPrice.toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-gray-600">Selling Price</p>
-                    <p className="font-medium">${selectedItem.sellingPrice.toFixed(2)}</p>
+                    <p className="font-medium">₦{selectedItem.sellingPrice.toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-gray-600">Min Stock Level</p>
@@ -496,7 +496,7 @@ export function InventoryManagement() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600">Total Sales</p>
-                    <p className="font-medium">${selectedItem.salesTotal.toFixed(2)}</p>
+                    <p className="font-medium">₦{selectedItem.salesTotal.toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-gray-600">Units Sold</p>
@@ -505,7 +505,7 @@ export function InventoryManagement() {
                   <div>
                     <p className="text-gray-600">Avg Sale Price</p>
                     <p className="font-medium">
-                      $
+                      ₦
                       {selectedItem.salesCount > 0
                         ? (selectedItem.salesTotal / selectedItem.salesCount).toFixed(2)
                         : '0.00'}

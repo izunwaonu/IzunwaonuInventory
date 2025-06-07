@@ -332,8 +332,8 @@ const PurchaseOrderPDF = ({ purchaseOrder }: { purchaseOrder: PurchaseOrderData 
                   )}
                 </View>
                 <Text style={styles.tableCol2}>{line.quantity}</Text>
-                <Text style={styles.tableCol3}>${Number(line.unitPrice).toFixed(2)}</Text>
-                <Text style={styles.tableCol4}>${Number(line.total).toFixed(2)}</Text>
+                <Text style={styles.tableCol3}>NGN{Number(line.unitPrice).toFixed(2)}</Text>
+                <Text style={styles.tableCol4}>NGN{Number(line.total).toFixed(2)}</Text>
               </View>
             ))}
           </View>
@@ -343,35 +343,35 @@ const PurchaseOrderPDF = ({ purchaseOrder }: { purchaseOrder: PurchaseOrderData 
         <View style={styles.summaryContainer}>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal:</Text>
-            <Text style={styles.summaryValue}>${Number(purchaseOrder.subtotal).toFixed(2)}</Text>
+            <Text style={styles.summaryValue}>NGN{Number(purchaseOrder.subtotal).toFixed(2)}</Text>
           </View>
 
           {purchaseOrder.discount && Number(purchaseOrder.discount) > 0 && (
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Discount:</Text>
               <Text style={[styles.summaryValue, { color: '#059669' }]}>
-                -${Number(purchaseOrder.discount).toFixed(2)}
+                -NGN{Number(purchaseOrder.discount).toFixed(2)}
               </Text>
             </View>
           )}
 
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Tax:</Text>
-            <Text style={styles.summaryValue}>${Number(purchaseOrder.taxAmount).toFixed(2)}</Text>
+            <Text style={styles.summaryValue}>NGN{Number(purchaseOrder.taxAmount).toFixed(2)}</Text>
           </View>
 
           {purchaseOrder.shippingCost && Number(purchaseOrder.shippingCost) > 0 && (
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Shipping:</Text>
               <Text style={styles.summaryValue}>
-                ${Number(purchaseOrder.shippingCost).toFixed(2)}
+                NGN{Number(purchaseOrder.shippingCost).toFixed(2)}
               </Text>
             </View>
           )}
 
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total:</Text>
-            <Text style={styles.totalValue}>${Number(purchaseOrder.total).toFixed(2)}</Text>
+            <Text style={styles.totalValue}>NGN{Number(purchaseOrder.total).toFixed(2)}</Text>
           </View>
         </View>
 

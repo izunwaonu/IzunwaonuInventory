@@ -545,7 +545,7 @@ export default function CreatePurchaseOrderForm() {
                           />
                         </td>
                         <td className="py-2 px-2 text-center font-medium">
-                          ${line.total.toFixed(2)}
+                          ₦{line.total.toFixed(2)}
                         </td>
                         <td className="py-2 px-2 text-center">
                           <Button
@@ -578,21 +578,21 @@ export default function CreatePurchaseOrderForm() {
             <div className="space-y-2 max-w-sm ml-auto">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₦{subtotal.toFixed(2)}</span>
               </div>
               {totalDiscount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>Discount:</span>
-                  <span>-${totalDiscount.toFixed(2)}</span>
+                  <span>-₦{totalDiscount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span>Tax:</span>
-                <span>${taxAmount.toFixed(2)}</span>
+                <span>₦{taxAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-2">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₦{total.toFixed(2)}</span>
               </div>
             </div>
           </CardContent>

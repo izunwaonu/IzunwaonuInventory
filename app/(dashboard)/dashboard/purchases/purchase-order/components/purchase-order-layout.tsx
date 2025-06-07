@@ -30,6 +30,12 @@
 //   notes: string | null;
 //   paymentTerms: string | null;
 //   expectedDeliveryDate: string | null;
+//   createdBy: {
+//     id: string;
+//     firstName: string;
+//     lastName: string;
+//     email: string;
+//   } | null;
 //   supplier: {
 //     id: string;
 //     name: string;
@@ -230,9 +236,10 @@
 import { useState, useEffect } from 'react';
 import { getPurchaseOrders } from '@/actions/purchase-orders';
 import PurchaseOrderDetails from './purchase-order-details';
-import { Search, Calendar, DollarSign } from 'lucide-react';
+import { Search, Calendar, ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -305,6 +312,7 @@ export default function PurchaseOrderLayout() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [showMobileList, setShowMobileList] = useState(false);
 
   useEffect(() => {
     const loadPurchaseOrders = async () => {
@@ -329,6 +337,7 @@ export default function PurchaseOrderLayout() {
 
   const handlePOSelect = (po: PurchaseOrder) => {
     setSelectedPO(po);
+    setShowMobileList(false); // Close mobile list when item is selected
   };
 
   const handlePOUpdate = (updatedPO: PurchaseOrder) => {
@@ -346,54 +355,51 @@ export default function PurchaseOrderLayout() {
     return matchesSearch && matchesStatus;
   });
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-200px)]">
-      {/* Left column - Purchase Order List */}
-      <div className="lg:col-span-2 border rounded-lg overflow-hidden bg-white shadow-sm">
-        {/* Header with filters */}
-        <div className="p-4 border-b bg-gray-50">
-          <div className="space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search by PO number or supplier..."
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="DRAFT">Draft</SelectItem>
-                  <SelectItem value="SUBMITTED">Submitted</SelectItem>
-                  <SelectItem value="APPROVED">Approved</SelectItem>
-                  <SelectItem value="PARTIALLY_RECEIVED">Partially Received</SelectItem>
-                  <SelectItem value="RECEIVED">Received</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                  <SelectItem value="CLOSED">Closed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+  const PurchaseOrderList = () => (
+    <div className="h-full flex flex-col">
+      {/* Header with filters */}
+      <div className="p-4 border-b bg-gray-50 flex-shrink-0">
+        <div className="space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search by PO number or supplier..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="SUBMITTED">Submitted</SelectItem>
+              <SelectItem value="APPROVED">Approved</SelectItem>
+              <SelectItem value="PARTIALLY_RECEIVED">Partially Received</SelectItem>
+              <SelectItem value="RECEIVED">Received</SelectItem>
+              <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              <SelectItem value="CLOSED">Closed</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+      </div>
 
-        {/* Purchase Orders List */}
-        <div className="divide-y max-h-[calc(100vh-350px)] overflow-y-auto">
-          {isLoading ? (
-            <div className="p-6 text-center text-gray-500">Loading purchase orders...</div>
-          ) : filteredPOs.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              {searchTerm || statusFilter !== 'all'
-                ? 'No purchase orders match your filters'
-                : 'No purchase orders found'}
-            </div>
-          ) : (
-            filteredPOs.map((po) => (
+      {/* Purchase Orders List */}
+      <div className="flex-1 overflow-y-auto">
+        {isLoading ? (
+          <div className="p-6 text-center text-gray-500">Loading purchase orders...</div>
+        ) : filteredPOs.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            {searchTerm || statusFilter !== 'all'
+              ? 'No purchase orders match your filters'
+              : 'No purchase orders found'}
+          </div>
+        ) : (
+          <div className="divide-y">
+            {filteredPOs.map((po) => (
               <div
                 key={po.id}
                 className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
@@ -403,54 +409,102 @@ export default function PurchaseOrderLayout() {
               >
                 <div className="space-y-2">
                   {/* Header */}
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{po.poNumber}</h3>
-                      <p className="text-sm text-gray-600">{po.supplier.name}</p>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-gray-900 truncate">{po.poNumber}</h3>
+                      <p className="text-sm text-gray-600 truncate">{po.supplier.name}</p>
                     </div>
-                    <Badge className={statusColors[po.status as keyof typeof statusColors]}>
+                    <Badge
+                      className={`${
+                        statusColors[po.status as keyof typeof statusColors]
+                      } flex-shrink-0 text-xs`}
+                    >
                       {po.status.replace('_', ' ')}
                     </Badge>
                   </div>
 
                   {/* Details */}
-                  <div className="flex justify-between items-center text-sm">
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <Calendar className="h-3 w-3" />
-                      {format(new Date(po.date), 'MMM dd, yyyy')}
+                  <div className="flex justify-between items-center text-sm gap-2">
+                    <div className="flex items-center gap-1 text-gray-500 min-w-0">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{format(new Date(po.date), 'MMM dd, yyyy')}</span>
                     </div>
-                    <div className="flex items-center gap-1 font-semibold text-gray-900">
-                      <DollarSign className="h-3 w-3" />
-                      {po.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    <div className="flex items-center gap-1 font-semibold text-gray-900 flex-shrink-0">
+                      <span className="text-lg">₦</span>
+                      <span>{po.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
 
                   {/* Expected delivery */}
                   {po.expectedDeliveryDate && (
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 truncate">
                       Expected: {format(new Date(po.expectedDeliveryDate), 'MMM dd, yyyy')}
                     </div>
                   )}
                 </div>
               </div>
-            ))
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="h-[calc(100vh-200px)]">
+      {/* Desktop Layout */}
+      <div className="hidden lg:grid lg:grid-cols-5 gap-6 h-full">
+        {/* Left column - Purchase Order List */}
+        <div className="lg:col-span-2 border rounded-lg overflow-hidden bg-white shadow-sm">
+          <PurchaseOrderList />
+        </div>
+
+        {/* Right column - Purchase Order Details */}
+        <div className="lg:col-span-3 border rounded-lg bg-white shadow-sm overflow-hidden">
+          {selectedPO ? (
+            <PurchaseOrderDetails purchaseOrder={selectedPO} onUpdate={handlePOUpdate} />
+          ) : (
+            <div className="p-8 text-center text-gray-500 h-full flex items-center justify-center">
+              <div>
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Search className="h-8 w-8 text-gray-400" />
+                </div>
+                <p className="text-lg font-medium">Select a purchase order</p>
+                <p className="text-sm">Choose a purchase order from the list to view details</p>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Right column - Purchase Order Details */}
-      <div className="lg:col-span-3 border rounded-lg bg-white shadow-sm overflow-hidden">
+      {/* Mobile Layout */}
+      <div className="lg:hidden h-full">
         {selectedPO ? (
-          <PurchaseOrderDetails purchaseOrder={selectedPO} onUpdate={handlePOUpdate} />
-        ) : (
-          <div className="p-8 text-center text-gray-500 h-full flex items-center justify-center">
-            <div>
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <Search className="h-8 w-8 text-gray-400" />
+          <div className="h-full flex flex-col">
+            {/* Mobile header with back button */}
+            <div className="p-4 border-b bg-gray-50 flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedPO(null)}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to List
+              </Button>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-semibold text-gray-900 truncate">{selectedPO.poNumber}</h2>
               </div>
-              <p className="text-lg font-medium">Select a purchase order</p>
-              <p className="text-sm">Choose a purchase order from the list to view details</p>
             </div>
+
+            {/* Details */}
+            <div className="flex-1 overflow-hidden">
+              <PurchaseOrderDetails purchaseOrder={selectedPO} onUpdate={handlePOUpdate} />
+            </div>
+          </div>
+        ) : (
+          <div className="border rounded-lg bg-white shadow-sm h-full">
+            <PurchaseOrderList />
           </div>
         )}
       </div>
