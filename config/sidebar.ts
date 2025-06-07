@@ -213,26 +213,26 @@ export const sidebarLinks: ISidebarLink[] = [
         href: '/dashboard/inventory/units',
         permission: 'inventory.read',
       },
-      {
-        title: 'Tax Rates',
-        href: '/dashboard/inventory/tax',
-        permission: 'inventory.read',
-      },
+      // {
+      //   title: 'Tax Rates',
+      //   href: '/dashboard/inventory/tax',
+      //   permission: 'inventory.read',
+      // },
       {
         title: 'Current Stock',
         href: '/dashboard/inventory/current-stock',
         permission: 'inventory.read',
       },
-      {
-        title: 'Low Stock Items',
-        href: '/dashboard/inventory/low-stock',
-        permission: 'inventory.read',
-      },
-      {
-        title: 'Serial Numbers',
-        href: '/dashboard/inventory/serial-numbers',
-        permission: 'inventory.read',
-      },
+      // {
+      //   title: 'Low Stock Items',
+      //   href: '/dashboard/inventory/low-stock',
+      //   permission: 'inventory.read',
+      // },
+      // {
+      //   title: 'Serial Numbers',
+      //   href: '/dashboard/inventory/serial-numbers',
+      //   permission: 'inventory.read',
+      // },
       {
         title: 'Stock Transfers',
         href: '/dashboard/inventory/transfers',
@@ -352,7 +352,7 @@ export const sidebarLinks: ISidebarLink[] = [
       },
       {
         title: 'Sales History',
-        href: '/dashboard/reports/sales-history',
+        href: '/dashboard/reports/sales',
         permission: 'reports.read',
       },
     ],
@@ -419,16 +419,16 @@ export const sidebarLinks: ISidebarLink[] = [
         href: '/dashboard/settings/roles',
         permission: 'roles.read',
       },
-      {
-        title: 'Company Settings',
-        href: '/dashboard/settings/company',
-        permission: 'settings.read',
-      },
-      {
-        title: 'Profile',
-        href: '/dashboard/profile',
-        permission: 'settings.read',
-      },
+      // {
+      //   title: 'Company Settings',
+      //   href: '/dashboard/settings/company',
+      //   permission: 'settings.read',
+      // },
+      // {
+      //   title: 'Profile',
+      //   href: '/dashboard/profile',
+      //   permission: 'settings.read',
+      // },
       {
         title: 'Change Password',
         href: '/dashboard/settings/change-password',
@@ -437,11 +437,11 @@ export const sidebarLinks: ISidebarLink[] = [
     ],
   },
   // Keeping your existing Blogs section
-  {
-    title: 'Blogs',
-    icon: Book,
-    dropdown: false,
-    href: '/dashboard/blogs',
-    permission: 'blogs.read',
-  },
+  // {
+  //   title: 'Blogs',
+  //   icon: Book,
+  //   dropdown: false,
+  //   href: '/dashboard/blogs',
+  //   permission: 'blogs.read',
+  // },
 ];
